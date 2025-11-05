@@ -1,0 +1,27 @@
+﻿.hidden-element {
+    display: none;
+}
+
+.tundora {
+    color: #4A4A4A;
+}
+
+.min-width-60 {
+    min-width: 60px;
+    display: inline-block;
+}
+
+.table-xs th,
+.table-xs td {
+    padding: 0.1rem;
+    font-size: 0.9rem;
+}
+.row.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.custom-input:focus,
+.custom-input:active {
+    box-shadow: none;
+}

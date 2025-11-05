@@ -1,0 +1,197 @@
+﻿@model PartialViewsVM
+
+<div class="row justify-content-center">
+    <div class="text-center">
+        <!-- Header Menu begins -->
+        <div class="@(ViewData["Title"]?.ToString() == "New Trade" ? "" : "card-header")">
+            <div class="row align-items-center">
+                <!-- Header tabs begin -->
+                <div class="col mr-md-5 d-flex justify-content-center">
+                    <div id="researchDataTabHeaders">
+                        <ul class="nav nav-tabs" id="journalTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="pnl-tab" data-toggle="tab" data-target="#pnl" type="button" role="tab" aria-controls="pnl" aria-selected="true">PnL</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="entry-tab" data-toggle="tab" data-target="#entry" type="button" role="tab" aria-controls="entry" aria-selected="false">Entry</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="priceActionContext-tab" data-toggle="tab" data-target="#priceActionContext" type="button" role="tab" aria-controls="priceActionContext" aria-selected="false">PA Context</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="fullATR-tab" data-toggle="tab" data-target="#fullATR" type="button" role="tab" aria-controls="fullATR" aria-selected="false">Full ATR</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Header tabs ends -->
+            </div>
+        </div>
+        <!-- Header Menu ends -->
+        <!-- Card body begins -->
+        <div class="card-body" id="cardBody">
+            <div class="tab-content">
+                <!-- Tab content PnL -->
+                <div class="tab-pane fade show active tundora text-left" id="pnl" role="tabpanel" aria-labelledby="pnl-tab">
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="TradeRatingInput">Rating</label>
+                                    <select class="text-center form-control" id="TradeRatingInput" data-research-firstbar="TradeRatingDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.TradeRatingDisplay" asp-items="Model.TradeRating"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="OneToOneHitOnInput">1:1 hit on</label>
+                                    <input class="text-center form-control" id="OneToOneHitOnInput" data-research-firstbar="OneToOneHitOnDisplay" value="@Model.ResearchFirstBarPullbackDisplay.OneToOneHitOnDisplay" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsOneToThreeHitInput">1:3 hit</label>
+                                    <select class="text-center form-control" id="IsOneToThreeHitInput" data-research-firstbar="IsOneToThreeHitDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsOneToThreeHitDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsOneToFiveHitInput"> 1:5 hit</label>
+                                    <select class="text-center form-control" id="IsOneToFiveHitInput" data-research-firstbar="IsOneToFiveHitDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsOneToFiveHitDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsBreakevenInput">Breakeven</label>
+                                    <select class="text-center form-control" id="IsBreakevenInput" data-research-firstbar="IsBreakevenDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsBreakevenDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="OutcomeInput">Loss</label>
+                                    <select class="text-center form-control" id="OutcomeInput" data-research-firstbar="OutcomeDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.OutcomeDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="MaxRRInput">Max RR</label>
+                                    <input class="text-center form-control" id="MaxRRInput" data-research-firstbar="MaxRRDisplay" value="@Model.ResearchFirstBarPullbackDisplay.MaxRRDisplay" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="MarketGaveSmthInput">Market gave smth</label>
+                                    <select class="text-center form-control" id="MarketGaveSmthInput" data-research-firstbar="MarketGaveSmthDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.MarketGaveSmthDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col">
+                            <div class="form-group col-12 col-md-6 col-lg">
+                                <label class="d-block text-nowrap min-width-60" for="Comment">Comment</label>
+                                <textarea class="text-justify form-control" id="Comment" data-research-firstbar="CommentDisplay">@Model.ResearchFirstBarPullbackDisplay.CommentDisplay</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tab content Entry -->
+                <div class="tab-pane fade show tundora text-left" id="entry" role="tabpanel" aria-labelledby="entry-tab">
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsEntryAfteriBarDisplayInput">Entry after i bar</label>
+                                    <select class="text-center form-control" id="IsEntryAfteriBarDisplayInput" data-research-firstbar="IsEntryAfteriBarDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsEntryAfteriBarDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsSignalBarInTradeDirectionInput">Signal bar in my direction</label>
+                                    <select class="text-center form-control" id="IsSignalBarInTradeDirectionInput" data-research-firstbar="IsSignalBarInTradeDirectionDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsSignalBarInTradeDirectionDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsEntryAfter3To5BarsInput">Entry at 3-5 bars</label>
+                                    <select class="text-center form-control" id="IsEntryAfter3To5BarsInput" data-research-firstbar="IsEntryAfter3To5BarsDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsEntryAfter3To5BarsDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsEntryAfter5BarsInput">Entry after 5 bars</label>
+                                    <select class="text-center form-control" id="IsEntryAfter5BarsInput" data-research-firstbar="IsEntryAfter5BarsDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsEntryAfter5BarsDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsEntryBeforePreviousSwingOnTriggerDisplay">Entry before prev swing on trigger</label>
+                                    <select class="text-center form-control" id="IsEntryBeforePreviousSwingOnTriggerInput" data-research-firstbar="IsEntryBeforePreviousSwingOnTriggerDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsEntryBeforePreviousSwingOnTriggerDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsEntryAtPreviousSwingOnTriggerInput">Entry at prev swing on trigger</label>
+                                    <select class="text-center form-control" id="IsEntryAtPreviousSwingOnTriggerInput" data-research-firstbar="IsEntryAtPreviousSwingOnTriggerDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsEntryAtPreviousSwingOnTriggerDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsEntryBeforePreviousSwingOn4HInput">Entry before prev swing on 4H</label>
+                                    <select class="text-center form-control" id="IsEntryBeforePreviousSwingOn4HInput" data-research-firstbar="IsEntryBeforePreviousSwingOn4HDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsEntryBeforePreviousSwingOn4HDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsEntryBeforePreviousSwingOnDInput">Entry before prev swing on D</label>
+                                    <select class="text-center form-control" id="IsEntryBeforePreviousSwingOnDInput" data-research-firstbar="IsEntryBeforePreviousSwingOnDDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsEntryBeforePreviousSwingOnDDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tab content Price Aaction Context -->
+                <div class="tab-pane fade show tundora text-left" id="priceActionContext" role="tabpanel" aria-labelledby="priceActionContext-tab">
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsMomentumTradeInput">Momentum trade</label>
+                                    <select class="text-center form-control" id="IsMomentumTradeInput" data-research-firstbar="IsMomentumTradeDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsMomentumTradeDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IIsTrendTradeInput">Trend trade</label>
+                                    <select class="text-center form-control" id="IsTrendTradeInput" data-research-firstbar="IsTrendTradeDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsTrendTradeDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsTriggerTrendingInput">Trigger trending</label>
+                                    <select class="text-center form-control" id="IsTriggerTrendingInput" data-research-firstbar="IsTriggerTrendingDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsTriggerTrendingDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="Is4HTrendingInput">4H trending</label>
+                                    <select class="text-center form-control" id="Is4HTrendingInput" data-research-firstbar="Is4HTrendingDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.Is4HTrendingDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsDTrendingInput">D trending</label>
+                                    <select class="text-center form-control" id="IsDTrendingInput" data-research-firstbar="IsDTrendingDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsDTrendingDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsSignalBarStrongReversalDisplayInput">Signal bar strong reversal</label>
+                                    <select class="text-center form-control" id="IsSignalBarStrongReversalDisplayInput" data-research-firstbar="IsSignalBarStrongReversalDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsSignalBarStrongReversalDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tab content Full ATR -->
+                <div class="tab-pane fade show tundora text-left" id="fullATR" role="tabpanel" aria-labelledby="fullATR-tab">
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="FullATROneToOneHitOn">1:1 hit on</label>
+                                    <input class="text-center form-control" id="FullATROneToOneHitOn" data-research-firstbar="FullATROneToOneHitOnDisplay" value="@Model.ResearchFirstBarPullbackDisplay.FullATROneToOneHitOnDisplay" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsFullATROneToThreeHit">1:3 hit</label>
+                                    <select class="text-center form-control" id="IsFullATROneToThreeHit" data-research-firstbar="IsFullATROneToThreeHitDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsFullATROneToThreeHitDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsFullATROneToFiveHit"> 1:5 hit</label>
+                                    <select class="text-center form-control" id="IsFullATROneToFiveHit" data-research-firstbar="IsFullATROneToFiveHitDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsFullATROneToFiveHitDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsFullATRBreakeven">Breakeven</label>
+                                    <select class="text-center form-control" id="IsFullATRBreakeven" data-research-firstbar="IsFullATRBreakevenDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsFullATRBreakevenDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsFullATRLoss">Loss</label>
+                                    <select class="text-center form-control" id="IsFullATRLoss" data-research-firstbar="IsFullATRLossDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.IsFullATRLossDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="FullATRMaxRR">Max RR</label>
+                                    <input class="text-center form-control" id="FullATRMaxRR" data-research-firstbar="FullATRMaxRRDisplay" value="@Model.ResearchFirstBarPullbackDisplay.FullATRMaxRRDisplay" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="FullATRMarketGaveSmth">Market gave smth</label>
+                                    <select class="text-center form-control" id="FullATRMarketGaveSmth" data-research-firstbar="FullATRMarketGaveSmthDisplay" asp-for="@Model.ResearchFirstBarPullbackDisplay.FullATRMarketGaveSmthDisplay" asp-items="Model.YesNoOptions"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

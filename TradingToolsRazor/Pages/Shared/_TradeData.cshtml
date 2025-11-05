@@ -1,0 +1,108 @@
+﻿@using global::Shared.Enums
+@model PartialViewsVM
+
+<div class="row">
+    <div class="col">
+        <div class="d-flex flex-wrap">
+            <div class="form-group col-12 col-md-6 col-lg">
+                <label class="d-block text-nowrap min-width-60" for="SymbolInput">Symbol</label>
+                <input class="text-center form-control" id="SymbolInput" data-trade-data="Symbol" value="@Model.TradesVM.CurrentTrade.Symbol" />
+            </div>
+            <div class="form-group col-12 col-md-6 col-lg">
+                <label class="d-block text-nowrap min-width-60" for="StatusInput">Status</label>
+                <select class="text-center form-control" id="StatusInput" data-trade-data="Status" value="@Model.TradesVM.CurrentTrade.Status">
+                    @{
+                        int enumIntValue = 0;
+                        foreach (EStatus status in Enum.GetValues(typeof(EStatus)))
+                        {
+                            if (status == EStatus.All)
+                            {
+                                continue;
+                            }
+                            string selected = Model.TradesVM.CurrentTrade != null && status == Model.TradesVM.CurrentTrade.Status ? "selected" : null;
+                            <option value="@enumIntValue" selected=@selected>@status</option>
+                            enumIntValue++;
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group col-12 col-md-6 col-lg">
+                <label class="d-block text-nowrap min-width-60" for="OrderTypeInput">Outcome</label>
+                <select class="text-center form-control" id="OrderTypeInput" data-trade-data="OrderType" value="@Model.TradesVM.CurrentTrade.Outcome">
+                    @{
+                        enumIntValue = 0;
+                        foreach (EOutcome outcome in Enum.GetValues(typeof(EOutcome)))
+                        {
+                            <option value="@enumIntValue" selected="@(outcome == Model.TradesVM.CurrentTrade.Outcome ? "selected" : null)">@outcome</option>
+                            enumIntValue++;
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group col-12 col-md-6 col-lg">
+                <label class="d-block text-nowrap min-width-60" for="TradeRatingInput">Rating</label>
+                <select class="text-center form-control" id="TradeRatingInput" data-trade-data="TradeRating" asp-for="@Model.TradesVM.CurrentTrade.TradeRating" asp-items="Model.TradesVM.TradeRatingOptions"></select>
+            </div>
+            @* <div class="form-group col-12 col-md-6 col-lg">
+                <label class="d-block text-nowrap min-width-60" for="OrderTypeInput">Outcome</label>
+                <select class="text-center form-control" id="OrderTypeInput" data-trade-data="OrderType">
+                    @{
+                        enumIntValue = 0;
+                        foreach (EOutcome outcome in Enum.GetValues(typeof(EOutcome)))
+                        {
+                            <option value="@enumIntValue" selected="@(outcome == Model.CurrentTrade.Outcome ? "selected" : null)">@outcome</option>
+                            enumIntValue++;
+                        }
+                    }
+                </select>
+            </div> *@
+            <div class="form-group col-12 col-md-6 col-lg">
+                <label class="d-block text-nowrap min-width-60" for="OrderTypeInput">Order Type</label>
+                <select class="text-center form-control" id="OrderTypeInput" data-trade-data="OrderType" value="@Model.TradesVM.CurrentTrade.OrderType">
+                    @{
+                        enumIntValue = 0;
+                        foreach (EOrderType orderType in Enum.GetValues(typeof(EOrderType)))
+                        {
+                            <option value="@enumIntValue" selected="@(orderType == Model.TradesVM.CurrentTrade.OrderType ? "selected" : null)">@orderType</option>
+                            enumIntValue++;
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group col-12 col-md-6 col-lg">
+                <label class="d-block text-nowrap min-width-60" for="TriggerPriceInput">Trigger Price</label>
+                <input class="text-center form-control number-input" id="TriggerPriceInput" data-trade-data="TriggerPrice" value="@Model.TradesVM.CurrentTrade.TriggerPrice" />
+            </div>
+            <div class="form-group col-12 col-md-6 col-lg">
+                <label class="d-block text-nowrap min-width-60" for="EntryPriceInput">Entry Price</label>
+                <input class="text-center form-control number-input" id="EntryPriceInput" data-trade-data="EntryPrice" value="@Model.TradesVM.CurrentTrade.EntryPrice" />
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col">
+            <div class="d-flex flex-wrap">
+                <div class="form-group col-12 col-md-6 col-lg">
+                    <label class="d-block text-nowrap min-width-60" for="StopPriceInput">Stop Price</label>
+                    <input class="text-center form-control number-input" id="StopPriceInput" data-trade-data="StopPrice" value="@Model.TradesVM.CurrentTrade.StopPrice" />
+                </div>
+                <div class="form-group col-12 col-md-6 col-lg">
+                    <label class="d-block text-nowrap min-width-60" for="ExitPriceInput">Exit Price</label>
+                    <input class="text-center form-control number-input" id="ExitPriceInput" data-trade-data="ExitPrice" value="@Model.TradesVM.CurrentTrade.ExitPrice" />
+                </div>
+                <div class="form-group col-12 col-md-6 col-lg">
+                    <label class="d-block text-nowrap min-width-60" for="TargetsInput">Targets</label>
+                    <input class="text-center form-control" id="TargetsInput" data-trade-data="Targets" value="@Model.TradesVM.CurrentTrade.Targets" />
+                </div>
+                <div class="form-group col-12 col-md-6 col-lg">
+                    <label class="d-block text-nowrap min-width-60" for="PnLInput">PnL</label>
+                    <input class="text-center form-control number-input" id="PnLInput" data-trade-data="PnL" value="@Model.TradesVM.CurrentTrade.PnL" />
+                </div>
+                <div class="form-group col-12 col-md-6 col-lg">
+                    <label class="d-block text-nowrap min-width-60" for="FeeInput">Fee</label>
+                    <input class="text-center form-control number-input" id="FeeInput" data-trade-data="Fee" value="@Model.TradesVM.CurrentTrade.Fee" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

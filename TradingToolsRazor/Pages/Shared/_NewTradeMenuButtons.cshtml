@@ -1,0 +1,92 @@
+﻿@using global::Shared
+
+<!-- Menu Status -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Status: <span id="spanStatus"></span>
+        </button>
+        <div class="dropdown-menu animated--fade-in" id="dropdownBtnStatus" aria-labelledby="dropdownMenuButton">
+            @foreach (EStatus status in Enum.GetValues(typeof(EStatus)))
+            {
+                if (status == EStatus.All)
+                {
+                    continue;
+                }
+                <a class="dropdown-item" role="button">@status.ToString()</a>
+            }
+        </div>
+    </div>
+</div>
+<!-- Menu Time Frame -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Time Frame: <span id="spanTimeFrame"></span>
+        </button>
+        <div class="dropdown-menu animated--fade-in" id="dropdownBtnTimeFrame" aria-labelledby="dropdownMenuButton">
+            @foreach (ETimeFrame tf in Enum.GetValues(typeof(ETimeFrame)))
+            {
+                <a class="dropdown-item" role="button">@MyEnumConverter.TimeFrameFromEnum(tf)</a>
+            }
+        </div>
+    </div>
+</div>
+<!-- Menu Strategy -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Strategy: <span id="spanStrategy"></span>
+        </button>
+        <div class="dropdown-menu animated--fade-in" id="dropdownBtnStrategy" aria-labelledby="dropdownMenuButton">
+            @foreach (EStrategy strategy in Enum.GetValues(typeof(EStrategy)))
+            {
+                <a class="dropdown-item" role="button">@MyEnumConverter.StrategyFromEnum(strategy)</a>
+            }
+        </div>
+    </div>
+</div>
+<!-- Menu Trade Type -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Type: <span id="spanTradeType"></span>
+        </button>
+        <div class="dropdown-menu animated--fade-in" id="dropdownBtnTradeType" aria-labelledby="dropdownMenuButton">
+            @foreach (ETradeType tradeType in Enum.GetValues(typeof(ETradeType)))
+            {
+                <a class="dropdown-item" role="button">@MyEnumConverter.TradeTypeFromEnum(tradeType)</a>
+            }
+        </div>
+    </div>
+</div>
+<!-- Menu Trade Side -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Side: <span id="spanTradeSide"></span>
+        </button>
+        <div class="dropdown-menu animated--fade-in" id="dropdownBtnTradeSide" aria-labelledby="dropdownMenuButton">
+            @foreach (ESideType sideType in Enum.GetValues(typeof(ESideType)))
+            {
+                <a class="dropdown-item" role="button">@sideType.ToString()</a>
+            }
+        </div>
+    </div>
+</div>
+<!-- Menu Order Type -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Order Type: <span id="spanOrderType"></span>
+        </button>
+        <div class="dropdown-menu animated--fade-in" id="dropdownBtnOrderType" aria-labelledby="dropdownMenuButton">
+            @foreach (EOrderType orderType in Enum.GetValues(typeof(EOrderType)))
+            {
+                <a class="dropdown-item" role="button">@MyEnumConverter.OrderTypeFromEnum(orderType)</a>
+            }
+        </div>
+    </div>
+</div>
