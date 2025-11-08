@@ -1,4 +1,4 @@
 ﻿namespace SharedEnums.Enums
 {
-    public enum EStrategy { FirstBarPullback, Cradle }
+    public enum EStrategy { FirstBarPullback, Cradle, CandleBracketing }
 }

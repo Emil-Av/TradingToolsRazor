@@ -45,7 +45,7 @@ namespace Models.ViewModels
 
         public ETradeType TradeType { get; set; }
 
-        public ESideType SideType { get; set; }
+        public EDirection SideType { get; set; }
 
         public EOrderType OrderType { get; set; }
 
@@ -87,7 +87,7 @@ namespace Models.ViewModels
                 Result<ETimeFrame> timeFrameResult = MyEnumConverter.TimeFrameFromString(tradeDataObject["timeFrame"]);
                 Result<EStrategy> strategyResult = MyEnumConverter.StrategyFromString(tradeDataObject["strategy"]);
                 Result<ETradeType> typeResult = MyEnumConverter.TradeTypeFromString(tradeDataObject["tradeType"]);
-                Result<ESideType> sideResult = MyEnumConverter.SideTypeFromString(tradeDataObject["tradeSide"]);
+                Result<EDirection> sideResult = MyEnumConverter.SideTypeFromString(tradeDataObject["tradeSide"]);
 
                 // For a research trade there is no need for Status or OrderType
                 if (!typeResult.Success || typeResult.Success && typeResult.Value != ETradeType.Research)

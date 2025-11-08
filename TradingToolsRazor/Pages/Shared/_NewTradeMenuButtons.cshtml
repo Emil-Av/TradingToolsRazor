@@ -69,7 +69,7 @@
             Side: <span id="spanTradeSide"></span>
         </button>
         <div class="dropdown-menu animated--fade-in" id="dropdownBtnTradeSide" aria-labelledby="dropdownMenuButton">
-            @foreach (ESideType sideType in Enum.GetValues(typeof(ESideType)))
+            @foreach (EDirection sideType in Enum.GetValues(typeof(EDirection)))
             {
                 <a class="dropdown-item" role="button">@sideType.ToString()</a>
             }

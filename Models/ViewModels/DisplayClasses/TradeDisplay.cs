@@ -29,7 +29,7 @@ namespace Models.ViewModels.DisplayClasses
 
         public EStatus StatusDisplay { get; set; }
 
-        public ESideType? SideTypeDisplay { get; set; }
+        public EDirection? SideTypeDisplay { get; set; }
 
         public EOrderType? OrderTypeDisplay { get; set; }
 

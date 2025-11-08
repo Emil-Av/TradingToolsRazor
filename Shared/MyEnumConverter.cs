@@ -54,21 +54,21 @@ namespace Shared
             }
         }
 
-        public static Result<ESideType> SideTypeFromString(string sideType)
+        public static Result<EDirection> SideTypeFromString(string sideType)
         {
-            Dictionary<string, ESideType> sideTypes = new Dictionary<string, ESideType>() 
+            Dictionary<string, EDirection> sideTypes = new Dictionary<string, EDirection>() 
             {
-                { "Long", ESideType.Long },
-                { "Short", ESideType.Short }
+                { "Long", EDirection.Long },
+                { "Short", EDirection.Short }
             };
 
             try
             {
-                return Result<ESideType>.SuccessResult(sideTypes[sideType]);
+                return Result<EDirection>.SuccessResult(sideTypes[sideType]);
             }
             catch
             {
-                return Result<ESideType>.ErrorResult($"Error converting side type from a string. Value given: {sideType}");
+                return Result<EDirection>.ErrorResult($"Error converting side type from a string. Value given: {sideType}");
             }
         }
 
@@ -152,7 +152,8 @@ namespace Shared
             Dictionary<string, EStrategy> strategies = new Dictionary<string, EStrategy>()
             {
                 { "Cradle", EStrategy.Cradle },
-                { "First Bar Pullback", EStrategy.FirstBarPullback }
+                { "First Bar Pullback", EStrategy.FirstBarPullback },
+                { "Candle Bracketing", EStrategy.CandleBracketing }
             };
 
             try
@@ -170,7 +171,8 @@ namespace Shared
             Dictionary<EStrategy?, string> strategies = new Dictionary<EStrategy?, string>()
             {
                 { EStrategy.Cradle, "Cradle" },
-                { EStrategy.FirstBarPullback, "First Bar Pullback" }
+                { EStrategy.FirstBarPullback, "First Bar Pullback" },
+                { EStrategy.CandleBracketing, "Candle Bracketing" }
             };
 
             return strategies[strategy];

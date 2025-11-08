@@ -1,0 +1,92 @@
+﻿@model PartialViewsVM
+
+<div class="row justify-content-center">
+    <div class="text-center">
+        <div class="@(ViewData["Title"]?.ToString() == "New Trade" ? "" : "card-header")">
+            <div class="row align-items-center">
+                <!-- Header tabs begin -->
+                <div class="col mr-md-5 d-flex justify-content-center">
+                    <div id="researchDataTabHeaders">
+                        <ul class="nav nav-tabs" id="journalTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="bracketingData-tab" data-toggle="tab" data-target="#pnl" type="button" role="tab" aria-controls="pnl" aria-selected="true">Bracketing Data</button>
+                            </li>  
+                        </ul>
+                    </div>
+                </div>
+                <!-- Header tabs ends -->
+            </div>
+        </div>
+        
+        <div class="card-body" id="cardBody">
+            <div class="tab-content">
+                <!-- Tab content Bracketing Data -->
+                <div class="tab-pane fade show active tundora text-left" id="bracketingData" role="tabpanel" aria-labelledby="pnl-tab">
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="DateInput">Date</label>
+                                    <input class="text-center form-control" id="DateInput" data-research-bracketingData="Date" value="@Model.CandleBracketing.Date" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="TimeInput">Time</label>
+                                    <input class="text-center form-control" id="TimeInput" data-research-bracketingData="Time" value="@Model.CandleBracketing.Time" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="DirectionInput">Direction</label>
+                                    <select class="text-center form-control" id="DirectionInput" data-research-bracketingData="Direction"
+                                            asp-for="@Model.CandleBracketing.Direction"
+                                            asp-items="Html.GetEnumSelectList<SharedEnums.Enums.EDirection>()"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="EntryPriceInput">EntryPrice</label>
+                                    <input class="text-center form-control" id="EntryPriceInput" data-research-bracketingData="EntryPrice" value="@Model.CandleBracketing.EntryPrice" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="CandleHighInput">Candle High</label>
+                                    <input class="text-center form-control" id="CandleHighInput" data-research-bracketingData="CandleHigh" value="@Model.CandleBracketing.CandleHigh" />
+                                </div>
+                            </div>
+                        </div>
+                       
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="CandleLowInput">Candle Low</label>
+                                    <input class="text-center form-control" id="CandleLowInput" data-research-bracketingData="CandleLow" value="@Model.CandleBracketing.CandleLow" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="MaxPriceInput">Max Price</label>
+                                    <input class="text-center form-control" id="MaxPriceInput" data-research-bracketingData="MaxPrice" value="@Model.CandleBracketing.MaxPrice" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+</div>

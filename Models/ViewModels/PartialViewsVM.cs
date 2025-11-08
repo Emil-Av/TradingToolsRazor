@@ -6,9 +6,10 @@ namespace Models.ViewModels
     public class PartialViewsVM
     {
         public ResearchFirstBarPullbackDisplay ResearchFirstBarPullbackDisplay { get; set; }
-        public TradesVM TradesVM { get; set; }
-
         public ResearchCradle ResearchCradle { get; set; }
+
+        public ResearchCandleBracketing CandleBracketing { get; set; }
+        public TradesVM TradesVM { get; set; }
         public List<SelectListItem> YesNoOptions { get; set; }
         public List<SelectListItem> OrderType { get; set; }
         public List<SelectListItem> TradeRating { get; set; }
@@ -19,6 +20,7 @@ namespace Models.ViewModels
             ResearchFirstBarPullbackDisplay = new();
             TradesVM = new();
             ResearchCradle = new();
+            CandleBracketing = new();
             SetListItems();
         }
 

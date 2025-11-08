@@ -35,7 +35,7 @@ namespace Models
 
         public EStatus Status { get; set; }
 
-        public ESideType SideType { get; set; }
+        public EDirection SideType { get; set; }
 
         public EOrderType OrderType { get; set; }
 

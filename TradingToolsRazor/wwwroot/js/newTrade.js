@@ -30,6 +30,12 @@
         '#dropdownBtnOrderType': '#spanOrderType'
     };
 
+    const strategies = {
+        Cradle: "Cradle",
+        FirstBarPullback: "First Bar Pullback",
+        CandleBracketing: "Candle Bracketing"
+    };
+
     // Attach a click event for each <a> element of each menu.
     for (var key in menuButtons) {
         (function (key) {
@@ -49,23 +55,34 @@
 
     function SetResearchPartialView(key) {
         if ($('#currentMenu').text() == 'Research') {
-            if ($('#spanStrategy').text() == 'Cradle') {
+            if ($('#spanStrategy').text() == strategies.Cradle) {
                 ShowResearchCradlePartialView();
             }
-            else if ($('#spanStrategy').text() == 'First Bar Pullback') {
+            else if ($('#spanStrategy').text() == strategies.FirstBarPullback) {
                 ShowFirstBarPullbackPartialView();
             }
+            else if ($('#spanStrategy').text() == strategies.CandleBracketing) {
+                ShowCandleBracketingPartialView();
+            }
         }
+    } 
+
+    function ShowCandleBracketingPartialView() {
+        $('#researchCandleBracketingData').removeClass('d-none');
+        $('#researchCradleData').addClass('d-none');
+        $('#researchFirstBarPullbackData').addClass('d-none');
     }
 
     function ShowResearchCradlePartialView() {
         $('#researchCradleData').removeClass('d-none');
         $('#researchFirstBarPullbackData').addClass('d-none');
+        $('#researchCandleBracketingData').addClass('d-none');
     }
 
     function ShowFirstBarPullbackPartialView() {
         $('#researchFirstBarPullbackData').removeClass('d-none');
         $('#researchCradleData').addClass('d-none');
+        $('#researchCandleBracketingData').addClass('d-none');
     }
 
     // Mark the selected drop down item of the buttons on the top
@@ -103,6 +120,7 @@
             $('#tradeData').removeClass('d-none');
             $('#researchFirstBarPullbackData').addClass('d-none');
             $('#researchCradleData').addClass('d-none');
+            $('#researchCandleBracketingData').addClass('d-none');
 
         }
         // Display Research Partial View
@@ -111,8 +129,12 @@
                 ShowResearchCradlePartialView();
                 $('#tradeData').addClass('d-none');
             }
-            else if (selectedStrategy == "First Bar Pullback") {
+            else if (selectedStrategy == strategies.FirstBarPullback) {
                 ShowFirstBarPullbackPartialView();
+                $('#tradeData').addClass('d-none');
+            }
+            else if (selectedStrategy == strategies.CandleBracketing) {
+                ShowCandleBracketingPartialView();
                 $('#tradeData').addClass('d-none');
             }
         }
@@ -209,16 +231,22 @@
         formData.append('tradeParams', JSON.stringify(tradeParams));
 
         var researchData = {};
-        if (tradeParams['strategy'] == 'Cradle') {
+        if (tradeParams['strategy'] == strategies.Cradle) {
             $('#cardBody [data-research-cradle]').each(function () {
                 var bindProperty = $(this).data('research-cradle');
                 researchData[bindProperty] = $(this).val();
             });
         }
-        else if (tradeParams['strategy'] == 'First Bar Pullback') {
+        else if (tradeParams['strategy'] == strategies.FirstBarPullback) {
 
             $('#cardBody [data-research-firstbar]').each(function () {
                 var bindProperty = $(this).data('research-firstbar');
+                researchData[bindProperty] = $(this).val();
+            });
+        }
+        else if (tradeParams['strategy'] == strategies.CandleBracketing) {
+            $('#cardBody [data-research-candleBracketing]').each(function () {
+                var bindProperty = $(this).data('research-candleBracketing');
                 researchData[bindProperty] = $(this).val();
             });
         }
@@ -286,4 +314,4 @@
      * ***************************
      */
 
-})
+});

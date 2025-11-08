@@ -132,6 +132,11 @@
                                 {
                                     @await Html.PartialAsync("_ResearchFirstBarPullbackData", Model.ResearchVM)
                                 }
+                                else if (Model.ResearchVM.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
+                                {
+                                    @await Html.PartialAsync("_ResearchCandleBracketingData", Model.ResearchVM)
+                                }
+    )
                             </div>
                         </div>
                     </div>
