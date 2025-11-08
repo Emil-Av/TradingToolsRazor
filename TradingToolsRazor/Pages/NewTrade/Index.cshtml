@@ -1,17 +1,22 @@
 ﻿@page
+@model TradingToolsRazor.Pages.NewTrade.IndexModel
 
 @{
     ViewData["Title"] = "New Trade";
 }
 
-<div class="row justify-content-center align-items-top">'/Views/Shared/_
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+<input type="hidden" id="__RequestVerificationToken" value="@(Antiforgery.GetAndStoreTokens(HttpContext).RequestToken)" />
+
+<div class="row justify-content-center align-items-top">
     <div class="col-8 text-center">
         <h2>New Trade</h2>
         <div class="container mb-4">
             <div class="row justify-content-center">
                 <div class="col-12 col-md-auto d-flex align-items-center flex-wrap justify-content-center">
                     <!-- Menu Status -->
-                    <partial name="_NewTradeMenuButtons" />
+                    @await Html.PartialAsync("_NewTradeMenuButtons")
                 </div>
                 <!-- Menu buttons ends -->
                 <!-- Card prices and screenshots -->
@@ -48,9 +53,6 @@
                                             <p class="text-truncate">No uploaded files.</p>
                                         </div>
                                     </div>
-
-
-
                                 </div>
                             </div>
                         </div>
@@ -77,13 +79,13 @@
                             <div class="card-body" id="cardBody">
                                 <div class="col mr-md-5 d-flex mt-1 justify-content-center">
                                     <div id="tradeData">
-                                        @await Html.PartialAsync("_TradeData")
+                                        @await Html.PartialAsync("_TradeData", Model.NewTradeParentVM)
                                     </div>
                                     <div id="researchFirstBarPullbackData" class="d-none">
-                                        @await Html.PartialAsync("_ResearchFirstBarPullbackData")
+                                        @await Html.PartialAsync("_ResearchFirstBarPullbackData", Model.NewTradeParentVM)
                                     </div>
                                     <div id="researchCradleData" class="d-none">
-                                        @await Html.PartialAsync("_ResearchCradleData")
+                                        @await Html.PartialAsync("_ResearchCradleData", Model.NewTradeParentVM)
                                     </div>
                                 </div>
                             </div>

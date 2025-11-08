@@ -11,6 +11,11 @@ using SharedEnums.Enums;
 using System.Diagnostics;
 using System.IO.Compression;
 using Utilities;
+using System.Text.RegularExpressions;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TradingToolsRazor.Pages.Research
 {
@@ -28,8 +33,10 @@ namespace TradingToolsRazor.Pages.Research
             ResearchVM.AllTrades = new List<object>();
         }
 
-        [BindProperty]
+        //[BindProperty]
         public ResearchVM ResearchVM { get; set; }
+
+        #region Handlers
 
         // Handler for GET /Research/Index
         public async Task<IActionResult> OnGetAsync()
@@ -49,7 +56,7 @@ namespace TradingToolsRazor.Pages.Research
             return Page();
         }
 
-        // Handler for DELETE requests
+        // DELETE handler (can be called via fetch to ?handler=Delete)
         public async Task<IActionResult> OnDeleteAsync(int id, EStrategy strategy)
         {
             try
@@ -72,90 +79,79 @@ namespace TradingToolsRazor.Pages.Research
             }
         }
 
-        private async Task<List<ResearchCradle>> CheckAndDeleteSampleSize(ResearchCradle trade)
+        // POST: /Research?handler=LoadSampleSize
+        public async Task<IActionResult> OnPostLoadSampleSizeAsync([FromForm] LoadResearchSampleSize viewData)
         {
-            List<ResearchCradle> tradesInSampleSize = await _unitOfWork.ResearchCradle.GetAllAsync(x => x.SampleSizeId == trade.SampleSizeId);
-            if (!tradesInSampleSize.Any())
+            string errorMsg = ResearchVM.SetSampleSizeParams(viewData);
+            if (!string.IsNullOrEmpty(errorMsg))
             {
-                SampleSize sampleSize = await _unitOfWork.SampleSize.GetAsync(x => x.Id == trade.SampleSizeId);
-                if (sampleSize != null)
-                {
-                    _unitOfWork.SampleSize.Remove(sampleSize);
-                    await _unitOfWork.SaveAsync();
-                }
-            }
-            return tradesInSampleSize; // +1 because of the deleted trade
-        }
-        private async Task<JsonResult> DeleteCradle(int id)
-        {
-            // Implementation remains mostly the same as in the controller
-            ResearchCradle trade = await DeleteEntity(id);
-            DeleteTradeDirectory(trade.ScreenshotsUrls!.First());
-
-            var tradesInSampleSize = await CheckAndDeleteSampleSize(trade);
-            var sampleSizes = await _unitOfWork.SampleSize
-                .GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.Cradle);
-
-            if (!TrySetLastSampleSizeId(tradesInSampleSize, sampleSizes, trade, out int lastSampleSizeId))
-                return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });
-
-            if (sampleSizes.Any())
-            {
-                await LoadViewModelData(sampleSizes, lastSampleSizeId);
-                string researchVM = JsonConvert.SerializeObject(ResearchVM);
-                return new JsonResult(new { researchVM });
+                return new JsonResult(new { error = errorMsg });
             }
 
-            return new JsonResult(new { error = "No more trades for this strategy." });
-        }
+            List<SampleSize> sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == ResearchVM.CurrentStrategy);
 
-        private void DeleteTradeDirectory(string screenshotPath)
-        {
-            string directoryToDelete = Path.GetDirectoryName(Path.Combine(_webHostEnvironment.WebRootPath, screenshotPath)!)!;
-            Directory.Delete(directoryToDelete, true);
-        }
-
-        private async Task<ResearchCradle> DeleteEntity(int id)
-        {
-            ResearchCradle trade = await _unitOfWork.ResearchCradle.GetAsync(x => x.Id == id);
-            _unitOfWork.ResearchCradle.Remove(trade);
-            await _unitOfWork.SaveAsync();
-            return trade;
-        }
-        private void SetAvailableStrategies(List<SampleSize> sampleSizes)
-        {
-            foreach (var sampleSize in sampleSizes)
+            if (!sampleSizes.Any())
             {
-                if (!ResearchVM.AvailableStrategies.Contains(sampleSize.Strategy))
-                    ResearchVM.AvailableStrategies.Add(sampleSize.Strategy);
+                return new JsonResult(new { error = "No sample sizes for those params." });
             }
 
-            ResearchVM.AvailableStrategies.Sort();
+            errorMsg = await LoadViewModelData(sampleSizes, ResearchVM.CurrentSampleSizeId);
+            if (!string.IsNullOrEmpty(errorMsg))
+            {
+                return new JsonResult(new { error = errorMsg });
+            }
+
+            string researchVM = JsonConvert.SerializeObject(ResearchVM);
+
+            return new JsonResult(new { researchVM });
         }
 
-        private void SetAvailableTimeframes(List<SampleSize> sampleSizes)
+        // POST JSON body: /Research?handler=UpdateCradleResearch
+        public async Task<IActionResult> OnPostUpdateCradleResearchAsync([FromBody] ResearchCradle researchTrade)
         {
-            var currentStrategy = ResearchVM.CurrentSampleSize?.Strategy ?? EStrategy.FirstBarPullback;
-            var filtered = sampleSizes.Where(x => x.Strategy == currentStrategy).ToList();
+            var validationResult = ValidateModelState();
+            if (validationResult != null) return validationResult;
 
-            foreach (var s in filtered)
-                if (!ResearchVM.AvailableTimeframes.Contains(s.TimeFrame))
-                    ResearchVM.AvailableTimeframes.Add(s.TimeFrame);
+            await _unitOfWork.ResearchCradle.UpdateAsync(researchTrade);
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = $"{ex.Message}" });
+            }
 
-            ResearchVM.AvailableTimeframes.Sort();
+            return new JsonResult(new { success = "Trade updated." });
         }
 
-        /// <summary>
-        ///  The .zip file has to have the following format: Research/Sample Size 1/Trades folder and .csv file. The .csv file has to have format Research-EnumStrategy(e.g. 0)-EnumTimeFrame(e.g. 10M): e.g. Research-0-10M.csv
-        /// </summary>
-        /// <param name="zipFile"></param>
-        /// <returns></returns>
+        // POST JSON body: /Research?handler=UpdateFirstBarResearch
+        public async Task<IActionResult> OnPostUpdateFirstBarResearchAsync([FromBody] ResearchFirstBarPullbackDisplay currentTrade)
+        {
+            var validationResult = ValidateModelState();
+            if (validationResult != null) return validationResult;
 
-        public async Task<IActionResult> UploadResearch(IFormFile zipFile)
+
+            ResearchFirstBarPullback trade = EntityMapper.ViewModelDisplayToEntity<ResearchFirstBarPullback, ResearchFirstBarPullbackDisplay>(currentTrade, existingEntity: null);
+            await _unitOfWork.ResearchFirstBarPullback.UpdateAsync(trade);
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = $"Error saving the data: {ex.Message}" });
+            }
+            return new JsonResult(new { success = "Trade was successfully updated" });
+        }
+
+        // POST (form file): /Research?handler=UploadResearch
+        public async Task<IActionResult> OnPostUploadResearchAsync(IFormFile zipFile)
         {
             if (zipFile == null || zipFile.Length == 0)
             {
-                // return notification error
+                // return notification error - keep simple Json response
+                return new JsonResult(new { error = "No file uploaded." });
             }
             string wwwRootPath = _webHostEnvironment.WebRootPath;
 
@@ -169,42 +165,48 @@ namespace TradingToolsRazor.Pages.Research
                     using (var archive = new ZipArchive(zipStream))
                     {
                         // Sort the entries to have the folders in ascending order (Trade 1, Trade 2..)
-                        List<ZipArchiveEntry> sortedEntries = [.. archive.Entries.OrderBy(e => e.FullName, new NaturalStringComparer())];
+                        List<ZipArchiveEntry> sortedEntries = archive.Entries
+                            .OrderBy(e => e.FullName, new NaturalStringComparer())
+                            .ToList();
+
                         List<ResearchFirstBarPullback> researchTrades = new List<ResearchFirstBarPullback>();
 
-                        ETimeFrame researchedTF;
+                        ETimeFrame researchedTF = default;
                         int tradeIndex = 0;
-                        int currentTrade = 0;
                         string currentSampleSize = string.Empty;
                         string currentFolder = string.Empty;
+
                         foreach (var entry in sortedEntries)
                         {
                             if (entry.FullName.Contains("Sample Size") && string.IsNullOrEmpty(currentSampleSize))
                             {
                                 string[] researchInfo = entry.FullName.Split('/');
-                                if (researchInfo[1].Contains("Sample Size"))
+                                if (researchInfo.Length > 1 && researchInfo[1].Contains("Sample Size"))
                                 {
                                     currentSampleSize = researchInfo[1];
                                     continue;
                                 }
-
                             }
+
                             if (entry.FullName.Contains(".csv"))
                             {
                                 string[] researchInfo = entry.FullName.Split('-');
                                 if (!Int32.TryParse(researchInfo[1], out int strategy))
                                 {
                                     TempData["error"] = "Error parsing the strategy number from the csv file name. Check the file name.";
-                                    // In a controller, to redirect to the Index method, use RedirectToAction:
-                                    return RedirectToAction(nameof(Index));
+                                    return RedirectToPage("/Research/Index");
                                 }
+
                                 string tempTF = researchInfo[2].Replace(".csv", "");
                                 researchedTF = MyEnumConverter.TimeFrameFromString(tempTF).Value;
+
                                 // Set the sample size for the research
-                                SampleSize sampleSize = new SampleSize();
-                                sampleSize.TradeType = ETradeType.Research;
-                                sampleSize.Strategy = (EStrategy)strategy;
-                                sampleSize.TimeFrame = researchedTF;
+                                SampleSize sampleSize = new SampleSize
+                                {
+                                    TradeType = ETradeType.Research,
+                                    Strategy = (EStrategy)strategy,
+                                    TimeFrame = researchedTF
+                                };
                                 _unitOfWork.SampleSize.Add(sampleSize);
                                 await _unitOfWork.SaveAsync();
 
@@ -218,48 +220,44 @@ namespace TradingToolsRazor.Pages.Research
                                         for (int i = 0; i < csvData.Count; i++)
                                         {
                                             // First row is column names
-                                            if (i == 0)
-                                            {
-                                                continue;
-                                            }
+                                            if (i == 0) continue;
 
                                             // Half ATR
                                             if (i % 2 != 0)
                                             {
                                                 researchTrade.SampleSizeId = sampleSize.Id;
                                                 researchTrade.OneToOneHitOn = csvData[i][1].Length > 0 ? int.Parse(csvData[i][1]) : 0;
-                                                researchTrade.IsOneToThreeHit = csvData[i][2] == "Yes" ? true : false;
-                                                researchTrade.IsOneToFiveHit = csvData[i][3] == "Yes" ? true : false;
-                                                researchTrade.IsBreakeven = csvData[i][4] == "Yes" ? true : false;
+                                                researchTrade.IsOneToThreeHit = csvData[i][2] == "Yes";
+                                                researchTrade.IsOneToFiveHit = csvData[i][3] == "Yes";
+                                                researchTrade.IsBreakeven = csvData[i][4] == "Yes";
                                                 researchTrade.Outcome = csvData[i][5] == "Yes" ? EOutcome.Loss : EOutcome.Win;
-                                                // Format in csvData[i][6] is 1-4. Split the string at '-` and get the second item. Then parse that into int.
                                                 researchTrade.MaxRR = csvData[i][6].Length > 0 ? int.Parse(csvData[i][6].Split('-')[1]) : 0;
-                                                researchTrade.MarketGaveSmth = csvData[i][7].Length > 0 ? true : false;
-                                                researchTrade.IsEntryAfter3To5Bars = csvData[i][8] == "Yes" ? true : false;
-                                                researchTrade.IsEntryAfter5Bars = csvData[i][9] == "Yes" ? true : false;
-                                                researchTrade.IsEntryAtPreviousSwingOnTrigger = csvData[i][10] == "Yes" ? true : false;
-                                                researchTrade.IsEntryBeforePreviousSwingOnTrigger = csvData[i][11] == "Yes" ? true : false;
-                                                researchTrade.IsEntryBeforePreviousSwingOn4H = csvData[i][12] == "Yes" ? true : false;
-                                                researchTrade.IsEntryBeforePreviousSwingOnD = csvData[i][13] == "Yes" ? true : false;
-                                                researchTrade.IsMomentumTrade = csvData[i][14] == "Yes" ? true : false;
-                                                researchTrade.IsTriggerTrending = csvData[i][15] == "Yes" ? true : false;
-                                                researchTrade.Is4HTrending = csvData[i][16] == "Yes" ? true : false;
-                                                researchTrade.IsDTrending = csvData[i][17] == "Yes" ? true : false;
-                                                researchTrade.IsEntryAfteriBar = csvData[i][18] == "Yes" ? true : false;
-                                                researchTrade.IsSignalBarStrongReversal = csvData[i][18] == "Yes" ? true : false;
-                                                researchTrade.IsSignalBarInTradeDirection = csvData[i][19] == "Yes" ? true : false;
-                                                researchTrade.Comment = csvData[i][22];
+                                                researchTrade.MarketGaveSmth = csvData[i][7].Length > 0;
+                                                researchTrade.IsEntryAfter3To5Bars = csvData[i][8] == "Yes";
+                                                researchTrade.IsEntryAfter5Bars = csvData[i][9] == "Yes";
+                                                researchTrade.IsEntryAtPreviousSwingOnTrigger = csvData[i][10] == "Yes";
+                                                researchTrade.IsEntryBeforePreviousSwingOnTrigger = csvData[i][11] == "Yes";
+                                                researchTrade.IsEntryBeforePreviousSwingOn4H = csvData[i][12] == "Yes";
+                                                researchTrade.IsEntryBeforePreviousSwingOnD = csvData[i][13] == "Yes";
+                                                researchTrade.IsMomentumTrade = csvData[i][14] == "Yes";
+                                                researchTrade.IsTriggerTrending = csvData[i][15] == "Yes";
+                                                researchTrade.Is4HTrending = csvData[i][16] == "Yes";
+                                                researchTrade.IsDTrending = csvData[i][17] == "Yes";
+                                                researchTrade.IsEntryAfteriBar = csvData[i][18] == "Yes";
+                                                researchTrade.IsSignalBarStrongReversal = csvData[i][18] == "Yes";
+                                                researchTrade.IsSignalBarInTradeDirection = csvData[i][19] == "Yes";
+                                                researchTrade.Comment = csvData[i].Count > 22 ? csvData[i][22] : string.Empty;
                                             }
                                             // Full ATR
                                             else
                                             {
                                                 researchTrade.FullATROneToOneHitOn = csvData[i][1].Length > 0 ? int.Parse(csvData[i][1]) : 0;
-                                                researchTrade.IsFullATROneToThreeHit = csvData[i][2] == "Yes" ? true : false;
-                                                researchTrade.IsFullATROneToFiveHit = csvData[i][3] == "Yes" ? true : false;
-                                                researchTrade.IsFullATRBreakeven = csvData[i][4] == "Yes" ? true : false;
-                                                researchTrade.IsFullATRLoss = csvData[i][5] == "Yes" ? true : false;
+                                                researchTrade.IsFullATROneToThreeHit = csvData[i][2] == "Yes";
+                                                researchTrade.IsFullATROneToFiveHit = csvData[i][3] == "Yes";
+                                                researchTrade.IsFullATRBreakeven = csvData[i][4] == "Yes";
+                                                researchTrade.IsFullATRLoss = csvData[i][5] == "Yes";
                                                 researchTrade.FullATRMaxRR = csvData[i][6].Length > 0 ? int.Parse(csvData[i][6].Split('-')[1]) : 0;
-                                                researchTrade.MarketGaveSmth = csvData[i][7].Length > 0 ? true : false;
+                                                researchTrade.MarketGaveSmth = csvData[i][7].Length > 0;
                                                 researchTrades.Add(researchTrade);
                                                 researchTrade = new ResearchFirstBarPullback();
                                             }
@@ -275,27 +273,43 @@ namespace TradingToolsRazor.Pages.Research
                                     // Split the name to get the folder's name
                                     string[] tradeInfo = entry.FullName.Split('/');
                                     // What is left is "Trade x", x is the number of the trade. Remove "Trade" to get the number.
-                                    string tempTradeInfo = tradeInfo[3].Replace("Trade", "").Trim();
-                                    if (Int32.TryParse(tempTradeInfo, out int tempTradeIndex))
+                                    if (tradeInfo.Length > 3)
                                     {
-                                        tradeIndex = tempTradeIndex - 1;
+                                        string tempTradeInfo = tradeInfo[3].Replace("Trade", "").Trim();
+                                        if (Int32.TryParse(tempTradeInfo, out int tempTradeIndex))
+                                        {
+                                            tradeIndex = tempTradeIndex - 1;
+                                        }
                                     }
+
                                     currentFolder = ScreenshotsHelper.CreateScreenshotFolders(tradeInfo, currentFolder, entry.FullName, wwwRootPath, 3);
+
+                                    if (researchTrades.Count <= tradeIndex)
+                                    {
+                                        // Ensure the list has an entry for the index
+                                        while (researchTrades.Count <= tradeIndex)
+                                            researchTrades.Add(new ResearchFirstBarPullback());
+                                    }
 
                                     if (researchTrades[tradeIndex].ScreenshotsUrls == null)
                                     {
                                         researchTrades[tradeIndex].ScreenshotsUrls = new List<string>();
                                     }
 
-                                    entry.ExtractToFile(Path.Combine(currentFolder, entry.Name));
+                                    string targetFile = Path.Combine(currentFolder, entry.Name);
+                                    entry.ExtractToFile(targetFile, overwrite: true);
                                     string screenshotName = entry.FullName.Split('/').Last();
                                     string screenshotPath = currentFolder.Replace(wwwRootPath, "").Replace("\\", "/");
                                     researchTrades[tradeIndex].ScreenshotsUrls.Add(Path.Combine(screenshotPath, screenshotName));
                                 }
                             }
                         }
-                        _unitOfWork.ResearchFirstBarPullback.AddRange(researchTrades);
-                        await _unitOfWork.SaveAsync();
+
+                        if (researchTrades.Any())
+                        {
+                            _unitOfWork.ResearchFirstBarPullback.AddRange(researchTrades);
+                            await _unitOfWork.SaveAsync();
+                        }
                     }
                 }
             }
@@ -320,11 +334,169 @@ namespace TradingToolsRazor.Pages.Research
                 return result;
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToPage("/Research/Index");
         }
 
+        #endregion
 
         #region Private Methods
+
+        protected JsonResult? ValidateModelState()
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                string allErrors = string.Join(", ", errors);
+                return new JsonResult(new { error = allErrors });
+            }
+
+            return null;
+        }
+
+        private async Task<List<ResearchCradle>> CheckAndDeleteSampleSize(ResearchCradle trade)
+        {
+            List<ResearchCradle> tradesInSampleSize = await _unitOfWork.ResearchCradle.GetAllAsync(x => x.SampleSizeId == trade.SampleSizeId);
+            if (!tradesInSampleSize.Any())
+            {
+                SampleSize sampleSize = await _unitOfWork.SampleSize.GetAsync(x => x.Id == trade.SampleSizeId);
+                if (sampleSize != null)
+                {
+                    _unitOfWork.SampleSize.Remove(sampleSize);
+                    await _unitOfWork.SaveAsync();
+                }
+            }
+            return tradesInSampleSize; // +1 because of the deleted trade
+        }
+
+        private async Task<JsonResult> DeleteCradle(int id)
+        {
+            ResearchCradle trade = await DeleteEntity(id);
+            DeleteTradeDirectory(trade.ScreenshotsUrls!.First());
+
+            var tradesInSampleSize = await CheckAndDeleteSampleSize(trade);
+            var sampleSizes = await _unitOfWork.SampleSize
+                .GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.Cradle);
+
+            if (!TrySetLastSampleSizeId(tradesInSampleSize, sampleSizes, trade, out int lastSampleSizeId))
+                return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });
+
+            if (sampleSizes.Any())
+            {
+                await LoadViewModelData(sampleSizes, lastSampleSizeId);
+                string researchVM = JsonConvert.SerializeObject(ResearchVM);
+                return new JsonResult(new { researchVM });
+            }
+
+            return new JsonResult(new { error = "No more trades for this strategy." });
+        }
+
+        private void DeleteTradeDirectory(string screenshotPath)
+        {
+            string directoryToDelete = Path.GetDirectoryName(Path.Combine(_webHostEnvironment.WebRootPath, screenshotPath)!)!;
+            if (Directory.Exists(directoryToDelete))
+                Directory.Delete(directoryToDelete, true);
+        }
+
+        private async Task<ResearchCradle> DeleteEntity(int id)
+        {
+            ResearchCradle trade = await _unitOfWork.ResearchCradle.GetAsync(x => x.Id == id);
+            _unitOfWork.ResearchCradle.Remove(trade);
+            await _unitOfWork.SaveAsync();
+            return trade;
+        }
+
+        private async Task<JsonResult> DeleteFirstBarPullback(int id)
+        {
+            ResearchFirstBarPullback trade = await _unitOfWork.ResearchFirstBarPullback.GetAsync(x => x.Id == id);
+            if (trade == null)
+            {
+                return new JsonResult(new { error = "No trade was found for this id." });
+            }
+
+            SampleSize sampleSize = await _unitOfWork.SampleSize.GetAsync(x => x.Id == trade.SampleSizeId);
+            _unitOfWork.ResearchFirstBarPullback.Remove(trade);
+            await _unitOfWork.SaveAsync();
+
+            // Get the rest of the trades in this sample size
+            List<ResearchFirstBarPullback> listAllTrades = await _unitOfWork.ResearchFirstBarPullback.GetAllAsync(x => x.SampleSizeId == trade.SampleSizeId);
+            List<SampleSize> sampleSizes = null;
+            string jsonTrades = string.Empty;
+
+            // The sample size is empty now
+            if (!listAllTrades.Any())
+            {
+                // Delete the empty sample size
+                if (sampleSize != null)
+                {
+                    _unitOfWork.SampleSize.Remove(sampleSize);
+                    await _unitOfWork.SaveAsync();
+                }
+
+                // Check if there are more sample sizes for the paramaters. If yes get the last
+                sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.Strategy == sampleSize!.Strategy && x.TimeFrame == sampleSize.TimeFrame && x.TradeType == ETradeType.Research);
+
+                int lastSampleSizeId = 0;
+                // No more sample sizes for these parameters. The trade that was deleted was the last for these paramaters
+                if (!sampleSizes.Any())
+                {
+                    ResearchVM.AvailableTimeframes.Remove(sampleSize!.TimeFrame);
+                }
+                // Get the last sample size id for these paramaters
+                else
+                {
+                    lastSampleSizeId = sampleSizes.LastOrDefault()!.Id;
+                }
+
+                // Get all trades for the last sample size id for these paramaters
+                if (lastSampleSizeId != 0)
+                {
+                    listAllTrades = await _unitOfWork.ResearchFirstBarPullback.GetAllAsync(x => x.SampleSizeId == lastSampleSizeId);
+                }
+                // Check if there are any other sample sizes (any TF, any Strategy)
+                else
+                {
+                    sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == ETradeType.Research);
+
+                    if (sampleSizes.Any())
+                    {
+                        lastSampleSizeId = sampleSizes.LastOrDefault()!.Id;
+                        listAllTrades = await _unitOfWork.ResearchFirstBarPullback.GetAllAsync(x => x.SampleSizeId == lastSampleSizeId);
+                    }
+                }
+            }
+
+            if (listAllTrades.Any())
+            {
+                if (sampleSizes == null)
+                {
+                    sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.Id == listAllTrades.First().SampleSizeId);
+                }
+                foreach (ResearchFirstBarPullback researchFirstBarPullback in listAllTrades)
+                {
+                    ResearchVM.AllTrades.Add(EntityMapper.EntityToViewModel<ResearchFirstBarPullback, ResearchFirstBarPullbackDisplay>(researchFirstBarPullback));
+                }
+            }
+            else
+            {
+                return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });
+            }
+
+            // Set the values for the view
+            SampleSize currentSampleSize = sampleSizes.SingleOrDefault(x => x.Id == listAllTrades[0].SampleSizeId)!;
+            ResearchVM.CurrentStrategy = currentSampleSize.Strategy;
+            ResearchVM.CurrentTimeFrame = currentSampleSize.TimeFrame;
+            ResearchVM.CurrentSampleSizeNumber = sampleSizes.Count;
+            ResearchVM.TradesInSampleSize = listAllTrades.Count;
+            ResearchVM.NumberSampleSizes = sampleSizes.Count;
+            string researchVM = JsonConvert.SerializeObject(ResearchVM);
+            // The method should be able to delete the sample size, and then get the trades from the last sample size for the given params.
+            // Convert the trades and the new menu values in json and return that.
+            return new JsonResult(new { researchVM });
+        }
 
         private async Task<string> LoadViewModelData(List<SampleSize> sampleSizes, int sampleSizeNumber)
         {
@@ -381,12 +553,12 @@ namespace TradingToolsRazor.Pages.Research
             {
                 if (ResearchVM.CurrentSampleSize.Strategy == EStrategy.Cradle)
                 {
-                    ResearchVM.TradeData.ScreenshotsUrls = [.. (ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!];
+                    ResearchVM.TradeData.ScreenshotsUrls = new List<string>((ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!);
                 }
                 else
                 {
                     // Workaround - load the ScreenshotUrls from BaseTrade and map them to the IDs from TradeData...
-                    ResearchVM.TradeData.ScreenshotsUrls = [.. (ResearchVM.AllTrades.FirstOrDefault()! as ResearchFirstBarPullbackDisplay)!.ScreenshotsUrls!];
+                    ResearchVM.TradeData.ScreenshotsUrls = new List<string>((ResearchVM.AllTrades.FirstOrDefault()! as ResearchFirstBarPullbackDisplay)!.ScreenshotsUrls!);
                 }
             }
 
@@ -465,6 +637,29 @@ namespace TradingToolsRazor.Pages.Research
             }
 
             return false;
+        }
+
+        private void SetAvailableStrategies(List<SampleSize> sampleSizes)
+        {
+            foreach (var sampleSize in sampleSizes)
+            {
+                if (!ResearchVM.AvailableStrategies.Contains(sampleSize.Strategy))
+                    ResearchVM.AvailableStrategies.Add(sampleSize.Strategy);
+            }
+
+            ResearchVM.AvailableStrategies.Sort();
+        }
+
+        private void SetAvailableTimeframes(List<SampleSize> sampleSizes)
+        {
+            var currentStrategy = ResearchVM.CurrentSampleSize?.Strategy ?? EStrategy.FirstBarPullback;
+            var filtered = sampleSizes.Where(x => x.Strategy == currentStrategy).ToList();
+
+            foreach (var s in filtered)
+                if (!ResearchVM.AvailableTimeframes.Contains(s.TimeFrame))
+                    ResearchVM.AvailableTimeframes.Add(s.TimeFrame);
+
+            ResearchVM.AvailableTimeframes.Sort();
         }
 
         #endregion

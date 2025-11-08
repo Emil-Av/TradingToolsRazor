@@ -1,4 +1,198 @@
 ﻿@page
 @model TradingToolsRazor.Pages.Research.IndexModel
+@using Newtonsoft.Json
+@using global::Shared
+
 @{
+    ViewData["Title"] = "Strategy Research";
+}
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+<!-- add this so JS can read and send the antiforgery token -->
+<input type="hidden" id="__RequestVerificationToken" value="@(Antiforgery.GetAndStoreTokens(HttpContext).RequestToken)" />
+
+<div class="row justify-content-center align-items-top">
+    <div class="col-12 text-center">
+        <h2>
+            @(Model.ResearchVM.TradeData.ScreenshotsUrls.Any() ? "Research" : "No researched strategies yet")
+        </h2>
+        @if (Model.ResearchVM.TradeData.ScreenshotsUrls.Any())
+        {
+            <!-- Menus -->
+            <div class="container mb-4">
+                <div class="row justify-content-center">
+                    <div class="col-auto d-flex align-items-center">
+                        <div class="col-10 col-md-auto d-flex align-items-center flex-wrap justify-content-center">
+                            <!-- Menu Time Frame -->
+                            <div class="p-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Time Frame: <span id="spanTimeFrame">@MyEnumConverter.TimeFrameFromEnum(Model.ResearchVM.CurrentSampleSize.TimeFrame)</span>
+                                    </button>
+                                    <div class="dropdown-menu animated--fade-in" id="dropdownBtnTimeFrame" aria-labelledby="dropdownMenuButton">
+                                        @foreach (ETimeFrame tf in Model.ResearchVM.AvailableTimeframes)
+                                        {
+                                            <a class="dropdown-item" role="button">@MyEnumConverter.TimeFrameFromEnum(tf)</a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Menu Strategy -->
+                            <div class="p-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Strategy: <span id="spanStrategy">@MyEnumConverter.StrategyFromEnum(Model.ResearchVM.CurrentSampleSize.Strategy)</span>
+                                    </button>
+                                    <div class="dropdown-menu animated--fade-in" id="dropdownBtnStrategy" aria-labelledby="dropdownMenuButton">
+                                        @foreach (EStrategy strategy in Model.ResearchVM.AvailableStrategies)
+                                        {
+                                            <a class="dropdown-item" role="button">@MyEnumConverter.StrategyFromEnum(strategy)</a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Menu Sample Size -->
+                            <div class="p-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Sample Size: <span id="spanSampleSize">@(Model.ResearchVM.NumberSampleSizes)</span>
+                                    </button>
+                                    <div class="dropdown-menu animated--fade-in" id="dropdownBtnSampleSize" aria-labelledby="dropdownMenuButton">
+                                        @for (int i = 0; i < Model.ResearchVM.NumberSampleSizes; i++)
+                                        {
+                                            <a class="dropdown-item" href="#">@(Model.ResearchVM.NumberSampleSizes - i)</a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Menu Trade -->
+                            <div class="p-2">
+                                <div class="input-group">
+                                    <div class="input-group-prepend" style="margin-right: 1px;">
+                                        <button type="button" class="btn btn-primary" id="btnPrev">
+                                            <i class="fa-regular fa-square-caret-left fa-lg"></i>
+                                        </button>
+                                    </div>
+                                    <input type="text" value="1" id="tradeNumberInput" class="form-control text-center bg-gray-100 custom-input" style="max-width: 60px;" maxlength="3" />
+                                    <div class="input-group-append">
+                                        <input value="/@Model.ResearchVM.AllTrades.Count()" id="tradesInSampleSize" class="input-group-text bg-gray-200" style="max-width: 60px;" disabled />
+                                        <button type="button" class="btn btn-primary" id="btnNext">
+                                            <i class="fa-regular fa-square-caret-right fa-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Screenshots -->
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <div id="carouselTrades" class="carousel slide" data-interval="false">
+                        <div id="imageContainer">
+                            <ol class="carousel-indicators">
+                                @for (int i = 0; i < Model.ResearchVM.TradeData.ScreenshotsUrls.Count; i++)
+                                {
+                                    <li data-bs-target="#carouselTrades" data-slide-to="@(i)" @(i == 0 ? "class=active" : "")></li>
+                                }
+                            </ol>
+                            <div class="carousel-inner">
+                                @for (int i = 0; i < Model.ResearchVM.TradeData.ScreenshotsUrls.Count; i++)
+                                {
+                                    <div class="@(i == 0 ? "carousel-item active" : "carousel-item")">
+                                        <img src="@Model.ResearchVM.TradeData.ScreenshotsUrls[i]" class="d-block w-100" alt="...">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselTrades" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselTrades" type="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-3">
+                <div class="col-8 text-center">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <div id="researchDataContainer">
+                                @if (Model.ResearchVM.CurrentSampleSize.Strategy == EStrategy.Cradle)
+                                {
+                                    @await Html.PartialAsync("_ResearchCradleData", Model.ResearchVM)
+                                }
+                                else if (Model.ResearchVM.CurrentSampleSize.Strategy == EStrategy.FirstBarPullback)
+                                {
+                                    @await Html.PartialAsync("_ResearchFirstBarPullbackData", Model.ResearchVM)
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Buttons  -->
+            <div class="row justify-content-center">
+                <div class="col-8 mt-2">
+                    <div class="card-footer mt-2 d-flex justify-content-end">
+                        <button class="btn btn-info ml-1" id="btnUpdate" type="button">
+                            <span class="text"><i class="fa-regular fa-floppy-disk mr-2"></i>Update</span>
+                        </button>
+                        <button class="btn btn-danger ml-1" id="btnDelete" type="button">
+                            <span class="text"><i class="fa-solid fa-trash-can mr-2"></i>Delete</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            // Upload research (Razor Pages: use asp-page-handler)
+            <form method="post" enctype="multipart/form-data" id="formUploadFile" asp-page-handler="UploadResearch">
+                <input type="file" name="zipFile" id="fileInput" class="d-none" accept=".zip" />
+                <a class="button d-flex flex-column align-items-center justify-content-center mt-5" role="button" id="uploadFileButton" onclick="document.getElementById('fileInput').click()">
+                    <i class="fa-regular fa-folder-open fa-2xl mb-3"></i>
+                    <span>Upload Research</span>
+                </a>
+            </form>
+        }
+    </div>
+</div>
+
+@* Save all trades data in a div element for JS *@
+<div id="tradesData" data-trades="@JsonConvert.SerializeObject(Model.ResearchVM.AllTrades)"></div>
+
+@{
+    // Render partials to strings so they can be used from JS (escape backticks)
+    var pullbackContent = await Html.PartialAsync("_ResearchFirstBarPullbackData", Model.ResearchVM);
+    var cradleContent = await Html.PartialAsync("_ResearchCradleData", Model.ResearchVM);
+
+    string pullbackHtml;
+    using (var sw = new System.IO.StringWriter())
+    {
+        pullbackContent.WriteTo(sw, System.Text.Encodings.Web.HtmlEncoder.Default);
+        pullbackHtml = sw.ToString().Replace("`", "\\`");
+    }
+
+    string cradleHtml;
+    using (var sw = new System.IO.StringWriter())
+    {
+        cradleContent.WriteTo(sw, System.Text.Encodings.Web.HtmlEncoder.Default);
+        cradleHtml = sw.ToString().Replace("`", "\\`");
+    }
+}
+
+<script>
+    const partialViewFirstBarResearch = `@Html.Raw(pullbackHtml)`;
+    const partialViewCradleResesarch = `@Html.Raw(cradleHtml)`;
+</script>
+
+@section Scripts {
+    <script src="~/js/research.js?v=@DateTime.Now.Ticks"></script>
 }

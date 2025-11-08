@@ -9,7 +9,7 @@ using Shared;
 using SharedEnums.Enums;
 using Utilities;
 
-namespace TradingTools.Pages.NewTrade
+namespace TradingToolsRazor.Pages.NewTrade
 {
     public class IndexModel : PageModel
     {
@@ -24,16 +24,14 @@ namespace TradingTools.Pages.NewTrade
             NewTradeParentVM = new();
         }
 
-        [BindProperty]
         public NewTradeVM NewTradeVM { get; set; }
 
-        [BindProperty]
         public PartialViewsVM NewTradeParentVM { get; set; }
 
         #region Handlers
 
         public IActionResult OnGet()
-        {
+        {   
             // Display the main page
             return Page();
         }

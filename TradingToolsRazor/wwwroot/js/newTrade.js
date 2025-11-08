@@ -229,11 +229,13 @@
 
         formData.append('tradeData', JSON.stringify(tradeData));
 
+        var token = document.getElementById('__RequestVerificationToken')?.value;
         $.ajax({
             type: 'POST',
-            url: '/newtrade/savenewtrade',
-            processData: false, // Don't process the files, otherwise jQuery will transform the data into a query string
-            contentType: false, // Set content type to false as FormData will handle it
+            url: '/NewTrade?handler=SaveNewTrade',
+            processData: false,
+            contentType: false,
+            headers: token ? { 'RequestVerificationToken': token } : {},
             data: formData,
             success: function (response) {
                 if (response['success'] !== undefined) {
@@ -244,9 +246,9 @@
                     toastr.error(response['error']);
                 }
             },
-            error: function (error) {
-                // Handle error
-                console.error('Error uploading files:', error);
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Error uploading files:', jqXHR, textStatus, errorThrown);
+                toastr.error('Error uploading files. See console for details.');
             }
         });
     };

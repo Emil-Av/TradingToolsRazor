@@ -317,30 +317,42 @@ $(function () {
         return 1;
     }
 
-    function ajaxDelete(id) {
-        $.ajax({
-            method: 'DELETE',
-            url: '/research/delete',
-            dataType: 'JSON',
-            data: {
-                id: id,
-                strategy: getStrategyAsEnumIntValue()
-            },
-            success: function (response) {
-                if (response['error'] !== undefined) {
-                    toastr.error(response['error']);
-                }
-                else if (response.redirectUrl) {
-                    window.location.href = response.redirectUrl;
-                }
+    async function ajaxDelete(id) {
+        const token = document.getElementById('__RequestVerificationToken')?.value;
+        const strategy = getStrategyAsEnumIntValue();
+        const url = `/Research?handler=Delete&id=${encodeURIComponent(id)}&strategy=${encodeURIComponent(strategy)}`;
 
-                setData(response);
-            },
-            error: function (jqXHR, exception) // code for exceptions
-            {
-                createAjaxErrorMsg(jqXHR, exception);
+        try {
+            const resp = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    ...(token ? { 'RequestVerificationToken': token } : {})
+                }
+            });
+
+            if (!resp.ok) {
+                const text = await resp.text();
+                createAjaxErrorMsg({ status: resp.status, responseText: text }, resp.statusText);
+                return;
             }
-        });
+
+            const response = await resp.json();
+
+            if (response['error'] !== undefined) {
+                toastr.error(response['error']);
+                return;
+            }
+
+            if (response.redirectUrl) {
+                window.location.href = response.redirectUrl;
+                return;
+            }
+
+            setData(response);
+        } catch (ex) {
+            createAjaxErrorMsg({ status: 0, responseText: ex.message }, ex.message);
+        }
     }
 
     function setCurrentIndex(currentTradeNumber) {
@@ -386,47 +398,70 @@ $(function () {
         }
     }
 
-    function updateCradleResearch(updatedResearch) {
-        $.ajax({
-            method: 'POST',
-            url: '/research/UpdateCradleResearch',
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'JSON',
-            data: JSON.stringify(updatedResearch),
-            success: function (response) {
-                if (response['success'] !== undefined) {
-                    toastr.success(response['success']);
-                }
-                else if (response['error'] !== undefined) {
-                    toastr.error(response['error']);
-                }
-            },
-            error: function (response) {
-                console.error(response);
+    async function updateCradleResearch(updatedResearch) {
+        const token = document.getElementById('__RequestVerificationToken')?.value;
+        const url = '/Research?handler=UpdateCradleResearch';
+
+        try {
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json; charset=utf-8',
+                    ...(token ? { 'RequestVerificationToken': token } : {})
+                },
+                body: JSON.stringify(updatedResearch)
+            });
+
+            if (!resp.ok) {
+                const text = await resp.text();
+                createAjaxErrorMsg({ status: resp.status, responseText: text }, resp.statusText);
+                return;
             }
-        });
+
+            const json = await resp.json();
+            if (json.success) {
+                toastr.success(json.success);
+            } else if (json.error) {
+                toastr.error(json.error);
+            }
+        } catch (ex) {
+            console.error(ex);
+            toastr.error('Request failed. See console for details.');
+        }
     }
 
-    function updateFirstBarResearch(updatedResearch) {
-        // make the API call
-        $.ajax({
-            method: 'POST',
-            url: '/research/UpdateFirstBarResearch',
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'JSON',
-            data: JSON.stringify(updatedResearch),
-            success: function (response) {
-                if (response['success'] !== undefined) {
-                    toastr.success(response['success']);
-                }
-                else if (response['error'] !== undefined) {
-                    toastr.error(response['error']);
-                }
-            },
-            error: function (response) {
-                console.error(response);
+    async function updateFirstBarResearch(updatedResearch) {
+        const token = document.getElementById('__RequestVerificationToken')?.value;
+        const url = '/Research?handler=UpdateFirstBarResearch';
+
+        try {
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json; charset=utf-8',
+                    ...(token ? { 'RequestVerificationToken': token } : {})
+                },
+                body: JSON.stringify(updatedResearch)
+            });
+
+            if (!resp.ok) {
+                const text = await resp.text();
+                createAjaxErrorMsg({ status: resp.status, responseText: text }, resp.statusText);
+                return;
             }
-        });
+
+            const json = await resp.json();
+            if (json.success) {
+                toastr.success(json.success);
+            } else if (json.error) {
+                toastr.error(json.error);
+            }
+        } catch (ex) {
+            console.error(ex);
+            toastr.error('Request failed. See console for details.');
+        }
     }
 
     function getCradleResearchData(index) {
@@ -538,33 +573,47 @@ $(function () {
         console.log(newCarouselHtml);
     }
 
-    function loadSampleSizeAsync(timeFrame, strategy, sampleSizeNumber, isSampleSizeChanged, isTimeFrameChanged, isStrategyChanged) {
-        // make the API call
-        $.ajax({
-            method: 'POST',
-            url: '/research/loadSampleSize',
-            dataType: 'JSON',
-            data: {
-                timeFrame: timeFrame,
-                strategy: strategy,
-                sampleSizeNumber: sampleSizeNumber,
-                isSampleSizeChanged: isSampleSizeChanged,
-                isTimeFrameChanged: isTimeFrameChanged,
-                isStrategyChanged: isStrategyChanged
-            },
-            success: function (response) {
-                if (response['error'] !== undefined) {
-                    toastr.error(response['error']);
-                }
-                setData(response);
-            },
-            error: function (jqXHR, exception) // code for exceptions
-            {
-                createAjaxErrorMsg(jqXHR, exception);
+    async function loadSampleSizeAsync(timeFrame, strategy, sampleSizeNumber, isSampleSizeChanged, isTimeFrameChanged, isStrategyChanged) {
+        const token = document.getElementById('__RequestVerificationToken')?.value;
+        const url = '/Research?handler=LoadSampleSize';
+
+        const params = new URLSearchParams();
+        params.append('TimeFrame', timeFrame);
+        params.append('Strategy', strategy);
+        params.append('SampleSizeNumber', sampleSizeNumber);
+        params.append('IsSampleSizeChanged', isSampleSizeChanged);
+        params.append('IsTimeFrameChanged', isTimeFrameChanged);
+        params.append('IsStrategyChanged', isStrategyChanged);
+        if (token) params.append('__RequestVerificationToken', token);
+
+        try {
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    ...(token ? { 'RequestVerificationToken': token } : {})
+                },
+                body: params.toString()
+            });
+
+            if (!resp.ok) {
+                const text = await resp.text();
+                createAjaxErrorMsg({ status: resp.status, responseText: text }, resp.statusText);
+                return;
             }
-        });
 
+            const response = await resp.json();
+            if (response?.error !== undefined) {
+                toastr.error(response.error);
+                return;
+            }
 
+            setData(response);
+        } catch (ex) {
+            console.error(ex);
+            toastr.error('Request failed. See console for details.');
+        }
     }
 
     function setData(response) {

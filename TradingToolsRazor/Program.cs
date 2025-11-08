@@ -41,15 +41,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// Authorization middleware (enable if needed)
-// app.UseAuthorization();
-
 app.MapRazorPages();
-
-//app.MapGet("/", context =>
-//{
-//    context.Response.Redirect("/Home");
-//    return Task.CompletedTask;
-//});
 
 app.Run();
