@@ -12,6 +12,7 @@ namespace DataAccess.Data
 
         }
 
+        public DbSet<ResearchCandleBracketing> ResearchCandleBracketing { get; set; }
         public DbSet<ResearchCradle> ResearchCradles { get; set; }
         public DbSet<BaseTrade> BaseTrades { get; set; }
 
@@ -31,26 +32,41 @@ namespace DataAccess.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            base.OnModelCreating(modelBuilder);
+
             // TPT Configuration: Maps each derived class to its own table
-            //modelBuilder.Entity<BaseTrade>().ToTable("BaseTrades");
-            modelBuilder.Entity<Trade>().ToTable("Trades"); // Ensures Trade has a separate table
+            modelBuilder.Entity<BaseTrade>().ToTable("BaseTrades");
+            modelBuilder.Entity<Trade>().ToTable("Trades");
             modelBuilder.Entity<ResearchFirstBarPullback>().ToTable("ResearchFirstBarPullbacks");
             modelBuilder.Entity<ResearchCradle>().ToTable("ResearchCradles");
+            modelBuilder.Entity<ResearchCandleBracketing>().ToTable("ResearchCandleBracketing");
 
-            // Configure the primary key inheritance
+            // Configure the primary key inheritance (TPT) - derived -> BaseTrade (shared PK)
             modelBuilder.Entity<Trade>()
                 .HasOne<BaseTrade>()
                 .WithOne()
                 .HasForeignKey<Trade>(t => t.Id)
-                .OnDelete(DeleteBehavior.NoAction);  // Prevent cascading delete
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<ResearchCradle>()
                 .HasOne<BaseTrade>()
                 .WithOne()
                 .HasForeignKey<ResearchCradle>(t => t.Id)
-                .OnDelete(DeleteBehavior.NoAction);  // Prevent cascading delete
+                .OnDelete(DeleteBehavior.NoAction);
 
-            // Include SampleSize relationship
+            modelBuilder.Entity<ResearchFirstBarPullback>()
+                .HasOne<BaseTrade>()
+                .WithOne()
+                .HasForeignKey<ResearchFirstBarPullback>(t => t.Id)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ResearchCandleBracketing>()
+                .HasOne<BaseTrade>()
+                .WithOne()
+                .HasForeignKey<ResearchCandleBracketing>(t => t.Id)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // Include SampleSize relationship on BaseTrade
             modelBuilder.Entity<BaseTrade>()
                 .HasOne(b => b.SampleSize)
                 .WithMany()

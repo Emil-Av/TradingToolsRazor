@@ -1,59 +1,131 @@
 ﻿@model PartialViewsVM
 
 <div class="row justify-content-center">
-    <div class="text-center">
+    <div class="col-12 text-center">
         <div class="@(ViewData["Title"]?.ToString() == "New Trade" ? "" : "card-header")">
             <div class="row align-items-center">
                 <!-- Header tabs begin -->
                 <div class="col mr-md-5 d-flex justify-content-center">
                     <div id="researchDataTabHeaders">
-                        <ul class="nav nav-tabs" id="journalTabs" role="tablist">
+                        <ul class="nav nav-tabs" id="candleBracketingTabs" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="bracketingData-tab" data-toggle="tab" data-target="#pnl" type="button" role="tab" aria-controls="pnl" aria-selected="true">Bracketing Data</button>
-                            </li>  
+                                <button class="nav-link active" id="data-tab" data-toggle="tab" data-target="#data" type="button" role="tab" aria-controls="data" aria-selected="true">Data</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="priceData-tab" data-toggle="tab" data-target="#priceData" type="button" role="tab" aria-controls="priceData" aria-selected="false">Price Data</button>
+                            </li>
                         </ul>
                     </div>
                 </div>
                 <!-- Header tabs ends -->
             </div>
         </div>
-        
+
         <div class="card-body" id="cardBody">
             <div class="tab-content">
-                <!-- Tab content Bracketing Data -->
-                <div class="tab-pane fade show active tundora text-left" id="bracketingData" role="tabpanel" aria-labelledby="pnl-tab">
+                <!-- Tab content Data -->
+                <div class="tab-pane fade show active tundora text-left" id="data" role="tabpanel" aria-labelledby="data-tab">
                     <div class="row">
+
                         <div class="col">
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="DateInput">Date</label>
-                                    <input class="text-center form-control" id="DateInput" data-research-bracketingData="Date" value="@Model.CandleBracketing.Date" />
+                                    <input class="text-center form-control" id="DateInput" data-research-bracketing="Date" asp-for="CandleBracketing.Date" type="date" />
                                 </div>
                             </div>
                         </div>
+
                         <div class="col">
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="TimeInput">Time</label>
-                                    <input class="text-center form-control" id="TimeInput" data-research-bracketingData="Time" value="@Model.CandleBracketing.Time" />
+                                    <input class="text-center form-control" id="TimeInput" data-research-bracketing="Time" asp-for="CandleBracketing.Time" type="time" step="300" />
                                 </div>
                             </div>
                         </div>
+
                         <div class="col">
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="DirectionInput">Direction</label>
-                                    <select class="text-center form-control" id="DirectionInput" data-research-bracketingData="Direction"
-                                            asp-for="@Model.CandleBracketing.Direction"
+                                    <select class="text-center form-control" id="DirectionInput" data-research-bracketing="Direction"
+                                            asp-for="@Model.CandleBracketing"
                                             asp-items="Html.GetEnumSelectList<SharedEnums.Enums.EDirection>()"></select>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsLossInput">Is Loss</label>
+                                    <select class="text-center form-control" id="IsLossInput" data-research-bracketing="IsLoss" asp-for="CandleBracketing.IsLoss">                                   
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="ATRInput">ATR</label>
+                                    <input class="text-center form-control" id="ATRInput" type="number" data-research-bracketing="ATR" asp-for="CandleBracketing.ATR" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsWeekendInput">Is Weekend</label>
+                                    <select class="text-center form-control" id="IsWeekendInput" data-research-bracketing="IsWeekend" asp-for="CandleBracketing.IsWeekend">
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="CandleTypeInput">Candle type</label>
+                                    <select class="text-center form-control" id="CandleTypeInput" data-research-bracketing="CandleType"
+                                            asp-for="@Model.CandleBracketing.CandleType"
+                                            asp-items="Html.GetEnumSelectList<SharedEnums.Enums.ECandleType>()"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="IsFlippedTheSwitchInput">Flipped The Switch</label>
+                                    <select class="text-center form-control" id="IsFlippedTheSwitchInput" data-research-bracketing="IsFlippedTheSwitch" asp-for="CandleBracketing.IsFlippedTheSwitch">
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Tab content Price Data -->
+                <div class="tab-pane fade show tundora text-left" id="priceData" role="tabpanel" aria-labelledby="priceData-tab">
+                    <div class="row">
                         <div class="col">
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="EntryPriceInput">EntryPrice</label>
-                                    <input class="text-center form-control" id="EntryPriceInput" data-research-bracketingData="EntryPrice" value="@Model.CandleBracketing.EntryPrice" />
+                                    <input class="text-center form-control" id="EntryPriceInput" type="number" data-research-bracketing="EntryPrice" asp-for="CandleBracketing.EntryPrice" />
                                 </div>
                             </div>
                         </div>
@@ -61,18 +133,15 @@
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="CandleHighInput">Candle High</label>
-                                    <input class="text-center form-control" id="CandleHighInput" data-research-bracketingData="CandleHigh" value="@Model.CandleBracketing.CandleHigh" />
+                                    <input class="text-center form-control" id="CandleHighInput" type="number" data-research-bracketing="CandleHigh" asp-for="CandleBracketing.CandleHigh" />
                                 </div>
                             </div>
                         </div>
-                       
-                    </div>
-                    <div class="row">
                         <div class="col">
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="CandleLowInput">Candle Low</label>
-                                    <input class="text-center form-control" id="CandleLowInput" data-research-bracketingData="CandleLow" value="@Model.CandleBracketing.CandleLow" />
+                                    <input class="text-center form-control" id="CandleLowInput" type="number" data-research-bracketing="CandleLow" asp-for="CandleBracketing.CandleLow" />
                                 </div>
                             </div>
                         </div>
@@ -80,12 +149,38 @@
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="MaxPriceInput">Max Price</label>
-                                    <input class="text-center form-control" id="MaxPriceInput" data-research-bracketingData="MaxPrice" value="@Model.CandleBracketing.MaxPrice" />
+                                    <input class="text-center form-control" id="MaxPriceInput" type="number" data-research-bracketing="MaxPrice" asp-for="CandleBracketing.MaxPrice" />
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>                
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="ExitPriceInput">Exit Price</label>
+                                    <input class="text-center form-control" id="ExitPriceInput" type="number" data-research-bracketing="ExitPrice" asp-for="CandleBracketing.ExitPriceForResearch" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="LowestPointAfterEntryInput">Lowest Point (long)</label>
+                                    <input class="text-center form-control" id="LowestPointAfterEntryInput" type="number" data-research-bracketing="LowestPointAfterEntry" asp-for="CandleBracketing.LowestPointAfterEntry" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="HighestPointAfterEntryInput">Highest Point (short)</label>
+                                    <input class="text-center form-control" id="HighestPointAfterEntryInput" type="number" data-research-bracketing="HighestPointAfterEntry" asp-for="CandleBracketing.HighestPointAfterEntry" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

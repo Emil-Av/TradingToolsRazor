@@ -33,7 +33,6 @@ namespace TradingToolsRazor.Pages.Research
             ResearchVM.AllTrades = new List<object>();
         }
 
-        //[BindProperty]
         public ResearchVM ResearchVM { get; set; }
 
         #region Handlers
@@ -500,10 +499,10 @@ namespace TradingToolsRazor.Pages.Research
 
         private async Task<string> LoadViewModelData(List<SampleSize> sampleSizes, int sampleSizeNumber)
         {
-            int lastSampleSizeId = SetLastSampleSizeId(sampleSizes, ref sampleSizeNumber);
+            int lastSampleSizeId = GetLastSampleSizeId(sampleSizes, ref sampleSizeNumber);
             if (lastSampleSizeId == -1)
             {
-                return $"Error in setting the lastSampleSizeId in {nameof(SetLastSampleSizeId)}";
+                return $"Error in setting the lastSampleSizeId in {nameof(GetLastSampleSizeId)}";
             }
             SampleSize sampleSize = sampleSizes.FirstOrDefault(sampleSize => sampleSize.Id == lastSampleSizeId)!;
             await SetTrades();
@@ -521,6 +520,11 @@ namespace TradingToolsRazor.Pages.Research
                     ResearchVM.AllTrades = (await _unitOfWork.ResearchCradle
                         .GetAllAsync(x => x.SampleSizeId == lastSampleSizeId)).Cast<object>().ToList();
                     ResearchVM.ResearchCradle = (ResearchVM.AllTrades.FirstOrDefault() as ResearchCradle)!;
+                }
+                else if (sampleSize.Strategy == EStrategy.CandleBracketing)
+                {
+                    ResearchVM.AllTrades = (await _unitOfWork.CandleBracketing.GetAllAsync(x => x.SampleSizeId == lastSampleSizeId)).Cast<object>().ToList();
+                    ResearchVM.CandleBracketing = (ResearchVM.AllTrades.FirstOrDefault() as ResearchCandleBracketing)!;
                 }
                 else if (sampleSize.Strategy == EStrategy.FirstBarPullback)
                 {
@@ -553,7 +557,11 @@ namespace TradingToolsRazor.Pages.Research
             {
                 if (ResearchVM.CurrentSampleSize.Strategy == EStrategy.Cradle)
                 {
-                    ResearchVM.TradeData.ScreenshotsUrls = new List<string>((ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!);
+                    ResearchVM.TradeData.ScreenshotsUrls = (ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!;
+                }
+                else if (ResearchVM.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
+                {
+                    ResearchVM.TradeData.ScreenshotsUrls = (ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!;
                 }
                 else
                 {
@@ -562,7 +570,7 @@ namespace TradingToolsRazor.Pages.Research
                 }
             }
 
-            int SetLastSampleSizeId(List<SampleSize> sampleSizes, ref int sampleSizeNumber)
+            int GetLastSampleSizeId(List<SampleSize> sampleSizes, ref int sampleSizeNumber)
             {
                 if (sampleSizeNumber == IndexMethod)
                     return sampleSizes.LastOrDefault()?.Id ?? -1;

@@ -22,6 +22,8 @@ namespace DataAccess.Repository.IRepository
 
         IResearchCradleRepository ResearchCradle { get; }
 
+        IResearchCandleBracketingRepository CandleBracketing { get; }
+
         Task SaveAsync();
     }
 }

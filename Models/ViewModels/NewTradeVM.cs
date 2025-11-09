@@ -131,6 +131,10 @@ namespace Models.ViewModels
                 {
                     ResearchData = JsonConvert.DeserializeObject<ResearchCradle>(researchData);
                 }
+                else if (Strategy == EStrategy.CandleBracketing)
+                {
+                    ResearchData = JsonConvert.DeserializeObject<ResearchCandleBracketing>(researchData);
+                }
                 TradeData = JsonConvert.DeserializeObject<TradeDisplay>(tradeData);
 
                 // Helper method to avoid duplicating code

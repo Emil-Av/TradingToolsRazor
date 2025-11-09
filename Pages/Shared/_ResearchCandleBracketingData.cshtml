@@ -1,0 +1,137 @@
+@model PartialViewsVM
+
+<div class="row justify-content-center">
+    <div class="text-center">
+        <div class="@(ViewData["Title"].ToString() == "New Trade" ? "" : "card-header")">
+            <div class="row align-items-center">
+                <div class="col mr-md-5 d-flex justify-content-center">
+                    <div id="researchDataTabHeaders">
+                        <ul class="nav nav-tabs" id="journalTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="bracketingData-tab" data-toggle="tab" data-target="#bracketingData" type="button" role="tab" aria-controls="pnl" aria-selected="true">Bracketing Data</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body" id="cardBody">
+            <div class="tab-content">
+                <div class="tab-pane fade show active tundora text-left" id="bracketingData" role="tabpanel" aria-labelledby="bracketingData-tab">
+
+                    <!-- Row 1: Date / Time / Direction / Candle type -->
+                    <div class="row mb-2">
+                        <div class="col-12 col-md-3">
+                            <label for="DateInput" class="d-block">Date</label>
+                            <input class="form-control text-center" id="DateInput" data-research-bracketingData="Date" asp-for="CandleBracketing.Date" type="date" />
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="TimeInput" class="d-block">Time</label>
+                            <input class="form-control text-center" id="TimeInput" data-research-bracketingData="Time" asp-for="CandleBracketing.Time" type="time" step="300" />
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="DirectionInput" class="d-block">Direction</label>
+                            <select class="form-control text-center" id="DirectionInput" data-research-bracketingData="Direction"
+                                    asp-for="CandleBracketing.Direction"
+                                    asp-items="Html.GetEnumSelectList<SharedEnums.Enums.EDirection>()">
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="CandleTypeInput" class="d-block">Candle Type</label>
+                            <select class="form-control text-center" id="CandleTypeInput" data-research-bracketingData="CandleType"
+                                    asp-for="CandleBracketing.CandleType"
+                                    asp-items="Html.GetEnumSelectList<SharedEnums.Enums.ECandleType>()">
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Prices / ATR -->
+                    <div class="row mb-2">
+                        <div class="col-12 col-md-3">
+                            <label for="EntryPriceInput" class="d-block">Entry Price</label>
+                            <input class="form-control text-center number-input" id="EntryPriceInput" data-research-bracketingData="EntryPrice"
+                                   asp-for="CandleBracketing.EntryPrice" type="number" step="0.01" />
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="ExitPriceInput" class="d-block">Exit Price</label>
+                            <input class="form-control text-center number-input" id="ExitPriceInput" data-research-bracketingData="ExitPrice"
+                                   asp-for="CandleBracketing.ExitPrice" type="number" step="0.01" />
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="MaxPriceInput" class="d-block">Max Price</label>
+                            <input class="form-control text-center number-input" id="MaxPriceInput" data-research-bracketingData="MaxPrice"
+                                   asp-for="CandleBracketing.MaxPrice" type="number" step="0.01" />
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="ATRInput" class="d-block">ATR</label>
+                            <input class="form-control text-center" id="ATRInput" data-research-bracketingData="ATR"
+                                   asp-for="CandleBracketing.ATR" type="number" step="1" />
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Candle High / Candle Low / Lowest / Highest -->
+                    <div class="row mb-2">
+                        <div class="col-12 col-md-3">
+                            <label for="CandleHighInput" class="d-block">Candle High</label>
+                            <input class="form-control text-center number-input" id="CandleHighInput" data-research-bracketingData="CandleHigh"
+                                   asp-for="CandleBracketing.CandleHigh" type="number" step="0.01" />
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="CandleLowInput" class="d-block">Candle Low</label>
+                            <input class="form-control text-center number-input" id="CandleLowInput" data-research-bracketingData="CandleLow"
+                                   asp-for="CandleBracketing.CandleLow" type="number" step="0.01" />
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="LowestPointAfterEntryInput" class="d-block">Lowest Point (long)</label>
+                            <input class="form-control text-center number-input" id="LowestPointAfterEntryInput" data-research-bracketingData="LowestPointAfterEntry"
+                                   asp-for="CandleBracketing.LowestPointAfterEntry" type="number" step="0.01" />
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label for="HighestPointAfterEntryInput" class="d-block">Highest Point (short)</label>
+                            <input class="form-control text-center number-input" id="HighestPointAfterEntryInput" data-research-bracketingData="HighestPointAfterEntry"
+                                   asp-for="CandleBracketing.HighestPointAfterEntry" type="number" step="0.01" />
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Flags -->
+                    <div class="row">
+                        <div class="col-12 col-md-4">
+                            <label for="IsLossInput" class="d-block">Is Loss</label>
+                            <select class="form-control text-center" id="IsLossInput" data-research-bracketingData="IsLoss" asp-for="CandleBracketing.IsLoss">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label for="IsWeekendInput" class="d-block">Is Weekend</label>
+                            <select class="form-control text-center" id="IsWeekendInput" data-research-bracketingData="IsWeekend" asp-for="CandleBracketing.IsWeekend">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label for="IsFlippedTheSwitchInput" class="d-block">Flipped The Switch</label>
+                            <select class="form-control text-center" id="IsFlippedTheSwitchInput" data-research-bracketingData="IsFlippedTheSwitch" asp-for="CandleBracketing.IsFlippedTheSwitch">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

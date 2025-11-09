@@ -245,8 +245,8 @@
             });
         }
         else if (tradeParams['strategy'] == strategies.CandleBracketing) {
-            $('#cardBody [data-research-candleBracketing]').each(function () {
-                var bindProperty = $(this).data('research-candleBracketing');
+            $('#cardBody [data-research-bracketing]').each(function () {
+                var bindProperty = $(this).data('research-bracketing');
                 researchData[bindProperty] = $(this).val();
             });
         }
@@ -307,6 +307,7 @@
             $(this).prop('selectedIndex', 1);
         });
     }
+
 
     /**
      * ***************************

@@ -77,7 +77,15 @@ namespace Utilities
                 var viewValue = property.GetValue(viewData);
                 if (viewValue != null) // Check if value is set
                 {
+                    try
+                    {
+
                     property.SetValue(dbEntity, viewValue);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                 }
             }
         }

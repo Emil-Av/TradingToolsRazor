@@ -1,10 +1,5 @@
 ﻿using Shared.Enums;
 using SharedEnums.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Models
 {
@@ -27,7 +22,7 @@ namespace Models
         /// <summary>
         ///  Relevant for BE and losses only.
         /// </summary>
-        public new double ExitPrice { get; set; }
+        public new double ExitPriceForResearch { get; set; }
 
         public bool IsLoss { get; set; }
 
@@ -43,7 +38,7 @@ namespace Models
 
         public int ATR { get; set; }
 
-        public bool IsWeekend => Date.DayOfWeek == DayOfWeek.Saturday || Date.DayOfWeek == DayOfWeek.Sunday;
+        public bool IsWeekend { get; set; }
 
         public ECandleType CandleType { get; set; }
 

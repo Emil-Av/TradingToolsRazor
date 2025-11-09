@@ -31,8 +31,10 @@ namespace TradingToolsRazor.Pages.NewTrade
         #region Handlers
 
         public IActionResult OnGet()
-        {   
+        {
             // Display the main page
+            NewTradeParentVM.CandleBracketing.Date = DateOnly.FromDateTime(DateTime.Now);
+            NewTradeParentVM.CandleBracketing.Time = TimeOnly.FromDateTime(DateTime.Now);
             return Page();
         }
         protected JsonResult? ValidateModelState()
@@ -51,7 +53,7 @@ namespace TradingToolsRazor.Pages.NewTrade
             return null;
         }
 
-        public async Task<JsonResult> OnPostSaveNewTradeAsync([FromForm] IFormFile[] files, [FromForm] string tradeParams, [FromForm] string researchData,[FromForm] string tradeData)
+        public async Task<JsonResult> OnPostSaveNewTradeAsync([FromForm] IFormFile[] files, [FromForm] string tradeParams, [FromForm] string researchData, [FromForm] string tradeData)
         {
             var validationResult = ValidateModelState();
             if (validationResult != null) return validationResult;
@@ -86,6 +88,10 @@ namespace TradingToolsRazor.Pages.NewTrade
                 else if (NewTradeVM.Strategy == EStrategy.Cradle)
                 {
                     await SaveResearchCradleData(maxTradesProSampleSize: 100);
+                }
+                else if (NewTradeVM.Strategy == EStrategy.CandleBracketing)
+                {
+                    await SaveCandleBracketingData(maxTradesProSampleSize: 100);
                 }
             }
             else // PaperTrade or normal Trade
@@ -128,6 +134,29 @@ namespace TradingToolsRazor.Pages.NewTrade
                 newTrade.SampleSize = researchData.SampleSize;
 
                 return newTrade;
+            }
+
+            async Task<ResearchCandleBracketing> SaveCandleBracketingData(int maxTradesProSampleSize)
+            {
+                var viewData = NewTradeVM.ResearchData as ResearchCandleBracketing;
+                viewData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
+
+                var researchData = new ResearchCandleBracketing();
+                EntityMapper.ViewModelToEntity(researchData, viewData);
+                researchData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
+                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files);
+
+                _unitOfWork.CandleBracketing.Add(researchData);
+                try
+                {
+                    await _unitOfWork.SaveAsync();
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+                return viewData;
             }
 
             async Task<ResearchCradle> SaveResearchCradleData(int maxTradesProSampleSize)
