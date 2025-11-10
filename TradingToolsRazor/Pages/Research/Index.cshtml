@@ -136,7 +136,6 @@
                                 {
                                     @await Html.PartialAsync("_ResearchCandleBracketingData", Model.ResearchVM)
                                 }
-    )
                             </div>
                         </div>
                     </div>
@@ -177,6 +176,7 @@
     // Render partials to strings so they can be used from JS (escape backticks)
     var pullbackContent = await Html.PartialAsync("_ResearchFirstBarPullbackData", Model.ResearchVM);
     var cradleContent = await Html.PartialAsync("_ResearchCradleData", Model.ResearchVM);
+    var candleBracketingContent = await Html.PartialAsync("_ResearchCandleBracketingData", Model.ResearchVM);
 
     string pullbackHtml;
     using (var sw = new System.IO.StringWriter())
@@ -191,11 +191,19 @@
         cradleContent.WriteTo(sw, System.Text.Encodings.Web.HtmlEncoder.Default);
         cradleHtml = sw.ToString().Replace("`", "\\`");
     }
+
+    string candleBracketingHtml;
+    using (var sw = new System.IO.StringWriter())
+    {
+        candleBracketingContent.WriteTo(sw, System.Text.Encodings.Web.HtmlEncoder.Default);
+        candleBracketingHtml = sw.ToString().Replace("`", "\\`");
+    }
 }
 
 <script>
     const partialViewFirstBarResearch = `@Html.Raw(pullbackHtml)`;
     const partialViewCradleResesarch = `@Html.Raw(cradleHtml)`;
+    const partialViewCandleBracketingResearch = `@Html.Raw(candleBracketingHtml)`;
 </script>
 
 @section Scripts {

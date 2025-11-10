@@ -50,7 +50,7 @@
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="DirectionInput">Direction</label>
                                     <select class="text-center form-control" id="DirectionInput" data-research-bracketing="Direction"
-                                            asp-for="@Model.CandleBracketing"
+                                            asp-for="@Model.CandleBracketing.Direction"
                                             asp-items="Html.GetEnumSelectList<SharedEnums.Enums.EDirection>()"></select>
                                 </div>
                             </div>
@@ -60,13 +60,14 @@
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="IsLossInput">Is Loss</label>
-                                    <select class="text-center form-control" id="IsLossInput" data-research-bracketing="IsLoss" asp-for="CandleBracketing.IsLoss">                                   
+                                    <select class="text-center form-control" id="IsLossInput" data-research-bracketing="IsLoss" asp-for="CandleBracketing.IsLoss">
                                         <option value="true">Yes</option>
                                         <option value="false">No</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <div class="row">

@@ -23,6 +23,7 @@ $(function () {
     const strategies = {
         FirstBarPullback: 'First Bar Pullback',
         Cradle: 'Cradle',
+        CandleBracketing: 'Candle Bracketing'
     };
 
     /**
@@ -506,6 +507,9 @@ $(function () {
         else if (strategy == 1) {
             setCradleResearchData(trade);
         }
+        else if (strategy == 2) {
+            setCandleBracketingData(trade);
+        }
     }
 
     function getStrategy() {
@@ -516,6 +520,21 @@ $(function () {
         else if (strategy == strategies.Cradle) {
             return 1;
         }
+        else if (strategy == strategies.CandleBracketing) {
+            return 2;
+        }
+    }
+
+    function setCandleBracketingData(trade) {
+        $('#cardBody [data-research-bracketing]').each(function () {
+            var bindProperty = $(this).data('research-bracketing');
+            if (trade.hasOwnProperty(bindProperty)) {
+                var value = trade[bindProperty];
+                if (value !== null) {
+                    $(this).val(trade[bindProperty].toString());
+                }
+            }
+        });
     }
 
     function setCradleResearchData(trade) {
@@ -634,6 +653,9 @@ $(function () {
         }
         else if (strategy == 1) {
             $('#researchDataContainer').html(partialViewCradleResesarch);
+        }
+        else if (strategy == 2) {
+            $('#researchDataContainer').html(partialViewCandleBracketingResearch);
         }
     }
 
