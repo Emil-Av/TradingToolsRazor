@@ -24,13 +24,15 @@ namespace TradingToolsRazor.Pages.Research
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private const int IndexMethod = 0;
+        private readonly DeleteTradeHelper _deleteTradeHelper;
 
-        public IndexModel(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
+        public IndexModel(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, DeleteTradeHelper deleteTradeHelper)
         {
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
-            ResearchVM = new ResearchVM();
-            ResearchVM.AllTrades = new List<object>();
+            ResearchVM = new ();
+            ResearchVM.AllTrades = new ();
+            _deleteTradeHelper = deleteTradeHelper;
         }
 
         public ResearchVM ResearchVM { get; set; }
@@ -63,11 +65,14 @@ namespace TradingToolsRazor.Pages.Research
                 if (strategy == EStrategy.FirstBarPullback)
                 {
                     return new JsonResult(new { error = "Delete method not implemented for this strategy." });
-                    // return await DeleteFirstBarPullback(id);
                 }
                 else if (strategy == EStrategy.Cradle)
                 {
                     return await DeleteCradle(id);
+                }
+                else if (strategy == EStrategy.CandleBracketing)
+                {
+                    return await DeleteCandleBracketing(id);
                 }
 
                 return new JsonResult(new { error = "Delete method not implemented for this strategy." });
@@ -105,11 +110,30 @@ namespace TradingToolsRazor.Pages.Research
             return new JsonResult(new { researchVM });
         }
 
-        // POST JSON body: /Research?handler=UpdateCradleResearch
+        public async Task<IActionResult> OnPostUpdateCandleBracketingResearchAsync([FromBody] ResearchCandleBracketing researchCandleBracketing)
+        {
+            var validationResult = ValidateModelState();
+            if (validationResult != null)
+                return validationResult;
+
+            await _unitOfWork.ResearchCandleBracketing.UpdateAsync(researchCandleBracketing);
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = $"{ex.Message}" });
+            }
+
+            return new JsonResult(new { success = "Trade updated." });
+        }
+
         public async Task<IActionResult> OnPostUpdateCradleResearchAsync([FromBody] ResearchCradle researchTrade)
         {
             var validationResult = ValidateModelState();
-            if (validationResult != null) return validationResult;
+            if (validationResult != null)
+                return validationResult;
 
             await _unitOfWork.ResearchCradle.UpdateAsync(researchTrade);
             try
@@ -124,11 +148,11 @@ namespace TradingToolsRazor.Pages.Research
             return new JsonResult(new { success = "Trade updated." });
         }
 
-        // POST JSON body: /Research?handler=UpdateFirstBarResearch
         public async Task<IActionResult> OnPostUpdateFirstBarResearchAsync([FromBody] ResearchFirstBarPullbackDisplay currentTrade)
         {
             var validationResult = ValidateModelState();
-            if (validationResult != null) return validationResult;
+            if (validationResult != null)
+                return validationResult;
 
 
             ResearchFirstBarPullback trade = EntityMapper.ViewModelDisplayToEntity<ResearchFirstBarPullback, ResearchFirstBarPullbackDisplay>(currentTrade, existingEntity: null);
@@ -356,6 +380,21 @@ namespace TradingToolsRazor.Pages.Research
             return null;
         }
 
+        private async Task<List<ResearchCandleBracketing>> CheckAndDeleteSampleSize(ResearchCandleBracketing trade)
+        {
+            List<ResearchCandleBracketing> tradesInSampleSize = await _unitOfWork.ResearchCandleBracketing.GetAllAsync(x => x.SampleSizeId == trade.SampleSizeId);
+            if (!tradesInSampleSize.Any())
+            {
+                SampleSize sampleSize = await _unitOfWork.SampleSize.GetAsync(x => x.Id == trade.SampleSizeId);
+                if (sampleSize != null)
+                {
+                    _unitOfWork.SampleSize.Remove(sampleSize);
+                    await _unitOfWork.SaveAsync();
+                }
+            }
+            return tradesInSampleSize;
+        }
+
         private async Task<List<ResearchCradle>> CheckAndDeleteSampleSize(ResearchCradle trade)
         {
             List<ResearchCradle> tradesInSampleSize = await _unitOfWork.ResearchCradle.GetAllAsync(x => x.SampleSizeId == trade.SampleSizeId);
@@ -368,17 +407,50 @@ namespace TradingToolsRazor.Pages.Research
                     await _unitOfWork.SaveAsync();
                 }
             }
-            return tradesInSampleSize; // +1 because of the deleted trade
+            return tradesInSampleSize;
+        }
+
+        private async Task<JsonResult> DeleteCandleBracketing(int id)
+        {
+            ResearchCandleBracketing trade = await DeleteCandleBracketingEntity(id);
+
+            var tradesInSampleSize = await CheckAndDeleteSampleSize(trade);
+            var samplesizes = await _unitOfWork.SampleSize
+                .GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.CandleBracketing);
+
+            await _deleteTradeHelper.CheckAndUpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls.First(), tradesInSampleSize.Cast<BaseTrade>().ToList(), _webHostEnvironment.WebRootPath);
+
+            if (!TrySetLastSampleSizeId(tradesInSampleSize, samplesizes, trade, out int lastSampleSizeId))
+                return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });
+
+            if (samplesizes.Any())
+            {
+                await LoadViewModelData(samplesizes, lastSampleSizeId);
+                string researchVM = JsonConvert.SerializeObject(ResearchVM);
+                return new JsonResult(new { researchVM });
+            }
+
+            return new JsonResult(new { error = "No more trades for this strategy." });
+        }
+
+        private async Task<ResearchCandleBracketing> DeleteCandleBracketingEntity(int id)
+        {
+            ResearchCandleBracketing trade = await _unitOfWork.ResearchCandleBracketing.GetAsync(x => x.Id == id);
+            _unitOfWork.ResearchCandleBracketing.Remove(trade);
+            await _unitOfWork.SaveAsync();
+
+            return trade;
         }
 
         private async Task<JsonResult> DeleteCradle(int id)
         {
-            ResearchCradle trade = await DeleteEntity(id);
-            DeleteTradeDirectory(trade.ScreenshotsUrls!.First());
+            ResearchCradle trade = await DeleteCradleEntity(id);
 
             var tradesInSampleSize = await CheckAndDeleteSampleSize(trade);
             var sampleSizes = await _unitOfWork.SampleSize
                 .GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.Cradle);
+
+            await _deleteTradeHelper.CheckAndUpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls.First(), tradesInSampleSize.Cast<BaseTrade>().ToList(), _webHostEnvironment.WebRootPath);
 
             if (!TrySetLastSampleSizeId(tradesInSampleSize, sampleSizes, trade, out int lastSampleSizeId))
                 return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });
@@ -393,14 +465,9 @@ namespace TradingToolsRazor.Pages.Research
             return new JsonResult(new { error = "No more trades for this strategy." });
         }
 
-        private void DeleteTradeDirectory(string screenshotPath)
-        {
-            string directoryToDelete = Path.GetDirectoryName(Path.Combine(_webHostEnvironment.WebRootPath, screenshotPath)!)!;
-            if (Directory.Exists(directoryToDelete))
-                Directory.Delete(directoryToDelete, true);
-        }
 
-        private async Task<ResearchCradle> DeleteEntity(int id)
+
+        private async Task<ResearchCradle> DeleteCradleEntity(int id)
         {
             ResearchCradle trade = await _unitOfWork.ResearchCradle.GetAsync(x => x.Id == id);
             _unitOfWork.ResearchCradle.Remove(trade);
@@ -523,7 +590,7 @@ namespace TradingToolsRazor.Pages.Research
                 }
                 else if (sampleSize.Strategy == EStrategy.CandleBracketing)
                 {
-                    ResearchVM.AllTrades = (await _unitOfWork.CandleBracketing.GetAllAsync(x => x.SampleSizeId == lastSampleSizeId)).Cast<object>().ToList();
+                    ResearchVM.AllTrades = (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(x => x.SampleSizeId == lastSampleSizeId)).Cast<object>().ToList();
                     ResearchVM.CandleBracketing = (ResearchVM.AllTrades.FirstOrDefault() as ResearchCandleBracketing)!;
                 }
                 else if (sampleSize.Strategy == EStrategy.FirstBarPullback)
@@ -555,18 +622,22 @@ namespace TradingToolsRazor.Pages.Research
 
             void SetScreenShotsUrls()
             {
-                if (ResearchVM.CurrentSampleSize.Strategy == EStrategy.Cradle)
+                if (ResearchVM.AllTrades.Any())
                 {
-                    ResearchVM.TradeData.ScreenshotsUrls = (ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!;
-                }
-                else if (ResearchVM.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
-                {
-                    ResearchVM.TradeData.ScreenshotsUrls = (ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!;
-                }
-                else
-                {
-                    // Workaround - load the ScreenshotUrls from BaseTrade and map them to the IDs from TradeData...
-                    ResearchVM.TradeData.ScreenshotsUrls = new List<string>((ResearchVM.AllTrades.FirstOrDefault()! as ResearchFirstBarPullbackDisplay)!.ScreenshotsUrls!);
+
+                    if (ResearchVM.CurrentSampleSize.Strategy == EStrategy.Cradle)
+                    {
+                        ResearchVM.TradeData.ScreenshotsUrls = (ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!;
+                    }
+                    else if (ResearchVM.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
+                    {
+                        ResearchVM.TradeData.ScreenshotsUrls = (ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!;
+                    }
+                    else
+                    {
+                        // Workaround - load the ScreenshotUrls from BaseTrade and map them to the IDs from TradeData...
+                        ResearchVM.TradeData.ScreenshotsUrls = new List<string>((ResearchVM.AllTrades.FirstOrDefault()! as ResearchFirstBarPullbackDisplay)!.ScreenshotsUrls!);
+                    }
                 }
             }
 
@@ -630,6 +701,24 @@ namespace TradingToolsRazor.Pages.Research
                 ResearchVM.CurrentSampleSizeNumber = sampleSizeNumber;
             }
         }
+
+        private bool TrySetLastSampleSizeId(List<ResearchCandleBracketing> tradesInSampleSize, List<SampleSize> sampleSizes, ResearchCandleBracketing trade, out int lastSampleSizeId)
+        {
+            lastSampleSizeId = 0;
+            if (tradesInSampleSize.Any())
+            {
+                lastSampleSizeId = trade.SampleSizeId;
+                return true;
+            }
+            else if (sampleSizes.Any())
+            {
+                lastSampleSizeId = sampleSizes.Last().Id;
+                return true;
+            }
+
+            return false;
+        }
+
         private bool TrySetLastSampleSizeId(List<ResearchCradle> tradesInSampleSize, List<SampleSize> sampleSizes, ResearchCradle trade, out int lastSampleSizeId)
         {
             lastSampleSizeId = 0;

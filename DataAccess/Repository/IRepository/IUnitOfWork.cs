@@ -22,7 +22,7 @@ namespace DataAccess.Repository.IRepository
 
         IResearchCradleRepository ResearchCradle { get; }
 
-        IResearchCandleBracketingRepository CandleBracketing { get; }
+        IResearchCandleBracketingRepository ResearchCandleBracketing { get; }
 
         Task SaveAsync();
     }

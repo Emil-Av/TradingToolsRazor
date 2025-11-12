@@ -26,7 +26,7 @@ namespace DataAccess.Repository
 
         public IResearchCradleRepository ResearchCradle { get; private set; }
 
-        public IResearchCandleBracketingRepository CandleBracketing { get; private set; }
+        public IResearchCandleBracketingRepository ResearchCandleBracketing { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
@@ -38,7 +38,7 @@ namespace DataAccess.Repository
             UserSettings = new UserSettingsRepository(_db);
             ResearchFirstBarPullback = new ResearchFirstBarPullbackRepository(_db);
             ResearchCradle = new ResearchCradleRepository(_db);
-            CandleBracketing = new ResearchCandleBracketingRepository(_db);
+            ResearchCandleBracketing = new ResearchCandleBracketingRepository(_db);
         }
 
         public async Task SaveAsync()

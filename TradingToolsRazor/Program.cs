@@ -2,25 +2,20 @@ using DataAccess.Data;
 using DataAccess.Repository;
 using DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json.Serialization;
+using Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-builder.Services.AddRazorPages();
-
-// Add DbContext
+builder.Services.AddRazorPages().AddNewtonsoftJson(options =>
+{
+   options.SerializerSettings.Converters.Add(new Shared.TimeOnlyNewtonsoftConverter());
+}); // API calls json conversion (e.g. "true" get converted to true boolean)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Add UnitOfWork
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-// Add support for JSON serialization (for APIs or AJAX calls)
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
+builder.Services.AddScoped<DeleteTradeHelper>();
 
 // Allow uploading of files up to 100MB
 builder.WebHost.ConfigureKestrel(serverOptions =>

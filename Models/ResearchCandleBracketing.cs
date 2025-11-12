@@ -19,10 +19,12 @@ namespace Models
 
         public double MaxPrice { get; set; }
 
+        public double EntryPriceForResearch { get; set; }
+
         /// <summary>
         ///  Relevant for BE and losses only.
         /// </summary>
-        public new double ExitPriceForResearch { get; set; }
+        public double ExitPriceForResearch { get; set; }
 
         public bool IsLoss { get; set; }
 

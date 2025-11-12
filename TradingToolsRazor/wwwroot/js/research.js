@@ -315,7 +315,14 @@ $(function () {
         if ($('#spanStrategy').text() == strategies.FirstBarPullback) {
             return 0;
         }
-        return 1;
+        else if ($('#spanStrategy').text() == strategies.Cradle) {
+            return 1;
+        }
+        else if ($('#spanStrategy').text() == strategies.CandleBracketing) {
+            return 2;
+        }
+
+        return -1;
     }
 
     async function ajaxDelete(id) {
@@ -397,12 +404,14 @@ $(function () {
             updatedResearch = getCradleResearchData(index);
             updateCradleResearch(updatedResearch);
         }
+        else if (strategy == strategies.CandleBracketing) {
+            updatedResearch = getCandleBracketingData(index);
+            updateCandleBracketingResearch(updatedResearch);
+        }
     }
 
-    async function updateCradleResearch(updatedResearch) {
+    async function postUpdateDataAndNotify(url, payload) {
         const token = document.getElementById('__RequestVerificationToken')?.value;
-        const url = '/Research?handler=UpdateCradleResearch';
-
         try {
             const resp = await fetch(url, {
                 method: 'POST',
@@ -411,13 +420,13 @@ $(function () {
                     'Content-Type': 'application/json; charset=utf-8',
                     ...(token ? { 'RequestVerificationToken': token } : {})
                 },
-                body: JSON.stringify(updatedResearch)
+                body: JSON.stringify(payload)
             });
 
             if (!resp.ok) {
                 const text = await resp.text();
                 createAjaxErrorMsg({ status: resp.status, responseText: text }, resp.statusText);
-                return;
+                return null;
             }
 
             const json = await resp.json();
@@ -426,43 +435,39 @@ $(function () {
             } else if (json.error) {
                 toastr.error(json.error);
             }
+
+            return json;
         } catch (ex) {
             console.error(ex);
             toastr.error('Request failed. See console for details.');
+            return null;
         }
+    }
+
+    async function updateCandleBracketingResearch(updatedResearch) {
+        postUpdateDataAndNotify('/Research?handler=UpdateCandleBracketingResearch', updatedResearch);
+    }
+
+    async function updateCradleResearch(updatedResearch) {
+        postUpdateDataAndNotify('/Research?handler=UpdateCradleResearch', updatedResearch);
     }
 
     async function updateFirstBarResearch(updatedResearch) {
         const token = document.getElementById('__RequestVerificationToken')?.value;
-        const url = '/Research?handler=UpdateFirstBarResearch';
+        postUpdateDataAndNotify('/Research?handler=UpdateFirstBarResearch', updatedResearch)
+    }
 
-        try {
-            const resp = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json; charset=utf-8',
-                    ...(token ? { 'RequestVerificationToken': token } : {})
-                },
-                body: JSON.stringify(updatedResearch)
-            });
+    function getCandleBracketingData(index) {
+        var updatedTrade = {};  
+        $('#cardBody [data-research-bracketing]').each(function () {
+            var bindProperty = $(this).data('research-bracketing');
+            updatedTrade[bindProperty] = $(this).val();
+        });
 
-            if (!resp.ok) {
-                const text = await resp.text();
-                createAjaxErrorMsg({ status: resp.status, responseText: text }, resp.statusText);
-                return;
-            }
+        updatedTrade['Id'] = trades[index]['Id'];
+        updatedTrade['ScreenshotsUrls'] = trades[index]['ScreenshotsUrls'];
 
-            const json = await resp.json();
-            if (json.success) {
-                toastr.success(json.success);
-            } else if (json.error) {
-                toastr.error(json.error);
-            }
-        } catch (ex) {
-            console.error(ex);
-            toastr.error('Request failed. See console for details.');
-        }
+        return updatedTrade;
     }
 
     function getCradleResearchData(index) {
@@ -472,7 +477,6 @@ $(function () {
             updatedTrade[bindProperty] = $(this).val();
         });
 
-        //updatedTrade['TradeRating'] = parseInt($('#TradeRatingInput').val());
         updatedTrade['Id'] = trades[index]['Id'];
         updatedTrade['ScreenshotsUrls'] = trades[index]['ScreenshotsUrls'];
 

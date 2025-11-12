@@ -146,7 +146,7 @@ namespace TradingToolsRazor.Pages.NewTrade
                 researchData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
                 researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files);
 
-                _unitOfWork.CandleBracketing.Add(researchData);
+                _unitOfWork.ResearchCandleBracketing.Add(researchData);
                 try
                 {
                     await _unitOfWork.SaveAsync();

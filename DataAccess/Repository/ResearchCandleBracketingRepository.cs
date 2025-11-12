@@ -22,11 +22,11 @@ namespace DataAccess.Repository
             ResearchCandleBracketing? objFromDb = await _db.ResearchCandleBracketing.FindAsync(researchCandleBracketing.Id);
             if (objFromDb != null)
             {
-                Type type = typeof(ResearchCradle);
+                Type type = typeof(ResearchCandleBracketing);
 
                 foreach (var property in type.GetProperties())
                 {
-                    if (property.Name == "Id")
+                    if (property.Name == "Id" || property.Name == "SampleSizeId")
                     {
                         continue;
                     }
