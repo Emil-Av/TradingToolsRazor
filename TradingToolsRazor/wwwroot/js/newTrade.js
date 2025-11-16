@@ -294,8 +294,8 @@
             }
         });
 
-        // Clear fields without data-research attribute
-        $('input:not([data-research])').each(function () {
+        // Clear fields without data-research attribute BUT do NOT clear hidden inputs (the antiforgery hidden field)
+        $('input:not([data-research]):not([type="hidden"])').each(function () {
             // Clear the files input
             $(this).val('');
         });

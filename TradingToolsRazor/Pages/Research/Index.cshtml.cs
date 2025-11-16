@@ -575,7 +575,8 @@ namespace TradingToolsRazor.Pages.Research
             await SetTrades();
             SetValuesForButtons();
             SetScreenShotsUrls();
-
+            
+            // Should not happen. Empty sample size should not exist. If so, probably error in delete trade method.
             return ResearchVM.AllTrades.Any() ? string.Empty : "No trades available for this sample size.";
 
             #region Helper Methods
