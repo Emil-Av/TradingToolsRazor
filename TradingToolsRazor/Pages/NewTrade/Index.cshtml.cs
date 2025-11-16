@@ -91,7 +91,7 @@ namespace TradingToolsRazor.Pages.NewTrade
                 }
                 else if (NewTradeVM.Strategy == EStrategy.CandleBracketing)
                 {
-                    await SaveCandleBracketingData(maxTradesProSampleSize: 100);
+                    await SaveCandleBracketingData(maxTradesProSampleSize: 200); // Because of flipping the switch, potentially there can be 2 trades per day
                 }
             }
             else // PaperTrade or normal Trade
