@@ -282,27 +282,65 @@
     };
 
     function clearFields() {
-        // Clear fields with data-research attribute
-        $('[data-research]').each(function () {
-            if ($(this).is('input')) {
-                // Clear the rest of the input fields
-                $(this).val('');
-            }
-            // Clear the select fields
-            else if ($(this).is('select')) {
-                $(this).prop('selectedIndex', 1);
+        // Helpers: format date/time for HTML inputs
+        function formatDateForInput(date) {
+            // yyyy-MM-dd
+            return date.toISOString().split('T')[0];
+        }
+        function formatTimeForInput(date) {
+            // HH:mm
+            var hours = String(date.getHours()).padStart(2, '0');
+            var minutes = String(date.getMinutes()).padStart(2, '0');
+            return hours + ':' + minutes;
+        }
+
+        var now = new Date();
+        var todayValue = formatDateForInput(now);
+        var timeValue = formatTimeForInput(now);
+
+        // Clear and set sensible defaults for elements that belong to research partials
+        $('#cardBody [data-research], #cardBody [data-research-cradle], #cardBody [data-research-firstbar], #cardBody [data-research-bracketing]').each(function () {
+            var element = $(this);
+            if (element.is('input')) {
+                var elementType = (element.attr('type') || '').toLowerCase();
+                if (elementType === 'date') {
+                    element.val(todayValue);
+                } else if (elementType === 'time') {
+                    element.val(timeValue);
+                } else if (elementType === 'number' || element.hasClass('number-input')) {
+                    element.val('0');
+                } else {
+                    element.val('');
+                }
+            } else if (element.is('select')) {
+                element.prop('selectedIndex', 1);
+            } else if (element.is('textarea')) {
+                element.val('');
             }
         });
 
-        // Clear fields without data-research attribute BUT do NOT clear hidden inputs (the antiforgery hidden field)
+        // Clear visible inputs outside research area but DO NOT clear hidden inputs (antiforgery token etc.)
         $('input:not([data-research]):not([type="hidden"])').each(function () {
-            // Clear the files input
-            $(this).val('');
+            var element = $(this);
+            var elementType = (element.attr('type') || '').toLowerCase();
+            if (elementType === 'date') {
+                element.val(todayValue);
+            } else if (elementType === 'time') {
+                element.val(timeValue);
+            } else if (elementType === 'number' || element.hasClass('number-input')) {
+                element.val('0');
+            } else {
+                element.val('');
+            }
         });
+
+        // Reset file list UI and file inputs
         $('#fileList').empty();
-        $('#fileList').append('<p class="text-truncate">No uploaded files.</p>')
+        $('#fileList').append('<p class="text-truncate">No uploaded files.</p>');
         $('#formUploadFiles').trigger('reset');
         uploadedFiles = [];
+
+        // Reset selects that are not part of data-research
         $('select:not([data-research])').each(function () {
             $(this).prop('selectedIndex', 1);
         });
