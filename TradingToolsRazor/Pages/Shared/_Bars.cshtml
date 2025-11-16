@@ -28,18 +28,6 @@
         Trading
     </div>
     <!-- Nav Item - Pages Collapse Menu -->
-   @*  <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#dropdownBtnTrades"
-           aria-expanded="false" aria-controls="dropdownBtnTrades">
-            <i class="fas fa-fw fa-chart-area"></i>
-            <span>Trades</span>
-        </a>
-        <div id="dropdownBtnTrades" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" asp-controller="Trades" asp-action="Index">Trades</a>
-            </div>
-        </div>
-    </li> *@
     <li class="nav-item">
         <a class="nav-link" asp-page="/Trades/Index">
             <i class="fas fa-fw fa-chart-area"></i>
@@ -51,6 +39,14 @@
         <a class="nav-link" asp-page="/Research/Index">
             <i class="fa-brands fa-researchgate"></i>
             <span>Research</span>
+        </a>
+    </li>
+
+    <!-- Nav Item - Statistics -->
+    <li class="nav-item">
+        <a class="nav-link" asp-page="/Statistics/Index">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Statistics</span>
         </a>
     </li>
     <!-- Nav Item - Calculator -->

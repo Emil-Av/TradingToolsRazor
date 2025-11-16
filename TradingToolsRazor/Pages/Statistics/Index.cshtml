@@ -1,0 +1,108 @@
+﻿@page
+@model TradingToolsRazor.Pages.Statistics.IndexModel
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Statistics";
+}
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+<!-- add this so JS can read and send the antiforgery token -->
+<input type="hidden" id="__RequestVerificationToken" value="@(Antiforgery.GetAndStoreTokens(HttpContext).RequestToken)" />
+
+<div class="container">
+    <h2 class="mb-4">Candle Bracketing Statistics</h2>
+
+    @if (Model.CandleBracketingStats == null || !Model.CandleBracketingStats.Any())
+    {
+        <div class="alert alert-info">No statistics available.</div>
+    }
+    else
+    {
+        // Get categories in the original sequence of appearance
+        var categoriesInOrder = Model.CandleBracketingStats.Select(s => s.Category).Distinct().ToList();
+
+        foreach (var category in categoriesInOrder)
+        {
+            var items = Model.CandleBracketingStats.Where(s => s.Category == category).ToList();
+
+            <div class="mb-5"> <!-- spacing between categories -->
+                <div class="mb-3">
+                    <h5 class="mb-0">@GetCategoryDescription(category)</h5>
+                </div>
+
+                @for (int i = 0; i < items.Count; i += 2)
+                {
+                    <div class="row mb-4">
+                        @for (int j = 0; j < 2; j++)
+                        {
+                            int index = i + j;
+                            if (index >= items.Count)
+                            {
+                                continue;
+                            }
+
+                            var stat = items[index];
+                            var cardClasses = GetCardClass(stat.Category);
+                            <div class="col-md-6 mb-3">
+                                <div class="card @cardClasses shadow h-100 py-2">
+                                    <div class="card-body">
+                                        <div class="row no-gutters align-items-center">
+                                            <div class="col mr-2">
+                                                <div class="text-xs font-weight-bold text-uppercase mb-1">
+                                                    @stat.Description
+                                                </div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                    @(stat.Value is double _double ? _double.ToString("0.##") : stat.Value?.ToString() ?? "-")
+                                                </div>
+                                                <div class="small text-muted mt-1">
+                                                    @stat.Key
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+@functions {
+    private string GetCategoryDescription(int category)
+    {
+        return category switch
+        {
+            1 => "Totals",
+            2 => "Wins",
+            3 => "Losses",
+            4 => "Non FTS/FTS trades",
+            5 => "Breakeven - non FTS/FTS trades",
+            6 => "Weekend trades",
+            7 => "Stats",
+            _ => "Unknown Category"
+        };
+    }
+
+    // Map category -> additional card classes (border-left-*, and text color)
+    private string GetCardClass(int category)
+    {
+        // Keep the base card styling, add different left-border and text color per category.
+        return category switch
+        {
+            1 => "border-left-primary",     // blue
+            2 => "border-left-success",     // green
+            3 => "border-left-danger",      // red
+            4 => "border-left-info",        // cyan
+            5 => "border-left-warning",     // yellow/orange
+            6 => "border-left-secondary",   // gray
+            7 => "border-left-dark",        // dark
+            _ => "border-left-primary"
+        };
+    }
+}
+

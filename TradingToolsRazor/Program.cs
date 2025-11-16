@@ -3,6 +3,7 @@ using DataAccess.Repository;
 using DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
+using Statistics.Services;
 using Utilities;
 
 var builder = WebApplication.CreateBuilder(args);

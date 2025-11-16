@@ -1,4 +1,5 @@
-﻿using Shared.Enums;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Shared.Enums;
 using SharedEnums.Enums;
 
 namespace Models
@@ -26,7 +27,13 @@ namespace Models
         /// </summary>
         public double ExitPriceForResearch { get; set; }
 
+        [NotMapped]
+        public bool IsWin => !IsLoss && ExitPriceForResearch == 0;
+
         public bool IsLoss { get; set; }
+
+        [NotMapped]
+        public bool IsBreakeven => !IsLoss && ExitPriceForResearch > 0;
 
         /// <summary>
         /// For longs.
