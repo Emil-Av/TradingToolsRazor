@@ -33,6 +33,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Redirect the root URL to the Home page
+app.MapGet("/", () => Results.Redirect("/Home"));
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

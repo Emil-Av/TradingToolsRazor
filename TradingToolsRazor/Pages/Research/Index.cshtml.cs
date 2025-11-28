@@ -418,7 +418,7 @@ namespace TradingToolsRazor.Pages.Research
             var samplesizes = await _unitOfWork.SampleSize
                 .GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.CandleBracketing);
 
-            await _deleteTradeHelper.CheckAndUpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls.First(), tradesInSampleSize.Cast<BaseTrade>().ToList(), _webHostEnvironment.WebRootPath);
+            await _deleteTradeHelper.UpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls!.First(), [.. tradesInSampleSize.Cast<BaseTrade>()], _webHostEnvironment.WebRootPath);
 
             if (!TrySetLastSampleSizeId(tradesInSampleSize, samplesizes, trade, out int lastSampleSizeId))
                 return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });
@@ -450,7 +450,7 @@ namespace TradingToolsRazor.Pages.Research
             var sampleSizes = await _unitOfWork.SampleSize
                 .GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.Cradle);
 
-            await _deleteTradeHelper.CheckAndUpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls.First(), tradesInSampleSize.Cast<BaseTrade>().ToList(), _webHostEnvironment.WebRootPath);
+            await _deleteTradeHelper.UpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls.First(), tradesInSampleSize.Cast<BaseTrade>().ToList(), _webHostEnvironment.WebRootPath);
 
             if (!TrySetLastSampleSizeId(tradesInSampleSize, sampleSizes, trade, out int lastSampleSizeId))
                 return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });
@@ -586,17 +586,22 @@ namespace TradingToolsRazor.Pages.Research
                 if (sampleSize.Strategy == EStrategy.Cradle)
                 {
                     ResearchVM.AllTrades = (await _unitOfWork.ResearchCradle
-                        .GetAllAsync(x => x.SampleSizeId == lastSampleSizeId)).Cast<object>().ToList();
+                                                                            .GetAllAsync(x => x.SampleSizeId == lastSampleSizeId))
+                                                                            .Cast<object>()
+                                                                            .ToList();
                     ResearchVM.ResearchCradle = (ResearchVM.AllTrades.FirstOrDefault() as ResearchCradle)!;
                 }
                 else if (sampleSize.Strategy == EStrategy.CandleBracketing)
                 {
-                    ResearchVM.AllTrades = (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(x => x.SampleSizeId == lastSampleSizeId)).Cast<object>().ToList();
+                    ResearchVM.AllTrades = (await _unitOfWork.ResearchCandleBracketing
+                                                                                    .GetAllAsync(x => x.SampleSizeId == lastSampleSizeId))
+                                                                                    .OrderBy(x => x.Date)
+                                                                                    .Cast<object>()
+                                                                                    .ToList();
                     ResearchVM.CandleBracketing = (ResearchVM.AllTrades.FirstOrDefault() as ResearchCandleBracketing)!;
                 }
                 else if (sampleSize.Strategy == EStrategy.FirstBarPullback)
                 {
-                    // Get all researched trades from the DB and project the instances into ResearchFirstBarPullbackDisplay
                     ResearchVM.AllTrades = (await _unitOfWork.ResearchFirstBarPullback
                                             .GetAllAsync(x => x.SampleSizeId == lastSampleSizeId))
                                             .Select(EntityMapper.EntityToViewModel<ResearchFirstBarPullback, ResearchFirstBarPullbackDisplay>)

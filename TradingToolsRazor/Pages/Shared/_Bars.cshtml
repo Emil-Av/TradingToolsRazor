@@ -1,4 +1,6 @@
-﻿<!-- Start of side bar -->
+﻿@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Env
+
+<!-- Start of side bar -->
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark toggled" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
@@ -97,6 +99,10 @@
                     </div>
                 </div>
             </form>
+
+            <span class="badge badge-info badge-pill ml-3 my-auto text-uppercase small">
+                <i class="fas fa-code mr-1"></i> @(Env.IsDevelopment() ? "Running Dev" : "Running Prod")
+            </span>
 
             <!-- Topbar Navbar -->
             <ul class="navbar-nav ml-auto">

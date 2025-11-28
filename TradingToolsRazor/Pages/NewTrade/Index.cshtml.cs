@@ -236,7 +236,8 @@ namespace TradingToolsRazor.Pages.NewTrade
                 x.Strategy == NewTradeVM.Strategy &&
                 x.TradeType == NewTradeVM.TradeType);
 
-            if (!listSampleSizes.Any()) return (0, false);
+            if (!listSampleSizes.Any()) 
+                return (0, false);
 
             id = listSampleSizes.Last().Id;
 
@@ -248,13 +249,24 @@ namespace TradingToolsRazor.Pages.NewTrade
                 ETradeType.Research when NewTradeVM.Strategy == EStrategy.Cradle =>
                     (await _unitOfWork.ResearchCradle.GetAllAsync(x => x.SampleSizeId == id)).Count,
 
+                ETradeType.Research when NewTradeVM.Strategy == EStrategy.CandleBracketing =>
+                    (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(x => x.SampleSizeId == id))
+                                                                                                        .Select(trade => trade.Date)
+                                                                                                        .Distinct()
+                                                                                                        .Count(),
+
                 ETradeType.PaperTrade or ETradeType.Trade =>
                     (await _unitOfWork.Trade.GetAllAsync(x => x.SampleSizeId == id)).Count,
 
                 _ => 0
             };
 
-            if (numberTradesInSampleSize == maxTradesProSampleSize) isFull = true;
+            if (listSampleSizes.Last().Strategy == EStrategy.CandleBracketing && numberTradesInSampleSize == 100)
+            {
+                isFull = true;
+            }
+            else if (numberTradesInSampleSize == maxTradesProSampleSize)
+                isFull = true;
 
             return (id, isFull);
         }

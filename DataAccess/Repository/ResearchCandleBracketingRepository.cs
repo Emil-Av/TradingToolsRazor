@@ -26,7 +26,7 @@ namespace DataAccess.Repository
 
                 foreach (var property in type.GetProperties())
                 {
-                    if (property.Name == "Id" || property.Name == "SampleSizeId")
+                    if (property.Name == "Id" || property.Name == "SampleSizeId" || property.Name == "IsWin" || property.Name == "IsBreakeven")
                     {
                         continue;
                     }

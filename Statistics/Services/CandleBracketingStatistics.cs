@@ -25,6 +25,7 @@ namespace Statistics.Services
                 new CandleBracketingStatisticItem(nameof(TotalWins), "Total Wins:", TotalWins(trades), 1),
                 new CandleBracketingStatisticItem(nameof(TotalLosses), "Total losses:", TotalLosses(trades), 1),
                 new CandleBracketingStatisticItem(nameof(TotalBreakevensTrades), "Total breakeven trades:", TotalBreakevensTrades(trades), 1),
+                new CandleBracketingStatisticItem(nameof(TotalUniqueDates), "Total unique dates in the sample size:", TotalUniqueDates(trades), 1),
 
                 new CandleBracketingStatisticItem(nameof(WinsWithoutFTS), "Wins without FTS:", WinsWithoutFTS(trades), 2),
                 new CandleBracketingStatisticItem(nameof(FTSWins), "FTS wins:", FTSWins(trades), 2),
@@ -52,7 +53,12 @@ namespace Statistics.Services
             };
 
             return statisticItems;
-        }        
+        }
+
+        private static int TotalUniqueDates(List<ResearchCandleBracketing> trades)
+        {
+            return trades.Select(trade => trade.Date).Distinct().Count();
+        }
 
         #region Totals
         public static int TotalTrades(List<ResearchCandleBracketing> trades)
@@ -150,21 +156,10 @@ namespace Statistics.Services
 
             var percentMoves = winners.Select(trade =>
             {
-                double move = 0;
-                try
-                {
-
-                 move = (double)(trade.Direction == EDirection.Long
-                                                                ? (trade.MaxPrice - trade.EntryPriceForResearch) / trade.EntryPriceForResearch * 100
-                                                                : (trade.EntryPriceForResearch - trade.MaxPrice) / trade.EntryPriceForResearch * 100)!;
-                }
-                catch (Exception ex)
-                {
-
-                }
-
+                double move = (double)(trade.Direction == EDirection.Long
+                                                               ? (trade.MaxPrice - trade.EntryPriceForResearch) / trade.EntryPriceForResearch * 100
+                                                               : (trade.EntryPriceForResearch - trade.MaxPrice) / trade.EntryPriceForResearch * 100)!;
                 return move;
-
             });
 
             return Math.Round(percentMoves.Average(), 2);
@@ -262,9 +257,9 @@ namespace Statistics.Services
                     double favorableMove = 0;
 
                     if (trade.Direction == EDirection.Long)
-                        favorableMove =  (double)(trade.MaxPrice - trade.EntryPriceForResearch)!;
+                        favorableMove = (double)(trade.MaxPrice - trade.EntryPriceForResearch)!;
                     else if (trade.Direction == EDirection.Short)
-                        favorableMove =(double)(trade.EntryPriceForResearch - trade.MaxPrice)!;
+                        favorableMove = (double)(trade.EntryPriceForResearch - trade.MaxPrice)!;
 
                     return favorableMove / trade.ATR;
                 })
@@ -334,7 +329,7 @@ namespace Statistics.Services
             Console.WriteLine($"Count below mean: {belowMean.Count}");
             Console.WriteLine("----------------------------------");
         }
- 
+
 
         #endregion
     }

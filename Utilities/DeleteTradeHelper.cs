@@ -21,7 +21,7 @@ namespace Utilities
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task CheckAndUpdateScreenshotPathsAfterDeletion(string screenshotPath, List<BaseTrade> tradesInSampleSize, string webRootPath)
+        public async Task UpdateScreenshotPathsAfterDeletion(string screenshotPath, List<BaseTrade> tradesInSampleSize, string webRootPath)
         {
             DeleteTradeDirectory(screenshotPath, webRootPath);
             int tradeNumber = ParseTradeNumber(screenshotPath);
@@ -107,9 +107,9 @@ namespace Utilities
 
         private void MoveFileIfExists(string oldFilePath, string newFilePath)
         {
-            if (System.IO.File.Exists(oldFilePath))
+            if (File.Exists(oldFilePath))
             {
-                System.IO.File.Move(oldFilePath, newFilePath, overwrite: true);
+                File.Move(oldFilePath, newFilePath, overwrite: true);
             }
         }
 
