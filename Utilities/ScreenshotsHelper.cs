@@ -27,7 +27,7 @@ namespace Utilities
         /// <param name="newTrade"></param>
         /// <param name="files"></param>
         /// <returns></returns>
-        public static async Task<List<string>> SaveFilesAsync<T>(string webRootPath, T vm, object newTrade, IFormFile[] files)
+        public static async Task<List<string>> SaveFilesAsync<T>(string webRootPath, T vm, object newTrade, IFormFile[] files, int tradesProSampleSize)
         {
             #region Create folders
             // /Screenshots
@@ -68,7 +68,7 @@ namespace Utilities
                     // Trade directories in the sample size e.g. Screenshots/Research/FirstBarPullback/10M/Sample Size 1/Trade 2
                     string[] tradesFolderInLastSampleSize = Directory.GetDirectories(lastSampleSizeFolder);
                     // Check the number of trades of the last sample size
-                    if (tradesFolderInLastSampleSize.Length < 100)
+                    if (tradesFolderInLastSampleSize.Length < tradesProSampleSize)
                     {
                         // create a folder for the trade
                         pathToSaveFiles = lastSampleSizeFolder;

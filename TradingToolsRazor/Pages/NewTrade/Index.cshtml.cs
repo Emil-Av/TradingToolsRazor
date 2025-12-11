@@ -30,7 +30,7 @@ namespace TradingToolsRazor.Pages.NewTrade
 
         #region Handlers
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet()
         {
             // Display the main page
             NewTradeParentVM.CandleBracketing.Date = DateOnly.FromDateTime(DateTime.Now);
@@ -99,7 +99,7 @@ namespace TradingToolsRazor.Pages.NewTrade
                 if (NewTradeVM.Strategy == EStrategy.FirstBarPullback)
                 {
                     var researchData = await SaveResearchDataFirstbarPullback(maxTradesProSampleSize: 20);
-                    var newTrade = await SetNewTradeData(researchData, files);
+                    var newTrade = await SetNewTradeData(researchData, files, 20);
                     await CreateJournal(newTrade);
 
                     _unitOfWork.Trade.Add(newTrade);
@@ -121,10 +121,10 @@ namespace TradingToolsRazor.Pages.NewTrade
                 newTrade.JournalId = journal.Id;
             }
 
-            async Task<Trade> SetNewTradeData(ResearchFirstBarPullback researchData, IFormFile[] files)
+            async Task<Trade> SetNewTradeData(ResearchFirstBarPullback researchData, IFormFile[] files, int maxTradesProSampleSize)
             {
                 var newTrade = EntityMapper.ViewModelDisplayToEntity<Trade, TradeDisplay>(NewTradeVM.TradeData, existingEntity: null);
-                await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, newTrade, files);
+                await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, newTrade, files, maxTradesProSampleSize);
 
                 newTrade.ResearchId = researchData.Id;
                 newTrade.SampleSizeId = researchData.SampleSizeId;
@@ -144,7 +144,7 @@ namespace TradingToolsRazor.Pages.NewTrade
                 var researchData = new ResearchCandleBracketing();
                 EntityMapper.ViewModelToEntity(researchData, viewData);
                 researchData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
-                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files);
+                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files, maxTradesProSampleSize);
 
                 _unitOfWork.ResearchCandleBracketing.Add(researchData);
                 try
@@ -167,7 +167,7 @@ namespace TradingToolsRazor.Pages.NewTrade
                 var researchData = new ResearchCradle();
                 EntityMapper.ViewModelToEntity(researchData, viewData);
                 researchData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
-                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files);
+                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files, maxTradesProSampleSize);
 
                 _unitOfWork.ResearchCradle.Add(researchData);
                 await _unitOfWork.SaveAsync();
@@ -183,7 +183,7 @@ namespace TradingToolsRazor.Pages.NewTrade
                 researchData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
                 if (maxTradesProSampleSize == 100)
                 {
-                    researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, researchData, files);
+                    researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, researchData, files, maxTradesProSampleSize);
                 }
 
                 _unitOfWork.ResearchFirstBarPullback.Add(researchData);
