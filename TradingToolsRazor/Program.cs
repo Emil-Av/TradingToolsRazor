@@ -2,9 +2,7 @@ using DataAccess.Data;
 using DataAccess.Repository;
 using DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Serialization;
-using Statistics.Services;
-using Utilities;
+using Utilities.Trade;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Primitives;
 using Models;
 using Models.ViewModels.DisplayClasses;
+using System.Diagnostics;
 
 namespace Utilities
 {
@@ -79,12 +80,11 @@ namespace Utilities
                 {
                     try
                     {
-
-                    property.SetValue(dbEntity, viewValue);
+                        property.SetValue(dbEntity, viewValue);
                     }
                     catch (Exception ex)
                     {
-
+                        Debug.WriteLine(ex.Message);
                     }
                 }
             }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using System.Formats.Asn1;
 
-namespace Utilities
+namespace Utilities.Trade
 {
     public class DeleteTradeHelper
     {

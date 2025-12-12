@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Utilities.Trade;
 
 namespace TradingToolsRazor.Pages.Research
 {
@@ -28,10 +29,9 @@ namespace TradingToolsRazor.Pages.Research
 
         public IndexModel(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, DeleteTradeHelper deleteTradeHelper)
         {
+            ResearchVM = new ();
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
-            ResearchVM = new ();
-            ResearchVM.AllTrades = new ();
             _deleteTradeHelper = deleteTradeHelper;
         }
 
@@ -166,198 +166,6 @@ namespace TradingToolsRazor.Pages.Research
                 return new JsonResult(new { error = $"Error saving the data: {ex.Message}" });
             }
             return new JsonResult(new { success = "Trade was successfully updated" });
-        }
-
-        // POST (form file): /Research?handler=UploadResearch
-        public async Task<IActionResult> OnPostUploadResearchAsync(IFormFile zipFile)
-        {
-            if (zipFile == null || zipFile.Length == 0)
-            {
-                // return notification error - keep simple Json response
-                return new JsonResult(new { error = "No file uploaded." });
-            }
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
-
-            try
-            {
-                using (var zipStream = new MemoryStream())
-                {
-                    await zipFile.CopyToAsync(zipStream);
-                    zipStream.Position = 0; // Reset the stream position to the beginning
-
-                    using (var archive = new ZipArchive(zipStream))
-                    {
-                        // Sort the entries to have the folders in ascending order (Trade 1, Trade 2..)
-                        List<ZipArchiveEntry> sortedEntries = archive.Entries
-                            .OrderBy(e => e.FullName, new NaturalStringComparer())
-                            .ToList();
-
-                        List<ResearchFirstBarPullback> researchTrades = new List<ResearchFirstBarPullback>();
-
-                        ETimeFrame researchedTF = default;
-                        int tradeIndex = 0;
-                        string currentSampleSize = string.Empty;
-                        string currentFolder = string.Empty;
-
-                        foreach (var entry in sortedEntries)
-                        {
-                            if (entry.FullName.Contains("Sample Size") && string.IsNullOrEmpty(currentSampleSize))
-                            {
-                                string[] researchInfo = entry.FullName.Split('/');
-                                if (researchInfo.Length > 1 && researchInfo[1].Contains("Sample Size"))
-                                {
-                                    currentSampleSize = researchInfo[1];
-                                    continue;
-                                }
-                            }
-
-                            if (entry.FullName.Contains(".csv"))
-                            {
-                                string[] researchInfo = entry.FullName.Split('-');
-                                if (!Int32.TryParse(researchInfo[1], out int strategy))
-                                {
-                                    TempData["error"] = "Error parsing the strategy number from the csv file name. Check the file name.";
-                                    return RedirectToPage("/Research/Index");
-                                }
-
-                                string tempTF = researchInfo[2].Replace(".csv", "");
-                                researchedTF = MyEnumConverter.TimeFrameFromString(tempTF).Value;
-
-                                // Set the sample size for the research
-                                SampleSize sampleSize = new SampleSize
-                                {
-                                    TradeType = ETradeType.Research,
-                                    Strategy = (EStrategy)strategy,
-                                    TimeFrame = researchedTF
-                                };
-                                _unitOfWork.SampleSize.Add(sampleSize);
-                                await _unitOfWork.SaveAsync();
-
-                                // Parse the .csv data
-                                using (var csvStream = entry.Open())
-                                {
-                                    var csvData = await ReadCsvFileAsync(csvStream);
-                                    if (csvData != null)
-                                    {
-                                        ResearchFirstBarPullback researchTrade = new ResearchFirstBarPullback();
-                                        for (int i = 0; i < csvData.Count; i++)
-                                        {
-                                            // First row is column names
-                                            if (i == 0) continue;
-
-                                            // Half ATR
-                                            if (i % 2 != 0)
-                                            {
-                                                researchTrade.SampleSizeId = sampleSize.Id;
-                                                researchTrade.OneToOneHitOn = csvData[i][1].Length > 0 ? int.Parse(csvData[i][1]) : 0;
-                                                researchTrade.IsOneToThreeHit = csvData[i][2] == "Yes";
-                                                researchTrade.IsOneToFiveHit = csvData[i][3] == "Yes";
-                                                researchTrade.IsBreakeven = csvData[i][4] == "Yes";
-                                                researchTrade.Outcome = csvData[i][5] == "Yes" ? EOutcome.Loss : EOutcome.Win;
-                                                researchTrade.MaxRR = csvData[i][6].Length > 0 ? int.Parse(csvData[i][6].Split('-')[1]) : 0;
-                                                researchTrade.MarketGaveSmth = csvData[i][7].Length > 0;
-                                                researchTrade.IsEntryAfter3To5Bars = csvData[i][8] == "Yes";
-                                                researchTrade.IsEntryAfter5Bars = csvData[i][9] == "Yes";
-                                                researchTrade.IsEntryAtPreviousSwingOnTrigger = csvData[i][10] == "Yes";
-                                                researchTrade.IsEntryBeforePreviousSwingOnTrigger = csvData[i][11] == "Yes";
-                                                researchTrade.IsEntryBeforePreviousSwingOn4H = csvData[i][12] == "Yes";
-                                                researchTrade.IsEntryBeforePreviousSwingOnD = csvData[i][13] == "Yes";
-                                                researchTrade.IsMomentumTrade = csvData[i][14] == "Yes";
-                                                researchTrade.IsTriggerTrending = csvData[i][15] == "Yes";
-                                                researchTrade.Is4HTrending = csvData[i][16] == "Yes";
-                                                researchTrade.IsDTrending = csvData[i][17] == "Yes";
-                                                researchTrade.IsEntryAfteriBar = csvData[i][18] == "Yes";
-                                                researchTrade.IsSignalBarStrongReversal = csvData[i][18] == "Yes";
-                                                researchTrade.IsSignalBarInTradeDirection = csvData[i][19] == "Yes";
-                                                researchTrade.Comment = csvData[i].Count > 22 ? csvData[i][22] : string.Empty;
-                                            }
-                                            // Full ATR
-                                            else
-                                            {
-                                                researchTrade.FullATROneToOneHitOn = csvData[i][1].Length > 0 ? int.Parse(csvData[i][1]) : 0;
-                                                researchTrade.IsFullATROneToThreeHit = csvData[i][2] == "Yes";
-                                                researchTrade.IsFullATROneToFiveHit = csvData[i][3] == "Yes";
-                                                researchTrade.IsFullATRBreakeven = csvData[i][4] == "Yes";
-                                                researchTrade.IsFullATRLoss = csvData[i][5] == "Yes";
-                                                researchTrade.FullATRMaxRR = csvData[i][6].Length > 0 ? int.Parse(csvData[i][6].Split('-')[1]) : 0;
-                                                researchTrade.MarketGaveSmth = csvData[i][7].Length > 0;
-                                                researchTrades.Add(researchTrade);
-                                                researchTrade = new ResearchFirstBarPullback();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                // Inside the folder with the screenshots
-                                if (entry.FullName.EndsWith(".png"))
-                                {
-                                    // Split the name to get the folder's name
-                                    string[] tradeInfo = entry.FullName.Split('/');
-                                    // What is left is "Trade x", x is the number of the trade. Remove "Trade" to get the number.
-                                    if (tradeInfo.Length > 3)
-                                    {
-                                        string tempTradeInfo = tradeInfo[3].Replace("Trade", "").Trim();
-                                        if (Int32.TryParse(tempTradeInfo, out int tempTradeIndex))
-                                        {
-                                            tradeIndex = tempTradeIndex - 1;
-                                        }
-                                    }
-
-                                    currentFolder = ScreenshotsHelper.CreateScreenshotFolders(tradeInfo, currentFolder, entry.FullName, wwwRootPath, 3);
-
-                                    if (researchTrades.Count <= tradeIndex)
-                                    {
-                                        // Ensure the list has an entry for the index
-                                        while (researchTrades.Count <= tradeIndex)
-                                            researchTrades.Add(new ResearchFirstBarPullback());
-                                    }
-
-                                    if (researchTrades[tradeIndex].ScreenshotsUrls == null)
-                                    {
-                                        researchTrades[tradeIndex].ScreenshotsUrls = new List<string>();
-                                    }
-
-                                    string targetFile = Path.Combine(currentFolder, entry.Name);
-                                    entry.ExtractToFile(targetFile, overwrite: true);
-                                    string screenshotName = entry.FullName.Split('/').Last();
-                                    string screenshotPath = currentFolder.Replace(wwwRootPath, "").Replace("\\", "/");
-                                    researchTrades[tradeIndex].ScreenshotsUrls.Add(Path.Combine(screenshotPath, screenshotName));
-                                }
-                            }
-                        }
-
-                        if (researchTrades.Any())
-                        {
-                            _unitOfWork.ResearchFirstBarPullback.AddRange(researchTrades);
-                            await _unitOfWork.SaveAsync();
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error parsing the csv file. Error message: {ex.Message}");
-                TempData["error"] = $"Error parsing the csv file. Error message: {ex.Message}";
-            }
-
-            async Task<List<List<string>>> ReadCsvFileAsync(Stream csvStream)
-            {
-                var result = new List<List<string>>();
-                using (var reader = new StreamReader(csvStream))
-                {
-                    while (await reader.ReadLineAsync() is string line)
-                    {
-                        var values = line.Split(',').ToList();
-                        result.Add(values);
-                    }
-                }
-
-                return result;
-            }
-
-            return RedirectToPage("/Research/Index");
         }
 
         #endregion
@@ -674,7 +482,8 @@ namespace TradingToolsRazor.Pages.Research
                 }
                 else if (ResearchVM.HasSampleSizeChanged)
                 {
-                    lastSampleSizeId = sampleSizes.ElementAtOrDefault(sampleSizeNumber - 1)?.Id ?? -1;
+                    lastSampleSizeId = sampleSizes.Where(sampleSize => sampleSize.TimeFrame == ResearchVM.CurrentTimeFrame).ElementAt(sampleSizeNumber - 1).Id;
+                    //lastSampleSizeId = sampleSizes.ElementAtOrDefault(sampleSizeNumber - 1)?.Id ?? -1;
                 }
                 else
                 {

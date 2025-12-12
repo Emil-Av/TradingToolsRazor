@@ -7,6 +7,7 @@ using Models.ViewModels.DisplayClasses;
 using Newtonsoft.Json;
 using Shared;
 using SharedEnums.Enums;
+using System.Diagnostics;
 using Utilities;
 
 namespace TradingToolsRazor.Pages.NewTrade
@@ -30,7 +31,7 @@ namespace TradingToolsRazor.Pages.NewTrade
 
         #region Handlers
 
-        public async Task<IActionResult> OnGet()
+        public IActionResult OnGet()
         {
             // Display the main page
             NewTradeParentVM.CandleBracketing.Date = DateOnly.FromDateTime(DateTime.Now);
@@ -124,7 +125,7 @@ namespace TradingToolsRazor.Pages.NewTrade
             async Task<Trade> SetNewTradeData(ResearchFirstBarPullback researchData, IFormFile[] files, int maxTradesProSampleSize)
             {
                 var newTrade = EntityMapper.ViewModelDisplayToEntity<Trade, TradeDisplay>(NewTradeVM.TradeData, existingEntity: null);
-                await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, newTrade, files, maxTradesProSampleSize);
+                //await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, newTrade, files, maxTradesProSampleSize);
 
                 newTrade.ResearchId = researchData.Id;
                 newTrade.SampleSizeId = researchData.SampleSizeId;
@@ -136,15 +137,16 @@ namespace TradingToolsRazor.Pages.NewTrade
                 return newTrade;
             }
 
-            async Task<ResearchCandleBracketing> SaveCandleBracketingData(int maxTradesProSampleSize)
+            async Task SaveCandleBracketingData(int maxTradesProSampleSize)
             {
                 var viewData = NewTradeVM.ResearchData as ResearchCandleBracketing;
-                viewData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
+                var sampleSizeData = await ProcessSampleSize(maxTradesProSampleSize, viewData.IsFlippedTheSwitch);
+                viewData!.SampleSizeId = sampleSizeData.id;
 
                 var researchData = new ResearchCandleBracketing();
                 EntityMapper.ViewModelToEntity(researchData, viewData);
-                researchData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
-                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files, maxTradesProSampleSize);
+                researchData.SampleSizeId = sampleSizeData.id;
+                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files, sampleSizeData.isFull);
 
                 _unitOfWork.ResearchCandleBracketing.Add(researchData);
                 try
@@ -153,21 +155,20 @@ namespace TradingToolsRazor.Pages.NewTrade
                 }
                 catch (Exception ex)
                 {
-
+                    Debug.Write($"{ex.Message}");
                 }
-
-                return viewData;
             }
 
             async Task<ResearchCradle> SaveResearchCradleData(int maxTradesProSampleSize)
             {
                 var viewData = NewTradeVM.ResearchData as ResearchCradle;
-                viewData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
+                var sampleSizeData = await ProcessSampleSize(maxTradesProSampleSize);
+                viewData.SampleSizeId = sampleSizeData.id;
 
                 var researchData = new ResearchCradle();
                 EntityMapper.ViewModelToEntity(researchData, viewData);
                 researchData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
-                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files, maxTradesProSampleSize);
+                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, viewData, files, sampleSizeData.isFull);
 
                 _unitOfWork.ResearchCradle.Add(researchData);
                 await _unitOfWork.SaveAsync();
@@ -180,11 +181,10 @@ namespace TradingToolsRazor.Pages.NewTrade
                 var viewData = NewTradeVM.ResearchData as ResearchFirstBarPullbackDisplay;
                 var researchData = EntityMapper.ViewModelDisplayToEntity<ResearchFirstBarPullback, ResearchFirstBarPullbackDisplay>(viewData, existingEntity: null);
 
-                researchData.SampleSizeId = (await ProcessSampleSize(maxTradesProSampleSize)).id;
-                if (maxTradesProSampleSize == 100)
-                {
-                    researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, researchData, files, maxTradesProSampleSize);
-                }
+                var sampleSizeData = await ProcessSampleSize(maxTradesProSampleSize);
+                researchData.SampleSizeId = sampleSizeData.id;
+
+                researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, researchData, files, sampleSizeData.isFull);
 
                 _unitOfWork.ResearchFirstBarPullback.Add(researchData);
                 await _unitOfWork.SaveAsync();
@@ -195,9 +195,9 @@ namespace TradingToolsRazor.Pages.NewTrade
             #endregion
         }
 
-        private async Task<(int id, bool wasFull)> ProcessSampleSize(int maxTradesProSampleSize)
+        private async Task<(int id, bool isFull)> ProcessSampleSize(int maxTradesProSampleSize, bool isFlippedTheSwitch = false)
         {
-            var sampleSizeData = await CheckLastSampleSize(maxTradesProSampleSize);
+            var sampleSizeData = await CheckLastSampleSize(maxTradesProSampleSize, isFlippedTheSwitch);
 
             if (sampleSizeData.isFull || sampleSizeData.id == 0)
             {
@@ -226,9 +226,8 @@ namespace TradingToolsRazor.Pages.NewTrade
             return sampleSizeData;
         }
 
-        private async Task<(int id, bool isFull)> CheckLastSampleSize(int maxTradesProSampleSize)
+        private async Task<(int id, bool isFull)> CheckLastSampleSize(int maxTradesProSampleSize, bool isFlippedTheSwitch)
         {
-            int id = 0;
             bool isFull = false;
 
             var listSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x =>
@@ -236,39 +235,38 @@ namespace TradingToolsRazor.Pages.NewTrade
                 x.Strategy == NewTradeVM.Strategy &&
                 x.TradeType == NewTradeVM.TradeType);
 
-            if (!listSampleSizes.Any()) 
+            if (!listSampleSizes.Any())
                 return (0, false);
 
-            id = listSampleSizes.Last().Id;
+            var sampleSize = listSampleSizes.Last();
 
             int numberTradesInSampleSize = NewTradeVM.TradeType switch
             {
                 ETradeType.Research when NewTradeVM.Strategy == EStrategy.FirstBarPullback =>
-                    (await _unitOfWork.ResearchFirstBarPullback.GetAllAsync(x => x.SampleSizeId == id)).Count,
+                    (await _unitOfWork.ResearchFirstBarPullback.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
                 ETradeType.Research when NewTradeVM.Strategy == EStrategy.Cradle =>
-                    (await _unitOfWork.ResearchCradle.GetAllAsync(x => x.SampleSizeId == id)).Count,
+                    (await _unitOfWork.ResearchCradle.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
                 ETradeType.Research when NewTradeVM.Strategy == EStrategy.CandleBracketing =>
-                    (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(x => x.SampleSizeId == id))
-                                                                                                        .Select(trade => trade.Date)
-                                                                                                        .Distinct()
-                                                                                                        .Count(),
+                    (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Select(trade => trade.Date)
+                                                                                                       .Distinct()
+                                                                                                       .Count(),
 
                 ETradeType.PaperTrade or ETradeType.Trade =>
-                    (await _unitOfWork.Trade.GetAllAsync(x => x.SampleSizeId == id)).Count,
+                    (await _unitOfWork.Trade.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
                 _ => 0
             };
 
-            if (listSampleSizes.Last().Strategy == EStrategy.CandleBracketing && numberTradesInSampleSize == 100)
+            if (sampleSize.Strategy == EStrategy.CandleBracketing && numberTradesInSampleSize == 100 && !isFlippedTheSwitch)
             {
                 isFull = true;
             }
             else if (numberTradesInSampleSize == maxTradesProSampleSize)
                 isFull = true;
 
-            return (id, isFull);
+            return (sampleSize.Id, isFull);
         }
 
         #endregion

@@ -10,10 +10,11 @@ namespace Models.ViewModels
         #region Constructor
         public ResearchVM()
         {
-            AvailableStrategies = new List<EStrategy>();
-            AvailableTimeframes = new List<ETimeFrame>();
+            AvailableStrategies = [];
+            AvailableTimeframes = [];
             CurrentTrade = new();
             TradeData = new();
+            AllTrades = [];
         }
 
         #endregion
