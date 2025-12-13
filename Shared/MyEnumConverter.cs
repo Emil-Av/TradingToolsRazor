@@ -77,7 +77,7 @@ namespace Shared
             Dictionary<string, ETradeType> tradeTypes = new Dictionary<string, ETradeType>()
             {
                 { "Trade", ETradeType.Trade },
-                { "Paper Trade" , ETradeType.PaperTrade },
+                //{ "Paper Trade" , ETradeType.PaperTrade },
                 { "Research", ETradeType.Research },
             };
 
@@ -96,7 +96,7 @@ namespace Shared
             Dictionary<ETradeType, string> tradeTypes = new Dictionary<ETradeType, string>()
             {
                 { ETradeType.Trade , "Trade"},
-                { ETradeType.PaperTrade, "Paper Trade" },
+                //{ ETradeType.PaperTrade, "Paper Trade" }
                 { ETradeType.Research, "Research" },
             };
 

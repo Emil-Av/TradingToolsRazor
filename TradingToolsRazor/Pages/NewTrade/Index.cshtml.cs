@@ -253,7 +253,7 @@ namespace TradingToolsRazor.Pages.NewTrade
                                                                                                        .Distinct()
                                                                                                        .Count(),
 
-                ETradeType.PaperTrade or ETradeType.Trade =>
+                ETradeType.Trade or ETradeType.Trade =>
                     (await _unitOfWork.Trade.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
                 _ => 0

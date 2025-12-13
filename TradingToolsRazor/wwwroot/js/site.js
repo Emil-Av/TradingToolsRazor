@@ -12,19 +12,6 @@ $(document).on('click', function (event) {
 });
 
 
-// Toggles the visibility of the loading indicator and the main content of a page
-var loadingIndicator = $('#loadingIndicator');
-var content = $('#myContent');
-function showLoadingIndicator() {
-    content.removeClass('showMyContent').addClass('hideMyContent');
-    loadingIndicator.css('display', 'block');
-}
-
-function hideLoadingIndicator() {
-    content.removeClass('hideMyContent').addClass('showMyContent');
-    loadingIndicator.css('display', 'none');
-}
-
 // Gets the data from the elements which have data-trade-data attribute. Used in multiple views.
 function getTradeData() {
     var tradeData = {};
@@ -63,19 +50,6 @@ function validateNumberInputs() {
     return isValid;
 }
 
-/**
- * Explanation of the Regular Expression
-    ^: Asserts the start of the string.
-    -?: Allows an optional negative sign.
-    \d+: Matches one or more digits.
-    (\,\d+)?: Matches an optional decimal point followed by one or more digits.
-    $: Asserts the end of the string.
- */
-function isNumeric(value) {
-    const regex = /^-?\d+(\,\d+)?$/;
-    return regex.test(value);
-}
-
 function setTimeFrameMenu(timeframes, timeFrameMapping, currentTimeFrame) {
     $('#dropdownBtnTimeFrame').empty();
     let availableTimeFrames = '';
@@ -88,5 +62,55 @@ function setTimeFrameMenu(timeframes, timeFrameMapping, currentTimeFrame) {
 
     // Corrected the issue here by removing the invalid empty brackets
     $('#spanTimeFrame').text(timeFrameMapping[currentTimeFrame]);
+}
+
+// Map display text to exact enum identifiers used by GetStatisticsModel
+// Enums:
+// ETimeFrame: M5, M10, M15, M30, H1, H2, H4, D
+// EStrategy: FirstBarPullback, Cradle, CandleBracketing
+// ETradeType: Trade, Research
+function toEnumName(menu, selectedValue) {
+    const menuValue = selectedValue.trim();
+
+    if (menu === 'timeFrame') {
+        // Accept these directly; ensure uppercase without spaces
+        const timeframe = menuValue.toUpperCase();
+        // Normalize common human-readable forms to enum names
+        const map = {
+            '5M': 0,
+            '10M': 1,
+            '15M': 2,
+            '30M': 3,
+            '1H': 4,
+            '2H': 5,
+            '4H': 6,
+            'D': 7
+        };
+        return map[timeframe] || timeframe;
+    }
+
+    if (menu === 'strategy') {
+        const map = {
+            'First Bar Pullback': 0,
+            'Cradle': 1,
+            'Candle Bracketing': 2,
+        };
+        return map[menuValue] || menuValue.replace(/\s+/g, '');
+    }
+
+    if (menu === 'tradeType') {
+        const map = {
+            'Trade': 1,
+            'Research': 2
+        };
+        return map[menuValue] || menuValue;
+    }
+
+    if (menu === 'time') {
+        // TimeOnly? expects "HH:mm"
+        return menuValue;
+    }
+
+    return menuValue;
 }
 

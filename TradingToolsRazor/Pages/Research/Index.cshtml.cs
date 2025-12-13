@@ -461,7 +461,6 @@ namespace TradingToolsRazor.Pages.Research
                     return sampleSizes.LastOrDefault()?.Id ?? -1;
 
                 int lastSampleSizeId = -1;
-                var currentTimeFrame = ResearchVM.CurrentTimeFrame;
 
                 if (ResearchVM.HasStrategyChanged)
                 {
@@ -470,12 +469,12 @@ namespace TradingToolsRazor.Pages.Research
                 }
                 else if (ResearchVM.HasTimeFrameChanged && ResearchVM.HasSampleSizeChanged)
                 {
-                    var filtered = sampleSizes.Where(s => s.TimeFrame == currentTimeFrame).ToList();
+                    var filtered = sampleSizes.Where(s => s.TimeFrame == ResearchVM.CurrentTimeFrame).ToList();
                     lastSampleSizeId = filtered.ElementAtOrDefault(sampleSizeNumber - 1)?.Id ?? -1;
                 }
                 else if (ResearchVM.HasTimeFrameChanged)
                 {
-                    var filtered = sampleSizes.Where(s => s.TimeFrame == currentTimeFrame).ToList();
+                    var filtered = sampleSizes.Where(s => s.TimeFrame == ResearchVM.CurrentTimeFrame).ToList();
                     var last = filtered.LastOrDefault();
                     lastSampleSizeId = last?.Id ?? -1;
                     sampleSizeNumber = filtered.Count;
@@ -483,7 +482,6 @@ namespace TradingToolsRazor.Pages.Research
                 else if (ResearchVM.HasSampleSizeChanged)
                 {
                     lastSampleSizeId = sampleSizes.Where(sampleSize => sampleSize.TimeFrame == ResearchVM.CurrentTimeFrame).ElementAt(sampleSizeNumber - 1).Id;
-                    //lastSampleSizeId = sampleSizes.ElementAtOrDefault(sampleSizeNumber - 1)?.Id ?? -1;
                 }
                 else
                 {
@@ -567,9 +565,9 @@ namespace TradingToolsRazor.Pages.Research
             var currentStrategy = ResearchVM.CurrentSampleSize?.Strategy ?? EStrategy.FirstBarPullback;
             var filtered = sampleSizes.Where(x => x.Strategy == currentStrategy).ToList();
 
-            foreach (var s in filtered)
-                if (!ResearchVM.AvailableTimeframes.Contains(s.TimeFrame))
-                    ResearchVM.AvailableTimeframes.Add(s.TimeFrame);
+            foreach (var strategy in filtered)
+                if (!ResearchVM.AvailableTimeframes.Contains(strategy.TimeFrame))
+                    ResearchVM.AvailableTimeframes.Add(strategy.TimeFrame);
 
             ResearchVM.AvailableTimeframes.Sort();
         }
