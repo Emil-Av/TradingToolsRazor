@@ -53,6 +53,23 @@
     </div>
 </div>
 
+<!-- Menu Sample Size -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Sample Size: <span id="spanSampleSize">@Model.CurrentSampleSizeNumber</span>
+        </button>
+        <div class="dropdown-menu animated--fade-in" id="dropdownBtnSampleSize" aria-labelledby="dropdownMenuButton">
+            @for (int i = 0; i < Model.NumberSampleSizes; i++)
+            {
+                var isSelected = i + 1 == Model.NumberSampleSizes;
+                <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@(i+1)</a>
+            }
+            <a class="dropdown-item" role="button">All</a>
+        </div>
+    </div>
+</div>
+
 @{
     if (Model.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
     {
@@ -70,7 +87,6 @@
                         var isSelected = time == currentTradeTime;
                         <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@time</a>
                     }
-                    <a class="dropdown-item" role="button">All</a>
                 </div>
             </div>
         </div>

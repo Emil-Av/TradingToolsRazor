@@ -73,9 +73,6 @@ function toEnumName(menu, selectedValue) {
     const menuValue = selectedValue.trim();
 
     if (menu === 'timeFrame') {
-        // Accept these directly; ensure uppercase without spaces
-        const timeframe = menuValue.toUpperCase();
-        // Normalize common human-readable forms to enum names
         const map = {
             '5M': 0,
             '10M': 1,
@@ -86,7 +83,7 @@ function toEnumName(menu, selectedValue) {
             '4H': 6,
             'D': 7
         };
-        return map[timeframe] || timeframe;
+        return map[menuValue];
     }
 
     if (menu === 'strategy') {
