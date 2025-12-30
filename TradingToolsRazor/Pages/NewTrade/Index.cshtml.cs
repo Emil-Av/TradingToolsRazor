@@ -100,7 +100,7 @@ namespace TradingToolsRazor.Pages.NewTrade
                 if (NewTradeVM.Strategy == EStrategy.FirstBarPullback)
                 {
                     var researchData = await SaveResearchDataFirstbarPullback(maxTradesProSampleSize: 20);
-                    var newTrade = await SetNewTradeData(researchData, files, 20);
+                    var newTrade = SetNewTradeData(researchData, files, 20);
                     await CreateJournal(newTrade);
 
                     _unitOfWork.Trade.Add(newTrade);
@@ -122,7 +122,7 @@ namespace TradingToolsRazor.Pages.NewTrade
                 newTrade.JournalId = journal.Id;
             }
 
-            async Task<Trade> SetNewTradeData(ResearchFirstBarPullback researchData, IFormFile[] files, int maxTradesProSampleSize)
+            Trade SetNewTradeData(ResearchFirstBarPullback researchData, IFormFile[] files, int maxTradesProSampleSize)
             {
                 var newTrade = EntityMapper.ViewModelDisplayToEntity<Trade, TradeDisplay>(NewTradeVM.TradeData, existingEntity: null);
                 //await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, NewTradeVM, newTrade, files, maxTradesProSampleSize);
@@ -140,7 +140,7 @@ namespace TradingToolsRazor.Pages.NewTrade
             async Task SaveCandleBracketingData(int maxTradesProSampleSize)
             {
                 var viewData = NewTradeVM.ResearchData as ResearchCandleBracketing;
-                var sampleSizeData = await ProcessSampleSize(maxTradesProSampleSize, viewData.IsFlippedTheSwitch);
+                var sampleSizeData = await ProcessSampleSize(maxTradesProSampleSize, viewData!.IsFlippedTheSwitch);
                 viewData!.SampleSizeId = sampleSizeData.id;
 
                 var researchData = new ResearchCandleBracketing();

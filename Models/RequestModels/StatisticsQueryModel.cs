@@ -20,6 +20,8 @@ namespace Models.RequestModels
         /// </summary>
         public bool IsInitialLoading => TimeFrame == null;
 
+        public bool IsNewLoad { get; set; }
+
         public int SampleSizeNumber { get; set; }
 
         public string? Time { get; set; }

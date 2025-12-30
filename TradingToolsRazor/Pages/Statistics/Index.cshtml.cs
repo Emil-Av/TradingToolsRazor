@@ -25,7 +25,10 @@ namespace TradingToolsRazor.Pages.Statistics
 
         public List<EStrategy> AvailableStrategies { get; set; } = [];
 
-        public List<string> Times { get; set; } = [];
+        /// <summary>
+        /// Relevant for CandleBracketing strategies.
+        /// </summary>
+        public List<TimeOnly> Times { get; set; } = [];
 
         public ResearchCandleBracketing? CurrentResearchCandleBracketingTrade { get; set; }
 
@@ -46,17 +49,22 @@ namespace TradingToolsRazor.Pages.Statistics
             SetTimeFrameMenu(sampleSizes);
             SetStrategiesMenu(sampleSizes);
 
-            var sampleSizeData = GetSampleSize(sampleSizes, query);
-            CurrentSampleSize = sampleSizeData.sampleSize;
+            var sampleSizeData = await GetSampleSize(sampleSizes, query);
+            CurrentSampleSize = sampleSizeData.sampleSizes.FirstOrDefault();
             await SetSampleSizeNumber(sampleSizeData, sampleSizes, query);
 
-            await SetTimesMenu(sampleSizeData.sampleSize);
-            await SetStatisticsAndCurrentTrade(sampleSizeData.sampleSize);
+            await SetTimesMenu(sampleSizeData.sampleSizes.FirstOrDefault()!);
+            await SetStatisticsAndCurrentTrade(sampleSizeData.sampleSizes.FirstOrDefault()!);
 
             return Page();
         }
 
-        private async Task SetSampleSizeNumber((SampleSize sampleSize, int numberSampleSizes) sampleSizeData, List<SampleSize> sampleSizes, StatisticsQueryModel query)
+        private async Task SetTimesMenu(SampleSize sampleSize)
+        {
+            Times = [.. (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(trade => trade.SampleSize!.TimeFrame == sampleSize.TimeFrame)).Select(trade => trade.Time).Distinct()];
+        }
+
+        private async Task SetSampleSizeNumber((List<SampleSize> sampleSizes, int numberSampleSizes) sampleSizeData, List<SampleSize> sampleSizes, StatisticsQueryModel query)
         {
             if (query.IsInitialLoading)
             {
@@ -68,60 +76,57 @@ namespace TradingToolsRazor.Pages.Statistics
                 if (query.Strategy == EStrategy.CandleBracketing)
                 {
                     // load all sample sizes for candle bracketing, trade type, time frame and time
-                    await SetSampleSizeNumberForCandleBracketing(null, sampleSizes, sampleSizeData, query);
+                    await SetSampleSizeNumberForCandleBracketing(sampleSizes, sampleSizeData, query);
                 }
             }
         }
-
-        private async Task SetSampleSizeNumberWhenInitialLoading((SampleSize sampleSize, int numberSampleSizes) sampleSizeData, List<SampleSize> sampleSizes, StatisticsQueryModel query)
+        private async Task SetSampleSizeNumberWhenInitialLoading((List<SampleSize> sampleSizes, int numberSampleSizes) sampleSizeData, List<SampleSize> sampleSizes, StatisticsQueryModel query)
         {
-            if (sampleSizeData.sampleSize.Strategy == EStrategy.CandleBracketing)
+            if (sampleSizeData.sampleSizes.FirstOrDefault()?.Strategy == EStrategy.CandleBracketing)
             {
-                var time = (await _unitOfWork.ResearchCandleBracketing.GetAsync(trade => trade.SampleSizeId == sampleSizeData.sampleSize.Id)).Time;
-                await SetSampleSizeNumberForCandleBracketing(time, sampleSizes, sampleSizeData, query);
-            }
-            else
-            {
-                // To be done when other strategies are added
-                NumberSampleSizes = sampleSizeData.numberSampleSizes;
-                CurrentSampleSizeNumber = NumberSampleSizes;
+                await SetSampleSizeNumberForCandleBracketing(sampleSizes, sampleSizeData, query);
             }
         }
 
-        private async Task SetSampleSizeNumberForCandleBracketing(TimeOnly? time, List<SampleSize> sampleSizes, (SampleSize sampleSize, int numberSampleSizes) sampleSizeData, StatisticsQueryModel query)
+        private async Task SetSampleSizeNumberForCandleBracketing(List<SampleSize> sampleSizes, (List<SampleSize> sampleSizes, int numberSampleSizes) sampleSizeData, StatisticsQueryModel query)
         {
-            time ??= TimeOnly.Parse(query.Time!);
             List<int> sampleSizeIds = [];
+            var trades = await _unitOfWork.ResearchCandleBracketing
+                    .GetAllAsync(x => x.SampleSize!.TimeFrame == sampleSizeData.sampleSizes.FirstOrDefault()!.TimeFrame && x.SampleSize.TradeType == sampleSizeData.sampleSizes.FirstOrDefault()!.TradeType,
+                                  includeProperties: "SampleSize");
 
             if (query.IsInitialLoading)
             {
-                sampleSizeIds = [.. (await _unitOfWork.ResearchCandleBracketing
-                    .GetAllAsync(x => x.Time == time && x.SampleSize!.TimeFrame == sampleSizeData.sampleSize.TimeFrame, includeProperties: "SampleSize"))
-                    .Select(x => x.SampleSizeId)
+                var currentTime = trades.First(trade => trade.SampleSizeId == sampleSizeData.sampleSizes.FirstOrDefault()!.Id).Time;
+                sampleSizeIds = [.. trades
+                    .Where(trade => trade.Time == currentTime)
+                    .Select(trade => trade.SampleSizeId)
                     .Distinct()];
             }
             else
             {
-                sampleSizeIds = [.. (await _unitOfWork.ResearchCandleBracketing
-                    .GetAllAsync(x => x.TimeFrame == query.TimeFrame && x.SampleSize!.TradeType == query.TradeType))
-                    .Select(x => x.SampleSizeId)
+                sampleSizeIds = [.. trades
+                    .Where(trade => trade.Time == TimeOnly.Parse(query.Time!))
+                    .Select(trade => trade.SampleSizeId)
                     .Distinct()];
             }
 
-            NumberSampleSizes = sampleSizes.Where(x => sampleSizeIds.Contains(x.Id)).Count();
+            NumberSampleSizes = sampleSizeIds.Count;
             CurrentSampleSizeNumber = NumberSampleSizes;
         }
 
-        private (SampleSize sampleSize, int numberSampleSizes) GetSampleSize(List<SampleSize> sampleSizes, StatisticsQueryModel query)
+        private async Task<(List<SampleSize> sampleSizes, int numberSampleSizes)> GetSampleSize(List<SampleSize> sampleSizes, StatisticsQueryModel query)
         {
             if (query.IsInitialLoading)
             {
                 var sampleSize = sampleSizes.Last();
                 var numberSampleSizes = sampleSizes.Where(x => x.TimeFrame == sampleSize.TimeFrame && x.Strategy == sampleSize.Strategy && x.TradeType == sampleSize.TradeType).Count();
-                return (sampleSize, numberSampleSizes);
+                return (new List<SampleSize> { sampleSize }, numberSampleSizes);
             }
 
-            return (sampleSizes.First(sampleSize => sampleSize.TimeFrame == query.TimeFrame && sampleSize.Strategy == query.Strategy && sampleSize.TradeType == query.TradeType), 1);
+            var sampleSizeIdsForTime = (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(trade => trade.Time == TimeOnly.Parse(query.Time!))).Select(trade => trade.SampleSizeId).Distinct().ToList();
+
+            return (sampleSizes.Where(sampleSize => sampleSizeIdsForTime.Contains(sampleSize.Id)).ToList(), sampleSizeIdsForTime.Count);
         }
 
         private async Task SetStatisticsAndCurrentTrade(SampleSize sampleSize)
@@ -132,19 +137,6 @@ namespace TradingToolsRazor.Pages.Statistics
                 CurrentResearchCandleBracketingTrade = trades.Last();
                 CandleBracketingStats = CandleBracketingStatistics.GetAllStats(trades);
             }
-        }
-
-        private async Task SetTimesMenu(SampleSize sampleSize)
-        {
-            if (sampleSize.Strategy != EStrategy.CandleBracketing)
-            {
-                return;
-            }
-
-            Times = [.. (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(trade => trade.SampleSize!.Id == sampleSize.Id, includeProperties: "SampleSize"))
-                .Select(trade => trade.Time.ToString("HH:mm"))
-                .Distinct()
-                .OrderBy(time => time)];
         }
 
         private void SetStrategiesMenu(List<SampleSize> sampleSizes)

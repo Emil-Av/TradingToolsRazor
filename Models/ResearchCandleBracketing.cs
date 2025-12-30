@@ -10,8 +10,6 @@ namespace Models
 
         public TimeOnly Time { get;set; }
 
-        public ETimeFrame TimeFrame { get; set; }   
-
         public EDirection Direction { get; set; }
 
         public double CandleHigh { get; set; }

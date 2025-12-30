@@ -8,7 +8,7 @@
 
         menu.addEventListener('click', function (e) {
 
-            var getAllSampleSizes = false;
+            var isNewLoad = false;
             const item = e.target;
             if (!item || !item.classList.contains('dropdown-item')) return;
 
@@ -18,19 +18,19 @@
             // Update the visible span with user-friendly text
             span.textContent = selectedText;
 
-            if (menuId === 'dropdownBtnTimeFrame') {
-                getAllSampleSizes = true;
+            if (menuId === 'dropdownBtnTimeFrame' || menuId === 'dropdownBtnStrategy' || menuId === 'dropdownBtnTradeType') {
+                isNewLoad = true;
             }
 
             // Update visual selection in the dropdown
             Array.from(menu.querySelectorAll('.dropdown-item')).forEach(a => a.classList.remove('bg-gray-400'));
             item.classList.add('bg-gray-400');
 
-            loadStatistics(getAllSampleSizes);
+            loadStatistics(isNewLoad);
         });
     }
 
-    async function loadStatistics(hasTimeFrameChanged) {
+    async function loadStatistics(isNewLoad) {
         const timeFrameText = (document.getElementById('spanTimeFrame')?.textContent || '').trim();
         const strategyText = (document.getElementById('spanStrategy')?.textContent || '').trim();
         const tradeTypeText = (document.getElementById('spanTradeType')?.textContent || '').trim();
@@ -42,7 +42,8 @@
             strategy: toEnumName('strategy', strategyText),
             tradeType: toEnumName('tradeType', tradeTypeText),
             sampleSizeNumber: sampleSizeText.toLowerCase() === 'all' ? 0 : parseInt(sampleSizeText, 10),
-            time: timeText
+            time: timeText,
+            isNewLoad: isNewLoad
         };
 
         const params = new URLSearchParams();
@@ -51,6 +52,7 @@
         params.set('tradeType', payload.tradeType);
         params.set('time', payload.time);
         params.set('sampleSizeNumber', payload.sampleSizeNumber);
+        params.set('isNewLoad', payload.isNewLoad);
 
         // Navigate to GET /Statistics with query to trigger server-side render
         window.location.href = `/Statistics?${params.toString()}`;
@@ -62,6 +64,5 @@
         initDropdown({ menuId: 'dropdownBtnTradeType', spanId: 'spanTradeType' });
         initDropdown({ menuId: 'dropdownBtnOrderType', spanId: 'spanTime' });
         initDropdown({ menuId: 'dropdownBtnSampleSize', spanId: 'spanSampleSize' });
-
     });
 })();
