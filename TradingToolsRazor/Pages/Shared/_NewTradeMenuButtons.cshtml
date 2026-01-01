@@ -1,60 +1,84 @@
 ﻿@using global::Shared
 
+<style>
+    .select-dropdown-styled {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: #4e73df;
+        color: #fff;
+        border: 1px solid #4e73df;
+        border-radius: 0.35rem;
+        padding: 0.375rem 2rem 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23fff' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 8px 10px;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    .select-dropdown-styled:hover {
+        background-color: #2e59d9;
+        border-color: #2653d4;
+    }
+
+    .select-dropdown-styled:focus {
+        background-color: #2e59d9;
+        border-color: #2653d4;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(105, 136, 228, 0.5);
+    }
+
+    .select-dropdown-styled option {
+        background-color: #fff;
+        color: #3a3b45;
+    }
+</style>
+
 <!-- Menu Time Frame -->
 <div class="col-auto p-2">
-    <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Time Frame: <span id="spanTimeFrame"></span>
-        </button>
-        <div class="dropdown-menu animated--fade-in" id="dropdownBtnTimeFrame" aria-labelledby="dropdownMenuButton">
-            @foreach (ETimeFrame tf in Enum.GetValues(typeof(ETimeFrame)))
-            {
-                <a class="dropdown-item" role="button">@MyEnumConverter.TimeFrameFromEnum(tf)</a>
-            }
-        </div>
-    </div>
+    <select class="select-dropdown-styled" id="selectTimeFrame" data-menu-type="timeFrame">
+        <option value="" selected disabled>Time Frame: </option>
+        @foreach (ETimeFrame tf in Enum.GetValues(typeof(ETimeFrame)))
+        {
+            <option value="@((int)tf)">Time Frame: @MyEnumConverter.TimeFrameFromEnum(tf)</option>
+        }
+    </select>
 </div>
+
 <!-- Menu Strategy -->
 <div class="col-auto p-2">
-    <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Strategy: <span id="spanStrategy"></span>
-        </button>
-        <div class="dropdown-menu animated--fade-in" id="dropdownBtnStrategy" aria-labelledby="dropdownMenuButton">
-            @foreach (EStrategy strategy in Enum.GetValues(typeof(EStrategy)))
-            {
-                <a class="dropdown-item" role="button">@MyEnumConverter.StrategyFromEnum(strategy)</a>
-            }
-        </div>
-    </div>
+    <select class="select-dropdown-styled" id="selectStrategy" data-menu-type="strategy">
+        <option value="" selected disabled>Strategy: </option>
+        @foreach (EStrategy strategy in Enum.GetValues(typeof(EStrategy)))
+        {
+            <option value="@((int)strategy)">Strategy: @MyEnumConverter.StrategyFromEnum(strategy)</option>
+        }
+    </select>
 </div>
+
 <!-- Menu Trade Type -->
 <div class="col-auto p-2">
-    <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Type: <span id="spanTradeType"></span>
-        </button>
-        <div class="dropdown-menu animated--fade-in" id="dropdownBtnTradeType" aria-labelledby="dropdownMenuButton">
-            @foreach (ETradeType tradeType in Enum.GetValues(typeof(ETradeType)))
-            {
-                <a class="dropdown-item" role="button">@MyEnumConverter.TradeTypeFromEnum(tradeType)</a>
-            }
-        </div>
-    </div>
+    <select class="select-dropdown-styled" id="selectTradeType" data-menu-type="tradeType">
+        <option value="" selected disabled>Type: </option>
+        @foreach (ETradeType tradeType in Enum.GetValues(typeof(ETradeType)))
+        {
+            <option value="@((int)tradeType)">Type: @MyEnumConverter.TradeTypeFromEnum(tradeType)</option>
+        }
+    </select>
 </div>
 
 <!-- Menu Order Type -->
 <div class="col-auto p-2">
-    <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Order Type: <span id="spanOrderType"></span>
-        </button>
-        <div class="dropdown-menu animated--fade-in" id="dropdownBtnOrderType" aria-labelledby="dropdownMenuButton">
-            @foreach (EOrderType orderType in Enum.GetValues(typeof(EOrderType)))
-            {
-                <a class="dropdown-item" role="button">@MyEnumConverter.OrderTypeFromEnum(orderType)</a>
-            }
-        </div>
-    </div>
+    <select class="select-dropdown-styled" id="selectOrderType" data-menu-type="orderType">
+        <option value="" selected disabled>Order Type: </option>
+        @foreach (EOrderType orderType in Enum.GetValues(typeof(EOrderType)))
+        {
+            <option value="@((int)orderType)">Order Type: @MyEnumConverter.OrderTypeFromEnum(orderType)</option>
+        }
+    </select>
 </div>

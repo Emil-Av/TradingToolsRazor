@@ -55,96 +55,120 @@ namespace Models.ViewModels
 
         public List<SelectListItem> TradeRating { get; set; }
 
+        public SRS SRSTrade { get; set; }
+
         #endregion
 
         #region Method
+
+        public string ParseViewData(string viewData, EStrategy strategy)
+        {
+            try
+            {
+                if (strategy == EStrategy.SRS)
+                {
+                    SRSTrade = JsonConvert.DeserializeObject<SRS>(viewData)!;
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Error in NewTradeVM.ParseViewData(): {ex.Message}";
+            }
+          
+
+            return string.Empty;
+        }
 
         /// <summary>
         ///  Sets the trade paramaters and the NewTradeVM.ResearchData proprerty.
         /// </summary>
         /// <param name="tradeParams"></param>
         /// <param name="researchData"></param>
+        /// <param name="tradeData"></param>
         /// <returns></returns>
         public string SetValues(string tradeParams, string researchData, string tradeData)
         {
-            string error = string.Empty;
             try
             {
-                List<string> errors = new List<string>();
-                Result<EStatus>? statusResult = null;
-                Result<EOrderType>? orderTypeResult = null;
-
-                Dictionary<string, string> tradeDataObject = JsonConvert.DeserializeObject<Dictionary<string, string>>(tradeParams)!;
-
-                Result<ETimeFrame> timeFrameResult = MyEnumConverter.TimeFrameFromString(tradeDataObject!["timeFrame"]);
-                Result<EStrategy> strategyResult = MyEnumConverter.StrategyFromString(tradeDataObject["strategy"]);
-                Result<ETradeType> typeResult = MyEnumConverter.TradeTypeFromString(tradeDataObject["tradeType"]);
-
-                // For a research trade there is no need for Status or OrderType
-                if (!typeResult.Success || typeResult.Success && typeResult.Value != ETradeType.Research)
+                var validationResult = ValidateAndSetTradeParameters(tradeParams);
+                if (!string.IsNullOrEmpty(validationResult))
                 {
-                    statusResult = MyEnumConverter.StatusFromString(tradeDataObject["status"]);
-                    orderTypeResult = MyEnumConverter.OrderTypeFromString(tradeDataObject["orderType"]);
-
-                    ValidateResult(statusResult, "Status");
-                    ValidateResult(orderTypeResult, "OrderType");
+                    return validationResult;
                 }
 
-                ValidateResult(timeFrameResult, "Time frame");
-                ValidateResult(strategyResult, "Strategy");
-                ValidateResult(typeResult, "Type");
-
-                if (errors.Any())
-                {
-                    return error = string.Join("<br>", errors);
-                }
-
-                // Menu buttons
-                TimeFrame = timeFrameResult.Value;
-                Strategy = strategyResult.Value;
-                TradeType = typeResult.Value;
-
-                // Status and OrderType are not required for Research
-                if (TradeType != ETradeType.Research)
-                {
-                    Status = statusResult!.Value;
-                    OrderType = orderTypeResult!.Value;
-                }
-
-                switch (Strategy)
-                {
-                    case EStrategy.FirstBarPullback:
-                        // ResearchData is of type object because it can contain research data for different strategies. See NewTradeController -> SaveTrade()
-                        ResearchData = JsonConvert.DeserializeObject<ResearchFirstBarPullbackDisplay>(researchData)!;
-                        break;
-                    case EStrategy.Cradle:
-                        ResearchData = JsonConvert.DeserializeObject<ResearchCradle>(researchData)!;
-                        break;
-                    case EStrategy.CandleBracketing:
-                        ResearchData = JsonConvert.DeserializeObject<ResearchCandleBracketing>(researchData)!;
-                        break;
-                    case EStrategy.SRS:
-                        ResearchData = JsonConvert.DeserializeObject<SRS>(researchData)!;
-                        break;
-                }
-
+                SetResearchData(researchData);
                 TradeData = JsonConvert.DeserializeObject<TradeDisplay>(tradeData)!;
 
-                // Helper method to avoid duplicating code
-                void ValidateResult<T>(Result<T> result, string tradeParam)
-                {
-                    if (!result.Success)
-                    {
-                        errors.Add($"{tradeParam} not selected.");
-                    }
-                }
+                return string.Empty;
             }
             catch (Exception ex)
             {
-                error = $"Error in NewTradeVM.SetValues(): {ex.Message}";
+                return $"Error in NewTradeVM.SetValues(): {ex.Message}";
+            }
+        }
+
+        private string ValidateAndSetTradeParameters(string tradeParams)
+        {
+            var errors = new List<string>();
+            var tradeDataObject = JsonConvert.DeserializeObject<Dictionary<string, string>>(tradeParams)!;
+
+            var timeFrameResult = MyEnumConverter.TimeFrameFromString(tradeDataObject["timeFrame"]);
+            var strategyResult = MyEnumConverter.StrategyFromString(tradeDataObject["strategy"]);
+            var typeResult = MyEnumConverter.TradeTypeFromString(tradeDataObject["tradeType"]);
+
+            ValidateResult(timeFrameResult, "Time frame", errors);
+            ValidateResult(strategyResult, "Strategy", errors);
+            ValidateResult(typeResult, "Type", errors);
+
+            Result<EStatus>? statusResult = null;
+            Result<EOrderType>? orderTypeResult = null;
+
+            // Status and OrderType are only required for non-Research trades
+            if (typeResult.Success && typeResult.Value != ETradeType.Research)
+            {
+                statusResult = MyEnumConverter.StatusFromString(tradeDataObject["status"]);
+                orderTypeResult = MyEnumConverter.OrderTypeFromString(tradeDataObject["orderType"]);
+
+                ValidateResult(statusResult, "Status", errors);
+                ValidateResult(orderTypeResult, "OrderType", errors);
             }
 
-            return error;
+            if (errors.Any())
+            {
+                return string.Join("<br>", errors);
+            }
+
+            TimeFrame = timeFrameResult.Value;
+            Strategy = strategyResult.Value;
+            TradeType = typeResult.Value;
+
+            if (TradeType != ETradeType.Research)
+            {
+                Status = statusResult!.Value;
+                OrderType = orderTypeResult!.Value;
+            }
+
+            return string.Empty;
+        }
+
+        private void SetResearchData(string researchData)
+        {
+            ResearchData = Strategy switch
+            {
+                EStrategy.FirstBarPullback => JsonConvert.DeserializeObject<ResearchFirstBarPullbackDisplay>(researchData)!,
+                EStrategy.Cradle => JsonConvert.DeserializeObject<ResearchCradle>(researchData)!,
+                EStrategy.CandleBracketing => JsonConvert.DeserializeObject<ResearchCandleBracketing>(researchData)!,
+                EStrategy.SRS => JsonConvert.DeserializeObject<SRS>(researchData)!,
+                _ => throw new ArgumentException($"Unknown strategy: {Strategy}")
+            };
+        }
+
+        private static void ValidateResult<T>(Result<T> result, string paramName, List<string> errors)
+        {
+            if (!result.Success)
+            {
+                errors.Add($"{paramName} not selected.");
+            }
         }
 
         #endregion

@@ -19,16 +19,6 @@
     * Region menu buttons starts
     * ***************************
     */
-    // Create key, value array: key is the button menu, value is the span element. The span element is the selected value from the dropdown menu.
-    var menuButtons =
-    {
-        '#dropdownBtnStatus': '#spanStatus',
-        '#dropdownBtnTimeFrame': '#spanTimeFrame',
-        '#dropdownBtnStrategy': '#spanStrategy',
-        '#dropdownBtnTradeType': '#spanTradeType',
-        '#dropdownBtnOrderType': '#spanOrderType'
-    };
-
     const strategies = {
         Cradle: "Cradle",
         FirstBarPullback: "First Bar Pullback",
@@ -36,73 +26,35 @@
         SRS: "SRS"
     };
 
-    // Attach a click event for each <a> element of each menu.
-    for (var key in menuButtons) {
-        (function (key) {
-            // Change the value of the span in the button
-            $(key).on('click', '.dropdown-item', function () {
-                // Set the new value
-                var value = $(this).text();
-                $(menuButtons[key]).text(value);
-                SetSelectedItemClass(key);
-                if (key == '#dropdownBtnStrategy') {
-                    SetResearchPartialView();
-                    if ($('#spanStrategy').text() == strategies.SRS) {
-                        SetSymbolDropDown();
-                    }
-                }
-
-            });
-        })(key);
+    // Helper function to extract value after colon and trim
+    function getSelectValue(selector) {
+        var fullText = $(selector + ' option:selected').text();
+        if (fullText.includes(':')) {
+            return fullText.split(':')[1].trim();
+        }
+        return fullText.trim();
     }
 
-    function SetSymbolDropDown() {
-        const symbols = {
-            0: 'DAX',
-            1: 'DOW'
-        };
-
-        const $symbolInput = $('#InputSymbol');
-        
-        // Check if it's already a select element
-        if ($symbolInput.is('select')) {
-            return;
+    // Attach a change event for each select element
+    $('#selectTimeFrame, #selectStrategy, #selectTradeType, #selectOrderType').on('change', function () {
+        if (this.id === 'selectStrategy') {
+            SetResearchPartialView();
         }
-        
-        // Get current value and attributes
-        const currentValue = $symbolInput.val();
-        const dataAttribute = $symbolInput.attr('data-trade-data');
-        const classes = $symbolInput.attr('class');
-        
-        // Create select element
-        let $select = $('<select>', {
-            id: 'InputSymbol',
-            'data-trade-data': dataAttribute,
-            class: classes
-        });
-        
-        // Add enum options
-        for (const [value, name] of Object.entries(symbols)) {
-            const selected = currentValue == name ? 'selected' : '';
-            $select.append(`<option value="${value}" ${selected}>${name}</option>`);
-        }
-        
-        // Replace input with select
-        $symbolInput.replaceWith($select);
-    }
+    });
 
     function SetResearchPartialView() {
         if ($('#currentMenu').text() == 'Research') {
-            if ($('#spanStrategy').text() == strategies.Cradle) {
+            var selectedText = getSelectValue('#selectStrategy');
+            if (selectedText == strategies.Cradle) {
                 ShowResearchCradlePartialView();
             }
-            else if ($('#spanStrategy').text() == strategies.FirstBarPullback) {
+            else if (selectedText == strategies.FirstBarPullback) {
                 ShowFirstBarPullbackPartialView();
             }
-            else if ($('#spanStrategy').text() == strategies.CandleBracketing) {
+            else if (selectedText == strategies.CandleBracketing) {
                 ShowCandleBracketingPartialView();
             }
-            else if ($('#spanStrategy').text() == strategies.SRS) {
+            else if (selectedText == strategies.SRS) {
                 ShowSRSPartialView();
             }
         }
@@ -139,21 +91,6 @@
         $('#researchSRSData').addClass('d-none');
     }
 
-    // Mark the selected drop down item of the buttons on the top
-    function SetSelectedItemClass() {
-        // Set the "selected item" color
-        for (var key in menuButtons) {
-            $(key + ' a').each(function () {
-                if ($(this).text() === $(menuButtons[key]).text()) {
-                    $(this).addClass('bg-gray-400');
-                }
-                else {
-                    $(this).removeClass('bg-gray-400');
-                }
-            })
-        }
-    }
-
     /**
     * ***************************
     * Region menu buttons ends
@@ -168,7 +105,7 @@
 
     $('#headerMenu').on('click', '.dropdown-item', function () {
         var currentCardMenu = $(this).text();
-        var selectedStrategy = $('#spanStrategy').text();
+        var selectedStrategy = getSelectValue('#selectStrategy');
         // Display TradeData Partial View
         if (currentCardMenu == 'Trade Data') {
             $('#tradeData').removeClass('d-none');
@@ -179,7 +116,7 @@
 
         }
         // Display Research Partial View
-        else if (selectedStrategy.length > 0) {
+        else if (selectedStrategy && selectedStrategy.length > 0) {
             if (selectedStrategy == "Cradle") {
                 ShowResearchCradlePartialView();
                 $('#tradeData').addClass('d-none');
@@ -219,7 +156,13 @@
 
     $('#btnSave').on('click', function () {
         if (validateNumberInputs()) {
-            saveTrade();
+            var selectedStrategy = getSelectValue('#selectStrategy');
+            if (selectedStrategy == strategies.SRS) {
+                saveTrade();
+            }
+            else {
+                saveTradeOld();
+            }
         }
     });
 
@@ -266,6 +209,80 @@
     }
 
     function saveTrade() {
+        // Collect all data-trade-data values into a viewData object
+        var viewData = {};
+        $('#cardBody [data-trade-data]').each(function () {
+            var bindProperty = $(this).data('trade-data');
+            var value = $(this).val();
+            
+            // Handle empty values
+            if (value === "") {
+                viewData[bindProperty] = null;
+            } else {
+                viewData[bindProperty] = value;
+            }
+        });
+
+        // Get strategy from select and convert to enum value
+        var strategyValue = $('#selectStrategy').val();
+        
+        if (!strategyValue) {
+            toastr.error("Please select a strategy.");
+            return;
+        }
+        
+        var strategyEnum = parseInt(strategyValue);
+
+        // Validate files
+        if (uploadedFiles.length == 0) {
+            toastr.error("No screenshots uploaded.");
+            return;
+        }
+
+        // Create FormData for multipart/form-data
+        var formData = new FormData();
+        
+        // Add files
+        for (var i = 0; i < uploadedFiles.length; i++) {
+            formData.append('files', uploadedFiles[i]);
+        }
+        
+        // Add viewData as JSON string
+        formData.append('viewData', JSON.stringify(viewData));
+        
+        // Add strategy enum value
+        formData.append('strategy', strategyEnum);
+
+        // Get anti-forgery token
+        var token = document.getElementById('__RequestVerificationToken')?.value;
+
+        // Make fetch API call
+        fetch('/NewTrade?handler=SaveNewTrade', {
+            method: 'POST',
+            headers: token ? { 'RequestVerificationToken': token } : {},
+            body: formData
+        })
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                toastr.success(data.success);
+                clearFields();
+            } else if (data.error) {
+                toastr.error(data.error);
+            }
+        })
+        .catch(function(error) {
+            console.error('Error uploading files:', error);
+            toastr.error('Error uploading files. See console for details.');
+        });
+    }
+
+    function saveTradeOld() {
 
         var formData = new FormData();
 
@@ -280,11 +297,10 @@
         }
 
         var tradeParams = {};
-        tradeParams['status'] = $('#spanStatus').text();
-        tradeParams['timeFrame'] = $('#spanTimeFrame').text();
-        tradeParams['strategy'] = $('#spanStrategy').text();
-        tradeParams['tradeType'] = $('#spanTradeType').text();
-        tradeParams['orderType'] = $('#spanOrderType').text();
+        tradeParams['timeFrame'] = getSelectValue('#selectTimeFrame');
+        tradeParams['strategy'] = getSelectValue('#selectStrategy');
+        tradeParams['tradeType'] = getSelectValue('#selectTradeType');
+        tradeParams['orderType'] = getSelectValue('#selectOrderType');
 
         formData.append('tradeParams', JSON.stringify(tradeParams));
 
@@ -325,7 +341,7 @@
         var token = document.getElementById('__RequestVerificationToken')?.value;
         $.ajax({
             type: 'POST',
-            url: '/NewTrade?handler=SaveNewTrade',
+            url: '/NewTrade?handler=SaveNewTradeOld',
             processData: false,
             contentType: false,
             headers: token ? { 'RequestVerificationToken': token } : {},
@@ -364,7 +380,7 @@
         var timeValue = formatTimeForInput(now);
 
         // Clear and set sensible defaults for elements that belong to research partials
-        $('#cardBody [data-research], #cardBody [data-research-cradle], #cardBody [data-research-firstbar], #cardBody [data-research-bracketing]').each(function () {
+        $('#cardBody [data-research], #cardBody [data-research-cradle], #cardBody [data-research-firstbar], #cardBody [data-research-bracketing], #cardBody [data-research-srs]').each(function () {
             var element = $(this);
             if (element.is('input')) {
                 var elementType = (element.attr('type') || '').toLowerCase();
@@ -405,8 +421,13 @@
         $('#formUploadFiles').trigger('reset');
         uploadedFiles = [];
 
+        // Reset the menu selects to their placeholder option
+        $('#selectTimeFrame, #selectStrategy, #selectTradeType, #selectOrderType').each(function () {
+            $(this).prop('selectedIndex', 0);
+        });
+
         // Reset selects that are not part of data-research
-        $('select:not([data-research])').each(function () {
+        $('select:not([data-research])').not('#selectTimeFrame, #selectStrategy, #selectTradeType, #selectOrderType').each(function () {
             $(this).prop('selectedIndex', 1);
         });
     }

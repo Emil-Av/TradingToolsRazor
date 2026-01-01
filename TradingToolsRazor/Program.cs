@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Utilities.Trade;
 using Statistics.Services;
 using Statistics.Interfaces;
+using TradingToolsRazor.Services;
+using TradingToolsRazor.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<DeleteTradeHelper>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+builder.Services.AddScoped<INewTradeService, NewTradeService>();
 
 // Allow uploading of files up to 100MB
 builder.WebHost.ConfigureKestrel(serverOptions =>

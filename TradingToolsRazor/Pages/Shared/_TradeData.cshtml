@@ -36,7 +36,7 @@
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputAmount">Amount</label>
-                                    <input class="text-center form-control number-input" id="InputAmount" data-trade-data="Amount" value="@Model.TradesVM.CurrentTrade.Amount" />
+                                    <input class="text-center form-control number-input" id="InputAmount" data-trade-data="Amount" value="@(Model.TradesVM.CurrentTrade.Amount ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputStatus">Status</label>
@@ -85,23 +85,23 @@
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputTriggerPrice">Trigger Price</label>
-                                    <input class="text-center form-control number-input" id="InputTriggerPrice" data-trade-data="TriggerPrice" value="@Model.TradesVM.CurrentTrade.TriggerPrice" />
+                                    <input class="text-center form-control number-input" id="InputTriggerPrice" data-trade-data="TriggerPrice" value="@(Model.TradesVM.CurrentTrade.TriggerPrice ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputEntryPrice">Entry Price</label>
-                                    <input class="text-center form-control number-input" id="InputEntryPrice" data-trade-data="EntryPrice" value="@Model.TradesVM.CurrentTrade.EntryPrice" />
+                                    <input class="text-center form-control number-input" id="InputEntryPrice" data-trade-data="EntryPrice" value="@(Model.TradesVM.CurrentTrade.EntryPrice ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputStopPrice">Stop Price</label>
-                                    <input class="text-center form-control number-input" id="InputStopPrice" data-trade-data="StopPrice" value="@Model.TradesVM.CurrentTrade.StopPrice" />
+                                    <input class="text-center form-control number-input" id="InputStopPrice" data-trade-data="StopPrice" value="@(Model.TradesVM.CurrentTrade.StopPrice ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputExitPrice">Exit Price</label>
-                                    <input class="text-center form-control number-input" id="InputExitPrice" data-trade-data="ExitPrice" value="@Model.TradesVM.CurrentTrade.ExitPrice" />
+                                    <input class="text-center form-control number-input" id="InputExitPrice" data-trade-data="ExitPrice" value="@(Model.TradesVM.CurrentTrade.ExitPrice ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputMaxPrice">Max Price</label>
-                                    <input class="text-center form-control number-input" id="InputMaxPrice" data-trade-data="MaxPrice" value="@Model.TradesVM.CurrentTrade.MaxPrice" />
+                                    <input class="text-center form-control number-input" id="InputMaxPrice" data-trade-data="MaxPrice" value="@(Model.TradesVM.CurrentTrade.MaxPrice ?? 0)" />
                                 </div>
                             </div>
                         </div>
@@ -115,11 +115,11 @@
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputPnL">PnL</label>
-                                    <input class="text-center form-control number-input" id="InputPnL" data-trade-data="PnL" value="@Model.TradesVM.CurrentTrade.PnL" />
+                                    <input class="text-center form-control number-input" id="InputPnL" data-trade-data="PnL" value="@(Model.TradesVM.CurrentTrade.PnL ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputFee">Fee</label>
-                                    <input class="text-center form-control number-input" id="InputFee" data-trade-data="Fee" value="@Model.TradesVM.CurrentTrade.Fee" />
+                                    <input class="text-center form-control number-input" id="InputFee" data-trade-data="Fee" value="@(Model.TradesVM.CurrentTrade.Fee ?? 0)" />
                                 </div>
                             </div>
                         </div>

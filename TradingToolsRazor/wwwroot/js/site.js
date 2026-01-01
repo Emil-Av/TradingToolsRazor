@@ -91,6 +91,7 @@ function toEnumName(menu, selectedValue) {
             'First Bar Pullback': 0,
             'Cradle': 1,
             'Candle Bracketing': 2,
+            'SRS': 3
         };
         return map[menuValue] || menuValue.replace(/\s+/g, '');
     }
