@@ -9,6 +9,8 @@ namespace Models.ViewModels
         public ResearchCradle ResearchCradle { get; set; }
 
         public ResearchCandleBracketing CandleBracketing { get; set; }
+        
+        public SRS SRS { get; set; }
         public TradesVM TradesVM { get; set; }
         public List<SelectListItem> YesNoOptions { get; set; }
         public List<SelectListItem> OrderType { get; set; }
@@ -21,6 +23,7 @@ namespace Models.ViewModels
             TradesVM = new();
             ResearchCradle = new();
             CandleBracketing = new();
+            SRS = new();
             SetListItems();
         }
 

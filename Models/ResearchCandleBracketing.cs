@@ -16,8 +16,6 @@ namespace Models
 
         public double CandleLow { get; set; }   
 
-        public double MaxPrice { get; set; }
-
         public double EntryPriceForResearch { get; set; }
 
         /// <summary>

@@ -19,27 +19,14 @@ namespace DataAccess.Repository
             _db = db;
         }
 
-        public async Task UpdateAsync(Trade paperTrade)
+        public async Task UpdateAsync(Trade trade)
         {
-            Trade? objFromDb = await _db.Trades.FindAsync(paperTrade.Id);
-            if (objFromDb != null)
+            Trade? objFromDb = await _db.Trades.FindAsync(trade.Id);
+            if (objFromDb is not null)
             {
-                objFromDb.SampleSize = paperTrade.SampleSize;
-                objFromDb.Symbol = paperTrade.Symbol;
-                objFromDb.SideDirection = paperTrade.SideDirection;
-                objFromDb.Status = paperTrade.Status;
-                objFromDb.Outcome = paperTrade.Outcome;
-                objFromDb.TradeRating = paperTrade.TradeRating;
-                objFromDb.TriggerPrice = paperTrade.TriggerPrice;
-                objFromDb.EntryPrice = paperTrade.EntryPrice;
-                objFromDb.StopPrice = paperTrade.StopPrice;
-                objFromDb.ExitPrice = paperTrade.ExitPrice;
-                objFromDb.Targets = paperTrade.Targets;
-                objFromDb.PnL = paperTrade.PnL;
-                objFromDb.Fee = paperTrade.Fee;
-                objFromDb.OrderType = paperTrade.OrderType;
-                objFromDb.ScreenshotsUrls = paperTrade.ScreenshotsUrls;
-                objFromDb.SampleSize.TradeType = paperTrade.SampleSize.TradeType;
+                var sampleSizeId = objFromDb.SampleSizeId;
+                _db.Entry(objFromDb).CurrentValues.SetValues(trade);
+                objFromDb.SampleSizeId = sampleSizeId;
             }
         }
     }

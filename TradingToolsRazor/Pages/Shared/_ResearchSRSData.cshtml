@@ -1,0 +1,45 @@
+﻿@model PartialViewsVM
+
+<div class="row justify-content-center">
+    <div class="text-center">
+        <div class="@(ViewData["Title"]?.ToString() == "New Trade" ? "" : "card-header")">
+            <div class="row align-items-center">
+                <div class="col mr-md-5 d-flex justify-content-center">
+                    <div id="researchDataTabHeaders">
+                        <ul class="nav nav-tabs" id="srsTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="srsData-tab" data-toggle="tab" data-target="#srsData" type="button" role="tab" aria-controls="srsData" aria-selected="true">SRS Data</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body" id="cardBody">
+            <div class="tab-content">
+                <div class="tab-pane fade show active tundora text-left" id="srsData" role="tabpanel" aria-labelledby="srsData-tab">
+
+                    <div class="row mb-2">
+                        <div class="col-12 col-md-6">
+                            <label for="IsGreenCandleInput" class="d-block">Is Green Candle</label>
+                            <select class="form-control text-center" id="IsGreenCandleInput" data-research-srs="IsGreenCandle" asp-for="SRS.IsGreenCandle">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="IsInOverNightRangeInput" class="d-block">Is In Over Night Range</label>
+                            <select class="form-control text-center" id="IsInOverNightRangeInput" data-research-srs="IsInOverNightRange" asp-for="SRS.IsInOverNightRange">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

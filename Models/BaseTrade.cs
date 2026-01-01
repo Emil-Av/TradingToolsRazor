@@ -1,10 +1,7 @@
 ﻿using System.Text.Json;
 using Shared.Enums;
 using SharedEnums.Enums;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.CompilerServices;
-using System.ComponentModel.DataAnnotations;
 
 namespace Models
 {

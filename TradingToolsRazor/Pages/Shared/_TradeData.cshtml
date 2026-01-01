@@ -1,84 +1,129 @@
 ﻿@using global::Shared.Enums
 @model PartialViewsVM
 
-<div class="row">
-    <div class="col">
-        <div class="d-flex flex-wrap">
-            <div class="form-group col-12 col-md-6 col-lg">
-                <label class="d-block text-nowrap min-width-60" for="InputSymbol">Symbol</label>
-                <input class="text-center form-control" id="InputSymbol" data-trade-data="Symbol" value="@Model.TradesVM.CurrentTrade.Symbol" />
-            </div>
-            <div class="form-group col-12 col-md-6 col-lg">
-                <label class="d-block text-nowrap min-width-60" for="InputStatus">Status</label>
-                <select class="text-center form-control" id="InputStatus" data-trade-data="Status" value="@Model.TradesVM.CurrentTrade.Status">
-                    @{
-                        int enumIntValue = 0;
-                        foreach (EStatus status in Enum.GetValues(typeof(EStatus)))
-                        {
-                            if (status == EStatus.All)
-                            {
-                                continue;
-                            }
-                            string selected = Model.TradesVM.CurrentTrade != null && status == Model.TradesVM.CurrentTrade.Status ? "selected" : null;
-                            <option value="@enumIntValue" selected=@selected>@status</option>
-                            enumIntValue++;
-                        }
-                    }
-                </select>
-            </div>
-            <div class="form-group col-12 col-md-6 col-lg">
-                <label class="d-block text-nowrap min-width-60" for="InputOutcome">Outcome</label>
-                <select class="text-center form-control" id="InputOutcome" data-trade-data="Outcome" value="@Model.TradesVM.CurrentTrade.Outcome">
-                    @{
-                        enumIntValue = 0;
-                        foreach (EOutcome outcome in Enum.GetValues(typeof(EOutcome)))
-                        {
-                            <option value="@enumIntValue" selected="@(outcome == Model.TradesVM.CurrentTrade.Outcome ? "selected" : null)">@outcome</option>
-                            enumIntValue++;
-                        }
-                    }
-                </select>
-            </div>
-            <div class="form-group col-12 col-md-6 col-lg">
-                <label class="d-block text-nowrap min-width-60" for="InputTradeRating">Rating</label>
-                <select class="text-center form-control" id="InputTradeRating" data-trade-data="TradeRating" asp-for="@Model.TradesVM.CurrentTrade.TradeRating" asp-items="Model.TradesVM.TradeRatingOptions"></select>
-            </div>
-            <div class="form-group col-12 col-md-6 col-lg">
-                <label class="d-block text-nowrap min-width-60" for="InputTriggerPrice">Trigger Price</label>
-                <input class="text-center form-control number-input" id="InputTriggerPrice" data-trade-data="TriggerPrice" value="@Model.TradesVM.CurrentTrade.TriggerPrice" />
-            </div>
-            <div class="form-group col-12 col-md-6 col-lg">
-                <label class="d-block text-nowrap min-width-60" for="InputAmount">Trigger Price</label>
-                <input class="text-center form-control number-input" id="InputAmount" data-trade-data="AmountPrice" value="@Model.TradesVM.CurrentTrade.Amount" />
-            </div>
-            <div class="form-group col-12 col-md-6 col-lg">
-                <label class="d-block text-nowrap min-width-60" for="InputEntryPrice">Entry Price</label>
-                <input class="text-center form-control number-input" id="InputEntryPrice" data-trade-data="EntryPrice" value="@Model.TradesVM.CurrentTrade.EntryPrice" />
+<div class="row justify-content-center">
+    <div class="col-12 text-center">
+        <div class="@(ViewData["Title"]?.ToString() == "New Trade" ? "" : "card-header")">
+            <div class="row align-items-center">
+                <div class="col mr-md-5 d-flex justify-content-center">
+                    <div id="tradeDataTabHeaders">
+                        <ul class="nav nav-tabs" id="tradeDataTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="basicInfo-tab" data-toggle="tab" data-target="#basicInfo" type="button" role="tab" aria-controls="basicInfo" aria-selected="true">Basic Info</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="prices-tab" data-toggle="tab" data-target="#prices" type="button" role="tab" aria-controls="prices" aria-selected="false">Prices</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="results-tab" data-toggle="tab" data-target="#results" type="button" role="tab" aria-controls="results" aria-selected="false">Results</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row mt-2">
-        <div class="col">
-            <div class="d-flex flex-wrap">
-                <div class="form-group col-12 col-md-6 col-lg">
-                    <label class="d-block text-nowrap min-width-60" for="InputStopPrice">Stop Price</label>
-                    <input class="text-center form-control number-input" id="InputStopPrice" data-trade-data="StopPrice" value="@Model.TradesVM.CurrentTrade.StopPrice" />
+
+        <div class="card-body" id="cardBody">
+            <div class="tab-content">
+                <!-- Tab content Basic Info -->
+                <div class="tab-pane fade show active tundora text-left" id="basicInfo" role="tabpanel" aria-labelledby="basicInfo-tab">
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputSymbol">Symbol</label>
+                                    <input class="text-center form-control" id="InputSymbol" data-trade-data="Symbol" value="@Model.TradesVM.CurrentTrade.Symbol" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputAmount">Amount</label>
+                                    <input class="text-center form-control number-input" id="InputAmount" data-trade-data="Amount" value="@Model.TradesVM.CurrentTrade.Amount" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputStatus">Status</label>
+                                    <select class="text-center form-control" id="InputStatus" data-trade-data="Status" value="@Model.TradesVM.CurrentTrade.Status">
+                                        @{
+                                            int enumIntValue = 0;
+                                            foreach (EStatus status in Enum.GetValues(typeof(EStatus)))
+                                            {
+                                                if (status == EStatus.All)
+                                                {
+                                                    continue;
+                                                }
+                                                string selected = Model.TradesVM.CurrentTrade != null && status == Model.TradesVM.CurrentTrade.Status ? "selected" : null;
+                                                <option value="@enumIntValue" selected=@selected>@status</option>
+                                                enumIntValue++;
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputOutcome">Outcome</label>
+                                    <select class="text-center form-control" id="InputOutcome" data-trade-data="Outcome" value="@Model.TradesVM.CurrentTrade.Outcome">
+                                        @{
+                                            enumIntValue = 0;
+                                            foreach (EOutcome outcome in Enum.GetValues(typeof(EOutcome)))
+                                            {
+                                                <option value="@enumIntValue" selected="@(outcome == Model.TradesVM.CurrentTrade.Outcome ? "selected" : null)">@outcome</option>
+                                                enumIntValue++;
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputTradeRating">Rating</label>
+                                    <select class="text-center form-control" id="InputTradeRating" data-trade-data="TradeRating" asp-for="@Model.TradesVM.CurrentTrade.TradeRating" asp-items="Model.TradesVM.TradeRatingOptions"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group col-12 col-md-6 col-lg">
-                    <label class="d-block text-nowrap min-width-60" for="InputExitPrice">Exit Price</label>
-                    <input class="text-center form-control number-input" id="InputExitPrice" data-trade-data="ExitPrice" value="@Model.TradesVM.CurrentTrade.ExitPrice" />
+
+                <!-- Tab content Prices -->
+                <div class="tab-pane fade tundora text-left" id="prices" role="tabpanel" aria-labelledby="prices-tab">
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputTriggerPrice">Trigger Price</label>
+                                    <input class="text-center form-control number-input" id="InputTriggerPrice" data-trade-data="TriggerPrice" value="@Model.TradesVM.CurrentTrade.TriggerPrice" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputEntryPrice">Entry Price</label>
+                                    <input class="text-center form-control number-input" id="InputEntryPrice" data-trade-data="EntryPrice" value="@Model.TradesVM.CurrentTrade.EntryPrice" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputStopPrice">Stop Price</label>
+                                    <input class="text-center form-control number-input" id="InputStopPrice" data-trade-data="StopPrice" value="@Model.TradesVM.CurrentTrade.StopPrice" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputExitPrice">Exit Price</label>
+                                    <input class="text-center form-control number-input" id="InputExitPrice" data-trade-data="ExitPrice" value="@Model.TradesVM.CurrentTrade.ExitPrice" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputMaxPrice">Max Price</label>
+                                    <input class="text-center form-control number-input" id="InputMaxPrice" data-trade-data="MaxPrice" value="@Model.TradesVM.CurrentTrade.MaxPrice" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group col-12 col-md-6 col-lg">
-                    <label class="d-block text-nowrap min-width-60" for="InputMaxPrice">Max Price</label>
-                    <input class="text-center form-control" id="InputMaxPrice" data-trade-data="MaxPrice" value="@Model.TradesVM.CurrentTrade.MaxPrice" />
-                </div>
-                <div class="form-group col-12 col-md-6 col-lg">
-                    <label class="d-block text-nowrap min-width-60" for="InputPnL">PnL</label>
-                    <input class="text-center form-control number-input" id="InputPnL" data-trade-data="PnL" value="@Model.TradesVM.CurrentTrade.PnL" />
-                </div>
-                <div class="form-group col-12 col-md-6 col-lg">
-                    <label class="d-block text-nowrap min-width-60" for="InputFee">Fee</label>
-                    <input class="text-center form-control number-input" id="InputFee" data-trade-data="Fee" value="@Model.TradesVM.CurrentTrade.Fee" />
+
+                <!-- Tab content Results -->
+                <div class="tab-pane fade tundora text-left" id="results" role="tabpanel" aria-labelledby="results-tab">
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex flex-wrap">
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputPnL">PnL</label>
+                                    <input class="text-center form-control number-input" id="InputPnL" data-trade-data="PnL" value="@Model.TradesVM.CurrentTrade.PnL" />
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputFee">Fee</label>
+                                    <input class="text-center form-control number-input" id="InputFee" data-trade-data="Fee" value="@Model.TradesVM.CurrentTrade.Fee" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

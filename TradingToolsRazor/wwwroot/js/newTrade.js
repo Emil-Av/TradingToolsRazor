@@ -32,7 +32,8 @@
     const strategies = {
         Cradle: "Cradle",
         FirstBarPullback: "First Bar Pullback",
-        CandleBracketing: "Candle Bracketing"
+        CandleBracketing: "Candle Bracketing",
+        SRS: "SRS"
     };
 
     // Attach a click event for each <a> element of each menu.
@@ -45,14 +46,52 @@
                 $(menuButtons[key]).text(value);
                 SetSelectedItemClass(key);
                 if (key == '#dropdownBtnStrategy') {
-                    SetResearchPartialView(key);
+                    SetResearchPartialView();
+                    if ($('#spanStrategy').text() == strategies.SRS) {
+                        SetSymbolDropDown();
+                    }
                 }
 
             });
         })(key);
     }
 
-    function SetResearchPartialView(key) {
+    function SetSymbolDropDown() {
+        const symbols = {
+            0: 'DAX',
+            1: 'DOW'
+        };
+
+        const $symbolInput = $('#InputSymbol');
+        
+        // Check if it's already a select element
+        if ($symbolInput.is('select')) {
+            return;
+        }
+        
+        // Get current value and attributes
+        const currentValue = $symbolInput.val();
+        const dataAttribute = $symbolInput.attr('data-trade-data');
+        const classes = $symbolInput.attr('class');
+        
+        // Create select element
+        let $select = $('<select>', {
+            id: 'InputSymbol',
+            'data-trade-data': dataAttribute,
+            class: classes
+        });
+        
+        // Add enum options
+        for (const [value, name] of Object.entries(symbols)) {
+            const selected = currentValue == name ? 'selected' : '';
+            $select.append(`<option value="${value}" ${selected}>${name}</option>`);
+        }
+        
+        // Replace input with select
+        $symbolInput.replaceWith($select);
+    }
+
+    function SetResearchPartialView() {
         if ($('#currentMenu').text() == 'Research') {
             if ($('#spanStrategy').text() == strategies.Cradle) {
                 ShowResearchCradlePartialView();
@@ -63,25 +102,41 @@
             else if ($('#spanStrategy').text() == strategies.CandleBracketing) {
                 ShowCandleBracketingPartialView();
             }
+            else if ($('#spanStrategy').text() == strategies.SRS) {
+                ShowSRSPartialView();
+            }
         }
-    } 
+    }
+
+    function ShowSRSPartialView() {
+        $('#researchSRSData').removeClass('d-none');
+
+        $('#researchCandleBracketingData').addClass('d-none');
+        $('#researchCradleData').addClass('d-none');
+        $('#researchFirstBarPullbackData').addClass('d-none');
+    }
 
     function ShowCandleBracketingPartialView() {
         $('#researchCandleBracketingData').removeClass('d-none');
         $('#researchCradleData').addClass('d-none');
         $('#researchFirstBarPullbackData').addClass('d-none');
+        $('#researchSRSData').addClass('d-none');
     }
 
     function ShowResearchCradlePartialView() {
         $('#researchCradleData').removeClass('d-none');
+
         $('#researchFirstBarPullbackData').addClass('d-none');
         $('#researchCandleBracketingData').addClass('d-none');
+        $('#researchSRSData').addClass('d-none');
     }
 
     function ShowFirstBarPullbackPartialView() {
         $('#researchFirstBarPullbackData').removeClass('d-none');
+
         $('#researchCradleData').addClass('d-none');
         $('#researchCandleBracketingData').addClass('d-none');
+        $('#researchSRSData').addClass('d-none');
     }
 
     // Mark the selected drop down item of the buttons on the top
@@ -120,6 +175,7 @@
             $('#researchFirstBarPullbackData').addClass('d-none');
             $('#researchCradleData').addClass('d-none');
             $('#researchCandleBracketingData').addClass('d-none');
+            $('#researchSRSData').addClass('d-none');
 
         }
         // Display Research Partial View
@@ -134,6 +190,10 @@
             }
             else if (selectedStrategy == strategies.CandleBracketing) {
                 ShowCandleBracketingPartialView();
+                $('#tradeData').addClass('d-none');
+            }
+            else if (selectedStrategy == strategies.SRS) {
+                ShowSRSPartialView();
                 $('#tradeData').addClass('d-none');
             }
         }
@@ -245,6 +305,13 @@
         else if (tradeParams['strategy'] == strategies.CandleBracketing) {
             $('#cardBody [data-research-bracketing]').each(function () {
                 var bindProperty = $(this).data('research-bracketing');
+                researchData[bindProperty] = $(this).val();
+            });
+        }
+
+        else if (tradeParams['strategy'] == strategies.SRS) {
+            $('#cardBody [data-research-srs]').each(function () {
+                var bindProperty = $(this).data('research-srs');
                 researchData[bindProperty] = $(this).val();
             });
         }
