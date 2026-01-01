@@ -6,7 +6,7 @@ namespace Shared
     {
         public static string OrderTypeFromEnum(EOrderType orderType)
         {
-            Dictionary<EOrderType, string> statusType = new Dictionary<EOrderType, string>()
+            Dictionary<EOrderType, string> statusType = new()
             {
                 { EOrderType.Market, "Market" },
                 { EOrderType.Limit, "Limit" },
@@ -18,7 +18,7 @@ namespace Shared
 
         public static Result<EOrderType> OrderTypeFromString(string orderType)
         {
-            Dictionary<string, EOrderType> orderTypes = new Dictionary<string, EOrderType>()
+            Dictionary<string, EOrderType> orderTypes = new()
             {
                 { "Market", EOrderType.Market },
                 { "Limit", EOrderType.Limit },
@@ -36,7 +36,7 @@ namespace Shared
 
         public static Result<EStatus> StatusFromString(string status)
         {
-            Dictionary<string, EStatus> statusTypes = new Dictionary<string, EStatus>()
+            Dictionary<string, EStatus> statusTypes = new()
             {
                 { "Pending", EStatus.Pending },
                 { "Opened", EStatus.Opened },
@@ -56,7 +56,7 @@ namespace Shared
 
         public static Result<EDirection> SideTypeFromString(string sideType)
         {
-            Dictionary<string, EDirection> sideTypes = new Dictionary<string, EDirection>() 
+            Dictionary<string, EDirection> sideTypes = new() 
             {
                 { "Long", EDirection.Long },
                 { "Short", EDirection.Short }
@@ -74,10 +74,9 @@ namespace Shared
 
         public static Result<ETradeType> TradeTypeFromString(string tradeType)
         {
-            Dictionary<string, ETradeType> tradeTypes = new Dictionary<string, ETradeType>()
+            Dictionary<string, ETradeType> tradeTypes = new()
             {
                 { "Trade", ETradeType.Trade },
-                //{ "Paper Trade" , ETradeType.PaperTrade },
                 { "Research", ETradeType.Research },
             };
 
@@ -93,10 +92,9 @@ namespace Shared
 
         public static string TradeTypeFromEnum(ETradeType tradeType)
         {
-            Dictionary<ETradeType, string> tradeTypes = new Dictionary<ETradeType, string>()
+            Dictionary<ETradeType, string> tradeTypes = new()
             {
                 { ETradeType.Trade , "Trade"},
-                //{ ETradeType.PaperTrade, "Paper Trade" }
                 { ETradeType.Research, "Research" },
             };
 
@@ -106,7 +104,7 @@ namespace Shared
         public static Result<ETimeFrame> TimeFrameFromString(string timeFrame)
         {
 
-            Dictionary<string, ETimeFrame> timeFrames = new Dictionary<string, ETimeFrame>()
+            Dictionary<string, ETimeFrame> timeFrames = new()
             {
                 { "5M", ETimeFrame.M5 },
                 { "10M", ETimeFrame.M10 },
@@ -131,7 +129,7 @@ namespace Shared
 
         public static string TimeFrameFromEnum(ETimeFrame timeFrame)
         {
-            Dictionary<ETimeFrame, string> timeFrames = new Dictionary<ETimeFrame, string>()
+            Dictionary<ETimeFrame, string> timeFrames = new()
             {
                 { ETimeFrame.M5, "5M" },
                 { ETimeFrame.M10 , "10M" },
@@ -149,11 +147,12 @@ namespace Shared
 
         public static Result<EStrategy> StrategyFromString(string strategy)
         {
-            Dictionary<string, EStrategy> strategies = new Dictionary<string, EStrategy>()
+            Dictionary<string, EStrategy> strategies = new()
             {
                 { "Cradle", EStrategy.Cradle },
                 { "First Bar Pullback", EStrategy.FirstBarPullback },
-                { "Candle Bracketing", EStrategy.CandleBracketing }
+                { "Candle Bracketing", EStrategy.CandleBracketing },
+                { "SRS", EStrategy.SRS }
             };
 
             try
@@ -166,13 +165,14 @@ namespace Shared
             }
         }
 
-        public static string StrategyFromEnum(EStrategy? strategy)
+        public static string StrategyFromEnum(EStrategy strategy)
         {
-            Dictionary<EStrategy?, string> strategies = new Dictionary<EStrategy?, string>()
+            Dictionary<EStrategy, string> strategies = new()
             {
                 { EStrategy.Cradle, "Cradle" },
                 { EStrategy.FirstBarPullback, "First Bar Pullback" },
-                { EStrategy.CandleBracketing, "Candle Bracketing" }
+                { EStrategy.CandleBracketing, "Candle Bracketing" },
+                { EStrategy.SRS, "SRS" },
             };
 
             return strategies[strategy];

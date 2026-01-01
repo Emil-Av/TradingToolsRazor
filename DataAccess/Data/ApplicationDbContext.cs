@@ -27,11 +27,10 @@ namespace DataAccess.Data
 
         public DbSet<UserSettings> UserSettings { get; set; }
 
+        public DbSet<SRS> SRS { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
             base.OnModelCreating(modelBuilder);
 
             // TPT Configuration: Maps each derived class to its own table
@@ -40,6 +39,7 @@ namespace DataAccess.Data
             modelBuilder.Entity<ResearchFirstBarPullback>().ToTable("ResearchFirstBarPullbacks");
             modelBuilder.Entity<ResearchCradle>().ToTable("ResearchCradles");
             modelBuilder.Entity<ResearchCandleBracketing>().ToTable("ResearchCandleBracketing");
+            modelBuilder.Entity<SRS>().ToTable("SRS");
 
             // Configure the primary key inheritance (TPT) - derived -> BaseTrade (shared PK)
             modelBuilder.Entity<Trade>()
@@ -64,6 +64,12 @@ namespace DataAccess.Data
                 .HasOne<BaseTrade>()
                 .WithOne()
                 .HasForeignKey<ResearchCandleBracketing>(t => t.Id)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<SRS>()
+                .HasOne<BaseTrade>()
+                .WithOne()
+                .HasForeignKey<SRS>(t => t.Id)
                 .OnDelete(DeleteBehavior.NoAction);
 
             // Include SampleSize relationship on BaseTrade

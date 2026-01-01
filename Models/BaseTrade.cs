@@ -26,8 +26,9 @@ namespace Models
 
         public double? ExitPrice { get; set; }
 
-        [Column(TypeName = "NVARCHAR(MAX)")]
-        public string? Targets { get; set; }
+        public double? MaxPrice { get; set; }
+
+        public double? Amount { get; set; }
 
         public double? PnL { get; set; }
 
@@ -35,7 +36,7 @@ namespace Models
 
         public EStatus Status { get; set; }
 
-        public EDirection SideType { get; set; }
+        public EDirection SideDirection { get; set; }
 
         public EOrderType OrderType { get; set; }
 
@@ -45,19 +46,16 @@ namespace Models
 
         public List<string>? ScreenshotsUrls { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+
         public int SampleSizeId { get; set; }
 
         [ForeignKey(nameof(SampleSizeId))]
         public SampleSize? SampleSize { get; set; }
 
-        /// <summary>
-        ///  All trades except research trades will have a Journal.
-        /// </summary>
         public int? JournalId { get; set; }
 
         [ForeignKey(nameof(JournalId))]
         public Journal? Journal { get; set; }
-
-        public DateTime CreatedAt { get; set; }
     }
 }

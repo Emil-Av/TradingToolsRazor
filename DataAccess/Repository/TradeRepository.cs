@@ -26,7 +26,7 @@ namespace DataAccess.Repository
             {
                 objFromDb.SampleSize = paperTrade.SampleSize;
                 objFromDb.Symbol = paperTrade.Symbol;
-                objFromDb.SideType = paperTrade.SideType;
+                objFromDb.SideDirection = paperTrade.SideDirection;
                 objFromDb.Status = paperTrade.Status;
                 objFromDb.Outcome = paperTrade.Outcome;
                 objFromDb.TradeRating = paperTrade.TradeRating;

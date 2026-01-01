@@ -26,7 +26,6 @@
         '#dropdownBtnTimeFrame': '#spanTimeFrame',
         '#dropdownBtnStrategy': '#spanStrategy',
         '#dropdownBtnTradeType': '#spanTradeType',
-        '#dropdownBtnTradeSide': '#spanTradeSide',
         '#dropdownBtnOrderType': '#spanOrderType'
     };
 
@@ -225,7 +224,6 @@
         tradeParams['timeFrame'] = $('#spanTimeFrame').text();
         tradeParams['strategy'] = $('#spanStrategy').text();
         tradeParams['tradeType'] = $('#spanTradeType').text();
-        tradeParams['tradeSide'] = $('#spanTradeSide').text();
         tradeParams['orderType'] = $('#spanOrderType').text();
 
         formData.append('tradeParams', JSON.stringify(tradeParams));

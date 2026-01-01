@@ -10,14 +10,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repository
 {
-    public class ResearchCradleRepository : Repository<ResearchCradle>, IResearchCradleRepository
+    public class ResearchCradleRepository(ApplicationDbContext db) : Repository<ResearchCradle>(db), IResearchCradleRepository
     {
-        private ApplicationDbContext _db;
-
-        public ResearchCradleRepository(ApplicationDbContext db) : base(db)
-        {
-            _db = db;
-        }
+        private readonly ApplicationDbContext _db = db;
 
         public async Task UpdateAsync(ResearchCradle researchCradle)
         {

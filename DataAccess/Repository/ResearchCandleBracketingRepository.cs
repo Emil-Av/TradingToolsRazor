@@ -9,38 +9,18 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repository
 {
-    public class ResearchCandleBracketingRepository : Repository<ResearchCandleBracketing>, IResearchCandleBracketingRepository
+    public class ResearchCandleBracketingRepository(ApplicationDbContext db) : Repository<ResearchCandleBracketing>(db), IResearchCandleBracketingRepository
     {
-        private ApplicationDbContext _db;
+        private readonly ApplicationDbContext _db = db;
 
-        public ResearchCandleBracketingRepository(ApplicationDbContext db) : base(db)
-        {
-            _db = db;
-        }
         public async Task UpdateAsync(ResearchCandleBracketing researchCandleBracketing)
         {
             ResearchCandleBracketing? objFromDb = await _db.ResearchCandleBracketing.FindAsync(researchCandleBracketing.Id);
             if (objFromDb != null)
             {
-                Type type = typeof(ResearchCandleBracketing);
-
-                foreach (var property in type.GetProperties())
-                {
-                    if (property.Name == "Id" || property.Name == "SampleSizeId" || property.Name == "IsWin" || property.Name == "IsBreakeven")
-                    {
-                        continue;
-                    }
-                    var value = property.GetValue(researchCandleBracketing);
-                    try
-                    {
-                        property.SetValue(objFromDb, value);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Handle the exception as needed, e.g., log it
-                        throw new InvalidOperationException($"Error setting property {property.Name}: {ex.Message}", ex);
-                    }
-                }
+                var originalSampleSizeId = objFromDb.SampleSizeId;
+                _db.Entry(objFromDb).CurrentValues.SetValues(researchCandleBracketing);
+                objFromDb.SampleSizeId = originalSampleSizeId;
             }
         }
 

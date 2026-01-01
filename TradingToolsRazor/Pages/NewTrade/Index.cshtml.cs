@@ -130,7 +130,6 @@ namespace TradingToolsRazor.Pages.NewTrade
                 newTrade.ResearchId = researchData.Id;
                 newTrade.SampleSizeId = researchData.SampleSizeId;
                 newTrade.Status = NewTradeVM.Status;
-                newTrade.SideType = NewTradeVM.SideType;
                 newTrade.OrderType = NewTradeVM.OrderType;
                 newTrade.SampleSize = researchData.SampleSize;
 

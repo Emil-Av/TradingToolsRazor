@@ -146,6 +146,9 @@ namespace Statistics.Services
         {
             var winners = trades.Where(trade => trade.IsWin).ToList();
 
+            if (!winners.Any())
+                return 0;
+
             winners.ForEach(winner =>
             {
                 if (winner.MaxPrice <= 0)

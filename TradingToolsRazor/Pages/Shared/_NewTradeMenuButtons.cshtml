@@ -1,24 +1,5 @@
 ﻿@using global::Shared
 
-<!-- Menu Status -->
-<div class="col-auto p-2">
-    <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Status: <span id="spanStatus"></span>
-        </button>
-        <div class="dropdown-menu animated--fade-in" id="dropdownBtnStatus" aria-labelledby="dropdownMenuButton">
-            @foreach (EStatus status in Enum.GetValues(typeof(EStatus)))
-            {
-                if (status == EStatus.All)
-                {
-                    continue;
-                }
-                <a class="dropdown-item" role="button">@status.ToString()</a>
-            }
-        </div>
-    </div>
-</div>
 <!-- Menu Time Frame -->
 <div class="col-auto p-2">
     <div class="dropdown">
@@ -62,20 +43,7 @@
         </div>
     </div>
 </div>
-<!-- Menu Trade Side -->
-<div class="col-auto p-2">
-    <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Side: <span id="spanTradeSide"></span>
-        </button>
-        <div class="dropdown-menu animated--fade-in" id="dropdownBtnTradeSide" aria-labelledby="dropdownMenuButton">
-            @foreach (EDirection sideType in Enum.GetValues(typeof(EDirection)))
-            {
-                <a class="dropdown-item" role="button">@sideType.ToString()</a>
-            }
-        </div>
-    </div>
-</div>
+
 <!-- Menu Order Type -->
 <div class="col-auto p-2">
     <div class="dropdown">

@@ -3,12 +3,6 @@ using Models.ViewModels.DisplayClasses;
 using Newtonsoft.Json;
 using Shared;
 using SharedEnums.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Models.ViewModels
 {
@@ -45,8 +39,6 @@ namespace Models.ViewModels
 
         public ETradeType TradeType { get; set; }
 
-        public EDirection SideType { get; set; }
-
         public EOrderType OrderType { get; set; }
 
         public object ResearchData { get; set; }
@@ -82,12 +74,11 @@ namespace Models.ViewModels
                 Result<EStatus>? statusResult = null;
                 Result<EOrderType>? orderTypeResult = null;
 
-                Dictionary<string, string> tradeDataObject = JsonConvert.DeserializeObject<Dictionary<string, string>>(tradeParams);
+                Dictionary<string, string> tradeDataObject = JsonConvert.DeserializeObject<Dictionary<string, string>>(tradeParams)!;
 
-                Result<ETimeFrame> timeFrameResult = MyEnumConverter.TimeFrameFromString(tradeDataObject["timeFrame"]);
+                Result<ETimeFrame> timeFrameResult = MyEnumConverter.TimeFrameFromString(tradeDataObject!["timeFrame"]);
                 Result<EStrategy> strategyResult = MyEnumConverter.StrategyFromString(tradeDataObject["strategy"]);
                 Result<ETradeType> typeResult = MyEnumConverter.TradeTypeFromString(tradeDataObject["tradeType"]);
-                Result<EDirection> sideResult = MyEnumConverter.SideTypeFromString(tradeDataObject["tradeSide"]);
 
                 // For a research trade there is no need for Status or OrderType
                 if (!typeResult.Success || typeResult.Success && typeResult.Value != ETradeType.Research)
@@ -102,7 +93,6 @@ namespace Models.ViewModels
                 ValidateResult(timeFrameResult, "Time frame");
                 ValidateResult(strategyResult, "Strategy");
                 ValidateResult(typeResult, "Type");
-                ValidateResult(sideResult, "Side");
 
                 if (errors.Any())
                 {
@@ -113,7 +103,6 @@ namespace Models.ViewModels
                 TimeFrame = timeFrameResult.Value;
                 Strategy = strategyResult.Value;
                 TradeType = typeResult.Value;
-                SideType = sideResult.Value;
 
                 // Status and OrderType are not required for Research
                 if (TradeType != ETradeType.Research)
@@ -122,20 +111,24 @@ namespace Models.ViewModels
                     OrderType = orderTypeResult!.Value;
                 }
 
-                if (Strategy == EStrategy.FirstBarPullback)
+                switch (Strategy)
                 {
-                    // ResearchData is of type object because it can contain research data for different strategies. See NewTradeController -> SaveTrade()
-                    ResearchData = JsonConvert.DeserializeObject<ResearchFirstBarPullbackDisplay>(researchData);
+                    case EStrategy.FirstBarPullback:
+                        // ResearchData is of type object because it can contain research data for different strategies. See NewTradeController -> SaveTrade()
+                        ResearchData = JsonConvert.DeserializeObject<ResearchFirstBarPullbackDisplay>(researchData)!;
+                        break;
+                    case EStrategy.Cradle:
+                        ResearchData = JsonConvert.DeserializeObject<ResearchCradle>(researchData)!;
+                        break;
+                    case EStrategy.CandleBracketing:
+                        ResearchData = JsonConvert.DeserializeObject<ResearchCandleBracketing>(researchData)!;
+                        break;
+                    case EStrategy.SRS:
+                        ResearchData = JsonConvert.DeserializeObject<SRS>(researchData)!;
+                        break;
                 }
-                else if (Strategy == EStrategy.Cradle)
-                {
-                    ResearchData = JsonConvert.DeserializeObject<ResearchCradle>(researchData);
-                }
-                else if (Strategy == EStrategy.CandleBracketing)
-                {
-                    ResearchData = JsonConvert.DeserializeObject<ResearchCandleBracketing>(researchData);
-                }
-                TradeData = JsonConvert.DeserializeObject<TradeDisplay>(tradeData);
+
+                TradeData = JsonConvert.DeserializeObject<TradeDisplay>(tradeData)!;
 
                 // Helper method to avoid duplicating code
                 void ValidateResult<T>(Result<T> result, string tradeParam)
