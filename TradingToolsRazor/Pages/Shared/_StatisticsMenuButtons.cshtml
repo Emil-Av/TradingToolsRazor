@@ -1,9 +1,9 @@
 ﻿@using global::Shared
 
 @{
-    ETimeFrame currentTimeFrame = Model.CurrentSampleSize.TimeFrame;
-    EStrategy currentStrategy = Model.CurrentSampleSize.Strategy;
-    ETradeType currentTradeType = Model.CurrentSampleSize.TradeType;
+    ETimeFrame currentTimeFrame = Model.ViewModel.CurrentSampleSize.TimeFrame;
+    EStrategy currentStrategy = Model.ViewModel.CurrentSampleSize.Strategy;
+    ETradeType currentTradeType = Model.ViewModel.CurrentSampleSize.TradeType;
 }
 
 <!-- Menu Time Frame -->
@@ -14,7 +14,7 @@
             Time Frame: <span id="spanTimeFrame">@MyEnumConverter.TimeFrameFromEnum(currentTimeFrame)</span>
         </button>
         <div class="dropdown-menu animated--fade-in" id="dropdownBtnTimeFrame" aria-labelledby="dropdownMenuButton">
-            @foreach (ETimeFrame timeFrame in Model.AvailableTimeFrames)
+            @foreach (ETimeFrame timeFrame in Model.ViewModel.AvailableTimeFrames)
             {
                 var isSelected = timeFrame == currentTimeFrame;
                 <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@MyEnumConverter.TimeFrameFromEnum(timeFrame)</a>
@@ -29,7 +29,7 @@
             Strategy: <span id="spanStrategy">@MyEnumConverter.StrategyFromEnum(currentStrategy)</span>
         </button>
         <div class="dropdown-menu animated--fade-in" id="dropdownBtnStrategy" aria-labelledby="dropdownMenuButton">
-            @foreach (EStrategy strategy in Model.AvailableStrategies)
+            @foreach (EStrategy strategy in Model.ViewModel.AvailableStrategies)
             {
                 var isSelected = strategy == currentStrategy;
                 <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@MyEnumConverter.StrategyFromEnum(strategy)</a>
@@ -57,12 +57,12 @@
 <div class="col-auto p-2">
     <div class="dropdown">
         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Sample Size: <span id="spanSampleSize">@Model.CurrentSampleSizeNumber</span>
+            Sample Size: <span id="spanSampleSize">@Model.ViewModel.CurrentSampleSizeNumber</span>
         </button>
         <div class="dropdown-menu animated--fade-in" id="dropdownBtnSampleSize" aria-labelledby="dropdownMenuButton">
-            @for (int i = 0; i < Model.NumberSampleSizes; i++)
+            @for (int i = 0; i < Model.ViewModel.NumberSampleSizes; i++)
             {
-                var isSelected = i + 1 == Model.NumberSampleSizes;
+                var isSelected = i + 1 == Model.ViewModel.NumberSampleSizes;
                 <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@(i+1)</a>
             }
             <a class="dropdown-item" role="button">All</a>
@@ -71,9 +71,9 @@
 </div>
 
 @{
-    if (Model.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
+    if (Model.ViewModel.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
     {
-        var currentTradeTime = Model.CurrentResearchCandleBracketingTrade.Time;
+        var currentTradeTime = Model.ViewModel.CurrentResearchCandleBracketingTrade.Time;
 
         <!-- Menu Time -->
         <div class="col-auto p-2">
@@ -82,7 +82,7 @@
                     Time: <span id="spanTime">@currentTradeTime</span>
                 </button>
                 <div class="dropdown-menu animated--fade-in" id="dropdownBtnOrderType" aria-labelledby="dropdownMenuButton">
-                    @foreach (var time in Model.Times)
+                    @foreach (var time in Model.ViewModel.Times)
                     {
                         var isSelected = time == currentTradeTime;
                         <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@time</a>

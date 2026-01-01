@@ -3,6 +3,8 @@ using DataAccess.Repository;
 using DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Utilities.Trade;
+using Statistics.Services;
+using Statistics.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<DeleteTradeHelper>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 
 // Allow uploading of files up to 100MB
 builder.WebHost.ConfigureKestrel(serverOptions =>

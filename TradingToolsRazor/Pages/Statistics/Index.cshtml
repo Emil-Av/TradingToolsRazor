@@ -19,18 +19,18 @@
                 <div class="col-12 col-md-auto d-flex align-items-center flex-wrap justify-content-center">
                     @await Html.PartialAsync("_StatisticsMenuButtons")
                 </div>
-                @if (Model.CandleBracketingStats == null || !Model.CandleBracketingStats.Any())
+                @if (Model.ViewModel.CandleBracketingStats == null || !Model.ViewModel.CandleBracketingStats.Any())
                 {
                     <div class="alert alert-info">No statistics available.</div>
                 }
                 else
                 {
                     // Get categories in the original sequence of appearance
-                    var categoriesInOrder = Model.CandleBracketingStats.Select(s => s.Category).Distinct().ToList();
+                    var categoriesInOrder = Model.ViewModel.CandleBracketingStats.Select(s => s.Category).Distinct().ToList();
 
                     foreach (var category in categoriesInOrder)
                     {
-                        var items = Model.CandleBracketingStats.Where(s => s.Category == category).ToList();
+                        var items = Model.ViewModel.CandleBracketingStats.Where(s => s.Category == category).ToList();
 
                         <div class="mb-5">
                             <!-- spacing between categories -->
