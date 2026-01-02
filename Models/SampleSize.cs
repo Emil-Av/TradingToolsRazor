@@ -5,9 +5,6 @@ namespace Models
 {
     public class SampleSize
     {
-        public SampleSize()
-        {
-        }
         public int Id { get; set; }
 
         public EStrategy Strategy { get; set; }

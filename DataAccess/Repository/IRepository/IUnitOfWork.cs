@@ -24,6 +24,8 @@ namespace DataAccess.Repository.IRepository
 
         IResearchCandleBracketingRepository ResearchCandleBracketing { get; }
 
+        ISRSRepository SRS { get; }
+
         Task SaveAsync();
     }
 }

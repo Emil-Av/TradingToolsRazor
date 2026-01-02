@@ -11,5 +11,7 @@ namespace Models
         public bool IsGreenCandle { get; set; }
 
         public bool IsInOverNightRange { get; set; }
+
+        public bool IsFlippedTheSwitch { get; set; }
     }
 }

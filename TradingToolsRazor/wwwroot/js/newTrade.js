@@ -158,7 +158,9 @@
         if (validateNumberInputs()) {
             var selectedStrategy = getSelectValue('#selectStrategy');
             if (selectedStrategy == strategies.SRS) {
-                saveTrade();
+                if (ValidateMenuButtonsAndScreenshots()) {
+                    saveTrade();
+                }
             }
             else {
                 saveTradeOld();
@@ -197,6 +199,40 @@
      * Region functions begins
      * ***************************
      */
+
+    function ValidateMenuButtonsAndScreenshots() {
+        var missingSelections = [];
+        
+        // Check Time Frame
+        if ($('#selectTimeFrame').val() === '' || $('#selectTimeFrame').val() === null) {
+            missingSelections.push('Time Frame');
+        }
+        
+        // Check Strategy
+        if ($('#selectStrategy').val() === '' || $('#selectStrategy').val() === null) {
+            missingSelections.push('Strategy');
+        }
+        
+        // Check Trade Type
+        if ($('#selectTradeType').val() === '' || $('#selectTradeType').val() === null) {
+            missingSelections.push('Type');
+        }
+
+        // Validate files
+        if (uploadedFiles.length == 0) {
+            missingSelections.push("No screenshots uploaded.");
+            return;
+        }
+        
+        // If there are missing selections, show error and return false
+        if (missingSelections.length > 0) {
+            var errorMessage = 'Please select: ' + missingSelections.join(', ');
+            toastr.error(errorMessage);
+            return false;
+        }
+        
+        return true;
+    }
     function displayNames() {
         var fileList = $('#fileList');
         fileList.removeClass('text-center').addClass('text-left');
@@ -210,34 +246,25 @@
 
     function saveTrade() {
         // Collect all data-trade-data values into a viewData object
-        var viewData = {};
+        var dataViewData = {};
         $('#cardBody [data-trade-data]').each(function () {
             var bindProperty = $(this).data('trade-data');
             var value = $(this).val();
             
             // Handle empty values
             if (value === "") {
-                viewData[bindProperty] = null;
+                dataViewData[bindProperty] = null;
             } else {
-                viewData[bindProperty] = value;
+                dataViewData[bindProperty] = value;
             }
         });
 
-        // Get strategy from select and convert to enum value
-        var strategyValue = $('#selectStrategy').val();
-        
-        if (!strategyValue) {
-            toastr.error("Please select a strategy.");
-            return;
-        }
-        
-        var strategyEnum = parseInt(strategyValue);
-
-        // Validate files
-        if (uploadedFiles.length == 0) {
-            toastr.error("No screenshots uploaded.");
-            return;
-        }
+        // Collect SampleSizeVM data from menu dropdowns
+        var sampleSizeViewData = {
+            TimeFrame: parseInt($('#selectTimeFrame').val()),
+            Strategy: parseInt($('#selectStrategy').val()),
+            TradeType: parseInt($('#selectTradeType').val())
+        };
 
         // Create FormData for multipart/form-data
         var formData = new FormData();
@@ -248,10 +275,10 @@
         }
         
         // Add viewData as JSON string
-        formData.append('viewData', JSON.stringify(viewData));
+        formData.append('viewData', JSON.stringify(dataViewData));
         
-        // Add strategy enum value
-        formData.append('strategy', strategyEnum);
+        // Add sampleSizeViewData as JSON string
+        formData.append('sampleSizeViewData', JSON.stringify(sampleSizeViewData));
 
         // Get anti-forgery token
         var token = document.getElementById('__RequestVerificationToken')?.value;

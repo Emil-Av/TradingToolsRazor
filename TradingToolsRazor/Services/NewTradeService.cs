@@ -28,13 +28,13 @@ namespace TradingToolsRazor.Services
             _viewModel = viewModel;
             _files = files;
 
-            if (_viewModel.TradeType == ETradeType.Research)
+            if (_viewModel.SampleSizeViewData.TradeType == ETradeType.Research)
             {
                 await SaveResearchTradeAsync();
             }
             else
             {
-                await SaveRealTradeAsync();
+                await SaveTradeAsync();
             }
         }
 
@@ -54,29 +54,55 @@ namespace TradingToolsRazor.Services
             }
         }
 
-        private async Task SaveRealTradeAsync()
+        private async Task SaveTradeAsync()
         {
-            if (_viewModel.Strategy == EStrategy.FirstBarPullback)
+            switch (_viewModel.SampleSizeViewData.Strategy)
             {
-                var researchData = await SaveResearchDataFirstbarPullback(maxTradesProSampleSize: 20);
-                var newTrade = SetNewTradeData(researchData, _files, 20);
-                await CreateJournal(newTrade);
-
-                _unitOfWork.Trade.Add(newTrade);
-                await _unitOfWork.SaveAsync();
-            }
-            else if (_viewModel.Strategy == EStrategy.SRS)
-            {
-                
+                case EStrategy.FirstBarPullback:
+                    await SaveResearchFirstBarPullbackTrade();
+                    break;
+                case EStrategy.SRS:
+                    await SaveSRSTrade();
+                    break;
             }
         }
 
-        private async Task CreateJournal(Trade newTrade)
+        private async Task SaveResearchFirstBarPullbackTrade()
+        {
+            var researchData = await SaveResearchDataFirstbarPullback(maxTradesProSampleSize: 20);
+            var newTrade = SetNewTradeData(researchData, _files, 20);
+            newTrade.JournalId = await CreateJournal();
+
+            _unitOfWork.Trade.Add(newTrade);
+            await _unitOfWork.SaveAsync();
+        }
+
+        private async Task SaveSRSTrade()
+        {
+            try
+            {
+                var (sampleSizeId, isFull) = await ProcessSampleSize(maxTradesProSampleSize: 20, _viewModel.SRSTrade.IsFlippedTheSwitch);
+                _viewModel.SRSTrade.SampleSizeId = sampleSizeId;
+                _viewModel.SRSTrade.JournalId = await CreateJournal();
+                _viewModel.SRSTrade.ScreenshotsUrls = await ScreenshotsService.SaveFilesAsync(_webHostEnvironment.WebRootPath, _viewModel, _viewModel.SRSTrade, _files, isFull);
+
+                _unitOfWork.SRS.Add(_viewModel.SRSTrade);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in NewTradeService.SaveSRSTrade(): {ex.Message}");
+            }
+           
+        }
+
+        private async Task<int> CreateJournal()
         {
             var journal = new Journal();
             _unitOfWork.Journal.Add(journal);
             await _unitOfWork.SaveAsync();
-            newTrade.JournalId = journal.Id;
+
+            return journal.Id;
         }
 
         private Trade SetNewTradeData(ResearchFirstBarPullback researchData, IFormFile[] files, int maxTradesProSampleSize)
@@ -86,7 +112,6 @@ namespace TradingToolsRazor.Services
             newTrade.ResearchId = researchData.Id;
             newTrade.SampleSizeId = researchData.SampleSizeId;
             newTrade.Status = _viewModel.Status;
-            newTrade.OrderType = _viewModel.OrderType;
             newTrade.SampleSize = researchData.SampleSize;
 
             return newTrade;
@@ -101,7 +126,7 @@ namespace TradingToolsRazor.Services
             var researchData = new ResearchCandleBracketing();
             EntityMapper.ViewModelToEntity(researchData, viewData);
             researchData.SampleSizeId = sampleSizeData.id;
-            researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, _viewModel, viewData, _files, sampleSizeData.isFull);
+            researchData.ScreenshotsUrls = await ScreenshotsService.SaveFilesAsync(_webHostEnvironment.WebRootPath, _viewModel, viewData, _files, sampleSizeData.isFull);
 
             _unitOfWork.ResearchCandleBracketing.Add(researchData);
             try
@@ -123,7 +148,7 @@ namespace TradingToolsRazor.Services
             var researchData = new ResearchCradle();
             EntityMapper.ViewModelToEntity(researchData, viewData);
             researchData.SampleSizeId = sampleSizeData.id;
-            researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, _viewModel, viewData, _files, sampleSizeData.isFull);
+            researchData.ScreenshotsUrls = await ScreenshotsService.SaveFilesAsync(_webHostEnvironment.WebRootPath, _viewModel, viewData, _files, sampleSizeData.isFull);
 
             _unitOfWork.ResearchCradle.Add(researchData);
             await _unitOfWork.SaveAsync();
@@ -139,7 +164,7 @@ namespace TradingToolsRazor.Services
             var sampleSizeData = await ProcessSampleSize(maxTradesProSampleSize);
             researchData.SampleSizeId = sampleSizeData.id;
 
-            researchData.ScreenshotsUrls = await ScreenshotsHelper.SaveFilesAsync(_webHostEnvironment.WebRootPath, _viewModel, researchData, _files, sampleSizeData.isFull);
+            researchData.ScreenshotsUrls = await ScreenshotsService.SaveFilesAsync(_webHostEnvironment.WebRootPath, _viewModel, researchData, _files, sampleSizeData.isFull);
 
             _unitOfWork.ResearchFirstBarPullback.Add(researchData);
             await _unitOfWork.SaveAsync();
@@ -153,14 +178,9 @@ namespace TradingToolsRazor.Services
 
             if (sampleSizeData.isFull || sampleSizeData.id == 0)
             {
-                Review? review = null;
-
-                if (_viewModel.TradeType != ETradeType.Research)
-                {
-                    review = new Review();
-                    _unitOfWork.Review.Add(review);
-                    await _unitOfWork.SaveAsync();
-                }
+                Review review = new Review();
+                _unitOfWork.Review.Add(review);
+                await _unitOfWork.SaveAsync();
 
                 var newSampleSize = new SampleSize
                 {

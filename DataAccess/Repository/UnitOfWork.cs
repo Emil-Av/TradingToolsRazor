@@ -28,6 +28,8 @@ namespace DataAccess.Repository
 
         public IResearchCandleBracketingRepository ResearchCandleBracketing { get; private set; }
 
+        public ISRSRepository SRS { get; private set; } 
+
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -39,6 +41,7 @@ namespace DataAccess.Repository
             ResearchFirstBarPullback = new ResearchFirstBarPullbackRepository(_db);
             ResearchCradle = new ResearchCradleRepository(_db);
             ResearchCandleBracketing = new ResearchCandleBracketingRepository(_db);
+            SRS = new SRSRepository(_db);
         }
 
         public async Task SaveAsync()

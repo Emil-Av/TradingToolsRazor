@@ -33,12 +33,25 @@ namespace Models.ViewModels
 
         #region Properties
         public EStatus Status { get; set; }
+
+        /// <summary>
+        /// Obsolete. Should use SampleSizeViewData instead.
+        /// </summary>
         public ETimeFrame TimeFrame { get; set; }
 
+        /// <summary>
+        /// Obsolete. Should use SampleSizeViewData instead.
+        /// </summary>
         public EStrategy Strategy { get; set; }
 
+        /// <summary>
+        /// Obsolete. Should use SampleSizeViewData instead.
+        /// </summary>
         public ETradeType TradeType { get; set; }
 
+        /// <summary>
+        /// Obsolete. Should use SampleSizeViewData instead.
+        /// </summary>
         public EOrderType OrderType { get; set; }
 
         public object ResearchData { get; set; }
@@ -57,15 +70,20 @@ namespace Models.ViewModels
 
         public SRS SRSTrade { get; set; }
 
+        public SampleSizeViewData SampleSizeViewData { get; set; }
+
         #endregion
 
         #region Method
 
-        public string ParseViewData(string viewData, EStrategy strategy)
+        public string ParseViewData(string viewData, string sampleSizeViewData)
         {
+
             try
             {
-                if (strategy == EStrategy.SRS)
+                SampleSizeViewData = JsonConvert.DeserializeObject<SampleSizeViewData>(sampleSizeViewData)!;
+                
+                if (SampleSizeViewData.Strategy == EStrategy.SRS)
                 {
                     SRSTrade = JsonConvert.DeserializeObject<SRS>(viewData)!;
                 }
@@ -74,7 +92,7 @@ namespace Models.ViewModels
             {
                 return $"Error in NewTradeVM.ParseViewData(): {ex.Message}";
             }
-          
+
 
             return string.Empty;
         }

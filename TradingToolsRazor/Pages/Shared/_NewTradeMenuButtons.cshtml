@@ -43,9 +43,9 @@
 <div class="col-auto p-2">
     <select class="select-dropdown-styled" id="selectTimeFrame" data-menu-type="timeFrame">
         <option value="" selected disabled>Time Frame: </option>
-        @foreach (ETimeFrame tf in Enum.GetValues(typeof(ETimeFrame)))
+        @foreach (ETimeFrame timeFrame in Enum.GetValues(typeof(ETimeFrame)))
         {
-            <option value="@((int)tf)">Time Frame: @MyEnumConverter.TimeFrameFromEnum(tf)</option>
+            <option value="@((int)timeFrame)">Time Frame: @MyEnumConverter.TimeFrameFromEnum(timeFrame)</option>
         }
     </select>
 </div>
@@ -72,7 +72,7 @@
     </select>
 </div>
 
-<!-- Menu Order Type -->
+@* <!-- Menu Order Type -->
 <div class="col-auto p-2">
     <select class="select-dropdown-styled" id="selectOrderType" data-menu-type="orderType">
         <option value="" selected disabled>Order Type: </option>
@@ -81,4 +81,4 @@
             <option value="@((int)orderType)">Order Type: @MyEnumConverter.OrderTypeFromEnum(orderType)</option>
         }
     </select>
-</div>
+</div> *@

@@ -35,8 +35,6 @@ namespace Models
 
         public EDirection SideDirection { get; set; }
 
-        public EOrderType OrderType { get; set; }
-
         public ETradeRating TradeRating { get; set; }
 
         public EOutcome Outcome { get; set; }   

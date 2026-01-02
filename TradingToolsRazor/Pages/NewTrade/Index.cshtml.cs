@@ -46,13 +46,13 @@ namespace TradingToolsRazor.Pages.NewTrade
             return null;
         }
 
-        public async Task<JsonResult> OnPostSaveNewTradeAsync([FromForm] IFormFile[] files, [FromForm] string viewData, [FromForm] EStrategy strategy)
+        public async Task<JsonResult> OnPostSaveNewTradeAsync([FromForm] IFormFile[] files, [FromForm] string viewData, [FromForm] string sampleSizeViewData)
         {
             var validationResult = ValidateModelState();
             if (validationResult != null)
                 return new JsonResult(new { error = validationResult.Value });
 
-            string errorMsg = NewTradeVM.ParseViewData(viewData, strategy);
+            string errorMsg = NewTradeVM.ParseViewData(viewData, sampleSizeViewData);
             if (!string.IsNullOrEmpty(errorMsg))
                 return new JsonResult(new { error = errorMsg });
 
