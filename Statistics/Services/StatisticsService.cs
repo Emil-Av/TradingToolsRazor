@@ -183,7 +183,7 @@ namespace Statistics.Services
             var tradesForCurrentSampleSize = await _unitOfWork.ResearchCandleBracketing.GetAllAsync(trade => trade.SampleSizeId == viewModel.CurrentSampleSize.Id);
 
             viewModel.CurrentResearchCandleBracketingTrade = tradesForCurrentSampleSize.LastOrDefault();
-            viewModel.CandleBracketingStats = CandleBracketingStatistics.GetAllStats(tradesForCurrentSampleSize);
+            viewModel.CandleBracketingStats = CandleBracketingStatisticsService.GetAllStats(tradesForCurrentSampleSize);
         }
     }
 }

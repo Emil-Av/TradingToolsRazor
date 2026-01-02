@@ -1,0 +1,93 @@
+@model TradingToolsRazor.Pages.Trades.IndexModel
+@using SharedEnums.Enums
+@using global::Shared
+
+<!-- Strategy Menu -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Strategy: <span id="spanStrategy">@MyEnumConverter.StrategyFromEnum(Model.TradesVM.CurrentSampleSize.Strategy)</span>
+        </button>
+        <ul class="dropdown-menu" id="dropdownBtnStrategy">
+            @foreach (var strategy in Model.TradesVM.AvailableStrategies)
+            {
+                <li><a class="dropdown-item" role="button">@MyEnumConverter.StrategyFromEnum(strategy)</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- Trade Type Menu -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Type: <span id="spanTradeType">@MyEnumConverter.TradeTypeFromEnum(Model.TradesVM.CurrentTrade.SampleSize.TradeType)</span>
+        </button>
+        <ul class="dropdown-menu" id="dropdownBtnTradeType">
+            @foreach (ETradeType tradeType in Enum.GetValues<ETradeType>())
+            {
+                <li><a class="dropdown-item" role="button">@MyEnumConverter.TradeTypeFromEnum(tradeType)</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- Status Menu -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Status: <span id="spanStatus">@Model.TradesVM.DefaultTradeStatus</span>
+        </button>
+        <ul class="dropdown-menu" id="dropdownBtnStatus">
+            @foreach (EStatus status in Enum.GetValues<EStatus>())
+            {
+                <li><a class="dropdown-item" role="button">@status</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- Time Frame Menu -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Time Frame: <span id="spanTimeFrame">@MyEnumConverter.TimeFrameFromEnum(Model.TradesVM.CurrentSampleSize.TimeFrame)</span>
+        </button>
+        <ul class="dropdown-menu" id="dropdownBtnTimeFrame">
+            @foreach (var tf in Model.TradesVM.AvailableTimeframes)
+            {
+                <li><a class="dropdown-item" role="button">@MyEnumConverter.TimeFrameFromEnum(tf)</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- Sample Size Menu -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Sample Size: <span id="spanSampleSize">@Model.TradesVM.NumberSampleSizes</span>
+        </button>
+        <ul class="dropdown-menu" id="dropdownBtnSampleSize">
+            @for (int i = Model.TradesVM.NumberSampleSizes; i > 0; i--)
+            {
+                <li><a class="dropdown-item" role="button">@i</a></li>
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- Trade Menu -->
+<div class="col-auto p-2">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Trade: <span id="spanTrade">@Model.TradesVM.TradesInSampleSize</span>
+        </button>
+        <ul class="dropdown-menu" id="dropdownBtnTrade">
+            @for (int i = Model.TradesVM.TradesInSampleSize; i > 0; i--)
+            {
+                <li><a class="dropdown-item" role="button">@i</a></li>
+            }
+        </ul>
+    </div>
+</div>

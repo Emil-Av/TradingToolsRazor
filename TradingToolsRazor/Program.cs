@@ -21,6 +21,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<DeleteTradeHelper>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddScoped<INewTradeService, NewTradeService>();
+builder.Services.AddScoped<ITradesService, TradesService>();
 
 // Allow uploading of files up to 100MB
 builder.WebHost.ConfigureKestrel(serverOptions =>

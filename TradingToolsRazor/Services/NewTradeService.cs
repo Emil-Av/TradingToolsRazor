@@ -184,9 +184,9 @@ namespace TradingToolsRazor.Services
 
                 var newSampleSize = new SampleSize
                 {
-                    Strategy = _viewModel.Strategy,
-                    TimeFrame = _viewModel.TimeFrame,
-                    TradeType = _viewModel.TradeType,
+                    Strategy = _viewModel.SampleSizeViewData.Strategy,
+                    TimeFrame = _viewModel.SampleSizeViewData.TimeFrame,
+                    TradeType = _viewModel.SampleSizeViewData.TradeType,
                     ReviewId = review?.Id
                 };
 

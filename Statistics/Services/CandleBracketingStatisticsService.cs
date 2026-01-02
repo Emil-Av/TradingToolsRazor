@@ -15,7 +15,7 @@ namespace Statistics.Services
     /// <summary>
     ///  Generates statistics for candle bracketing trades. Candle bracketing means putting buy/sell orders above/below a candle at specific time.
     /// </summary>
-    public class CandleBracketingStatistics
+    public class CandleBracketingStatisticsService
     {
         public static List<CandleBracketingStatisticItem> GetAllStats(List<ResearchCandleBracketing> trades)
         {
