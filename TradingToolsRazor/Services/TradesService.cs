@@ -34,6 +34,11 @@ namespace TradingToolsRazor.Services
             return _tradesVM;
         }
 
+        public TradesVM InitializeNewTradeTradesViewModel()
+        {
+            return new TradesVM { CurrentTrade = new() };
+        }
+
         public async Task<TradesVM> LoadTradeAsync(LoadTradeParams tradeParams)
         {
             _tradesVM = new TradesVM();

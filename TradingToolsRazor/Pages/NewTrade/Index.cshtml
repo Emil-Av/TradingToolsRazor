@@ -79,7 +79,7 @@
                             <div class="card-body" id="cardBody">
                                 <div class="col mr-md-5 d-flex mt-1 justify-content-center">
                                     <div id="tradeData">
-                                        @await Html.PartialAsync("_TradeData", Model.NewTradeParentVM)
+                                        @await Html.PartialAsync("_TradeData", Model.TradesVM)
                                     </div>
                                     <div id="researchFirstBarPullbackData" class="d-none">
                                         @await Html.PartialAsync("_ResearchFirstBarPullbackData", Model.NewTradeParentVM)

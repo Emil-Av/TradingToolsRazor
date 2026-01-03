@@ -13,13 +13,16 @@ using TradingToolsRazor.Services.Interfaces;
 
 namespace TradingToolsRazor.Pages.NewTrade
 {
-    public class IndexModel(INewTradeService newTradeService) : PageModel
+    public class IndexModel(INewTradeService newTradeService, ITradesService tradesService) : PageModel
     {
         private readonly INewTradeService _newTradeService = newTradeService;
+        private readonly ITradesService _tradesService = tradesService;
 
         public NewTradeVM NewTradeVM { get; set; } = new();
 
         public PartialViewsVM NewTradeParentVM { get; set; } = new();
+
+        public TradesVM TradesVM { get; set; } = new();
 
         #region Handlers
 
@@ -27,6 +30,7 @@ namespace TradingToolsRazor.Pages.NewTrade
         {
             NewTradeParentVM.CandleBracketing.Date = DateOnly.FromDateTime(DateTime.Now);
             NewTradeParentVM.CandleBracketing.Time = TimeOnly.FromDateTime(DateTime.Now);
+            TradesVM = _tradesService.InitializeNewTradeTradesViewModel();
             return Page();
         }
 

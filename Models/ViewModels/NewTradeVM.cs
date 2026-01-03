@@ -58,7 +58,7 @@ namespace Models.ViewModels
 
         public ResearchFirstBarPullbackDisplay ResearchFirstBarPullbackDisplay { get; set; }
 
-        public Trade CurrentTrade { get; set; }
+        public BaseTrade CurrentTrade { get; set; }
 
         public TradeDisplay TradeData { get; set; }
 
@@ -72,13 +72,14 @@ namespace Models.ViewModels
 
         public SampleSizeViewData SampleSizeViewData { get; set; }
 
+        public TradesVM TradesVM { get; set; }
+
         #endregion
 
         #region Method
 
         public string ParseViewData(string viewData, string sampleSizeViewData)
         {
-
             try
             {
                 SampleSizeViewData = JsonConvert.DeserializeObject<SampleSizeViewData>(sampleSizeViewData)!;

@@ -1,0 +1,33 @@
+@model TradingToolsRazor.Pages.Trades.IndexModel
+
+<!-- Screenshots Carousel -->
+<div class="row justify-content-center">
+    <div class="col-10">
+        <div id="carouselTrades" class="carousel slide" data-bs-ride="false">
+            <div id="imageContainer">
+                <div class="carousel-indicators">
+                    @for (int i = 0; i < Model.TradesVM.CurrentTrade.ScreenshotsUrls.Count; i++)
+                    {
+                        <button type="button" data-bs-target="#carouselTrades" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")" aria-label="Slide @(i + 1)"></button>
+                    }
+                </div>
+                <div class="carousel-inner">
+                    @for (int i = 0; i < Model.TradesVM.CurrentTrade.ScreenshotsUrls.Count; i++)
+                    {
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <img src="@Model.TradesVM.CurrentTrade.ScreenshotsUrls[i]" class="d-block w-100" alt="Trade screenshot @(i + 1)">
+                        </div>
+                    }
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselTrades" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselTrades" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+</div>
