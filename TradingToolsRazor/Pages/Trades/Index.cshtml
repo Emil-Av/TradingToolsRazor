@@ -150,7 +150,7 @@
                         <div id="tradeDataTabContent">
                             <div class="row">
                                 <div class="col">
-                                    <partial name="_TradeData" model="Model.TradesVM" />
+                                    @await Html.PartialAsync("_TradeData", Model.TradesVM)
                                 </div>
                             </div>
                         </div>

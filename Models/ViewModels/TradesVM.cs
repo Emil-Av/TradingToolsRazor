@@ -35,7 +35,7 @@ namespace Models.ViewModels
         public string? ErrorMsg { get; set; }
 
         // The trade being displayed
-        public Trade CurrentTrade { get; set; }
+        public BaseTrade CurrentTrade { get; set; }
 
         public TradeDisplay TradeData { get; set; }
 

@@ -1,5 +1,5 @@
 ﻿@using global::Shared.Enums
-@model PartialViewsVM
+@model TradesVM
 
 <div class="row justify-content-center">
     <div class="col-12 text-center">
@@ -32,15 +32,15 @@
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputSymbol">Symbol</label>
-                                    <input class="text-center form-control" id="InputSymbol" data-trade-data="Symbol" value="@Model.TradesVM.CurrentTrade.Symbol" />
+                                    <input class="text-center form-control" id="InputSymbol" data-trade-data="Symbol" value="@Model.CurrentTrade.Symbol" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputAmount">Amount</label>
-                                    <input class="text-center form-control number-input" id="InputAmount" data-trade-data="Amount" value="@(Model.TradesVM.CurrentTrade.Amount ?? 0)" />
+                                    <input class="text-center form-control number-input" id="InputAmount" data-trade-data="Amount" value="@(Model.CurrentTrade.Amount ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputStatus">Status</label>
-                                    <select class="text-center form-control" id="InputStatus" data-trade-data="Status" value="@Model.TradesVM.CurrentTrade.Status">
+                                    <select class="text-center form-control" id="InputStatus" data-trade-data="Status" value="@Model.CurrentTrade.Status">
                                         @{
                                             int enumIntValue = 0;
                                             foreach (EStatus status in Enum.GetValues(typeof(EStatus)))
@@ -49,7 +49,7 @@
                                                 {
                                                     continue;
                                                 }
-                                                string selected = Model.TradesVM.CurrentTrade != null && status == Model.TradesVM.CurrentTrade.Status ? "selected" : null;
+                                                string selected = Model.CurrentTrade != null && status == Model.CurrentTrade.Status ? "selected" : null;
                                                 <option value="@enumIntValue" selected=@selected>@status</option>
                                                 enumIntValue++;
                                             }
@@ -58,12 +58,12 @@
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputOutcome">Outcome</label>
-                                    <select class="text-center form-control" id="InputOutcome" data-trade-data="Outcome" value="@Model.TradesVM.CurrentTrade.Outcome">
+                                    <select class="text-center form-control" id="InputOutcome" data-trade-data="Outcome" value="@Model.CurrentTrade.Outcome">
                                         @{
                                             enumIntValue = 0;
                                             foreach (EOutcome outcome in Enum.GetValues(typeof(EOutcome)))
                                             {
-                                                <option value="@enumIntValue" selected="@(outcome == Model.TradesVM.CurrentTrade.Outcome ? "selected" : null)">@outcome</option>
+                                                <option value="@enumIntValue" selected="@(outcome == Model.CurrentTrade.Outcome ? "selected" : null)">@outcome</option>
                                                 enumIntValue++;
                                             }
                                         }
@@ -71,7 +71,7 @@
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputTradeRating">Rating</label>
-                                    <select class="text-center form-control" id="InputTradeRating" data-trade-data="TradeRating" asp-for="@Model.TradesVM.CurrentTrade.TradeRating" asp-items="Model.TradesVM.TradeRatingOptions"></select>
+                                    <select class="text-center form-control" id="InputTradeRating" data-trade-data="TradeRating" asp-for="@Model.CurrentTrade.TradeRating" asp-items="Model.TradeRatingOptions"></select>
                                 </div>
                             </div>
                         </div>
@@ -85,23 +85,23 @@
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputTriggerPrice">Trigger Price</label>
-                                    <input class="text-center form-control number-input" id="InputTriggerPrice" data-trade-data="TriggerPrice" value="@(Model.TradesVM.CurrentTrade.TriggerPrice ?? 0)" />
+                                    <input class="text-center form-control number-input" id="InputTriggerPrice" data-trade-data="TriggerPrice" value="@(Model.CurrentTrade.TriggerPrice ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputEntryPrice">Entry Price</label>
-                                    <input class="text-center form-control number-input" id="InputEntryPrice" data-trade-data="EntryPrice" value="@(Model.TradesVM.CurrentTrade.EntryPrice ?? 0)" />
+                                    <input class="text-center form-control number-input" id="InputEntryPrice" data-trade-data="EntryPrice" value="@(Model.CurrentTrade.EntryPrice ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputStopPrice">Stop Price</label>
-                                    <input class="text-center form-control number-input" id="InputStopPrice" data-trade-data="StopPrice" value="@(Model.TradesVM.CurrentTrade.StopPrice ?? 0)" />
+                                    <input class="text-center form-control number-input" id="InputStopPrice" data-trade-data="StopPrice" value="@(Model.CurrentTrade.StopPrice ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputExitPrice">Exit Price</label>
-                                    <input class="text-center form-control number-input" id="InputExitPrice" data-trade-data="ExitPrice" value="@(Model.TradesVM.CurrentTrade.ExitPrice ?? 0)" />
+                                    <input class="text-center form-control number-input" id="InputExitPrice" data-trade-data="ExitPrice" value="@(Model.CurrentTrade.ExitPrice ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputMaxPrice">Max Price</label>
-                                    <input class="text-center form-control number-input" id="InputMaxPrice" data-trade-data="MaxPrice" value="@(Model.TradesVM.CurrentTrade.MaxPrice ?? 0)" />
+                                    <input class="text-center form-control number-input" id="InputMaxPrice" data-trade-data="MaxPrice" value="@(Model.CurrentTrade.MaxPrice ?? 0)" />
                                 </div>
                             </div>
                         </div>
@@ -115,11 +115,11 @@
                             <div class="d-flex flex-wrap">
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputPnL">PnL</label>
-                                    <input class="text-center form-control number-input" id="InputPnL" data-trade-data="PnL" value="@(Model.TradesVM.CurrentTrade.PnL ?? 0)" />
+                                    <input class="text-center form-control number-input" id="InputPnL" data-trade-data="PnL" value="@(Model.CurrentTrade.PnL ?? 0)" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputFee">Fee</label>
-                                    <input class="text-center form-control number-input" id="InputFee" data-trade-data="Fee" value="@(Model.TradesVM.CurrentTrade.Fee ?? 0)" />
+                                    <input class="text-center form-control number-input" id="InputFee" data-trade-data="Fee" value="@(Model.CurrentTrade.Fee ?? 0)" />
                                 </div>
                             </div>
                         </div>

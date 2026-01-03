@@ -107,14 +107,15 @@ namespace TradingToolsRazor.Services
 
         private Trade SetNewTradeData(ResearchFirstBarPullback researchData, IFormFile[] files, int maxTradesProSampleSize)
         {
-            var newTrade = EntityMapper.ViewModelDisplayToEntity<Trade, TradeDisplay>(_viewModel.TradeData, existingEntity: null);
+            //var newTrade = EntityMapper.ViewModelDisplayToEntity<Trade, TradeDisplay>(_viewModel.TradeData, existingEntity: null);
 
-            newTrade.ResearchId = researchData.Id;
-            newTrade.SampleSizeId = researchData.SampleSizeId;
-            newTrade.Status = _viewModel.Status;
-            newTrade.SampleSize = researchData.SampleSize;
+            //newTrade.ResearchId = researchData.Id;
+            //newTrade.SampleSizeId = researchData.SampleSizeId;
+            //newTrade.Status = _viewModel.Status;
+            //newTrade.SampleSize = researchData.SampleSize;
 
-            return newTrade;
+            //return newTrade;
+            return new();
         }
 
         private async Task SaveCandleBracketingData(int maxTradesProSampleSize)
