@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repository.IRepository
 {
-    public interface ITradeRepository : IRepository<Trade>
+    public interface IBaseTradeRepository : IRepository<BaseTrade>
     {
-        Task UpdateAsync(Trade paperTrade);
+        Task UpdateAsync(BaseTrade paperTrade);
     }
 }

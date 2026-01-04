@@ -37,6 +37,8 @@ namespace Models.ViewModels
         // The trade being displayed
         public BaseTrade CurrentTrade { get; set; }
 
+        public SRS SRSTrade { get; set; }
+
         public TradeDisplay TradeData { get; set; }
 
         public SampleSize CurrentSampleSize { get; set; }

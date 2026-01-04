@@ -22,15 +22,13 @@ namespace TradingToolsRazor.Pages.NewTrade
 
         public PartialViewsVM NewTradeParentVM { get; set; } = new();
 
-        public TradesVM TradesVM { get; set; } = new();
-
         #region Handlers
 
         public IActionResult OnGet()
         {
             NewTradeParentVM.CandleBracketing.Date = DateOnly.FromDateTime(DateTime.Now);
             NewTradeParentVM.CandleBracketing.Time = TimeOnly.FromDateTime(DateTime.Now);
-            TradesVM = _tradesService.InitializeNewTradeTradesViewModel();
+            NewTradeVM.TradesVM = _tradesService.InitializeNewTradeTradesViewModel();
             return Page();
         }
 

@@ -33,7 +33,7 @@ namespace Models
 
         public EStatus Status { get; set; }
 
-        public EDirection SideDirection { get; set; }
+        public EDirection Direction { get; set; }
 
         public ETradeRating TradeRating { get; set; }
 

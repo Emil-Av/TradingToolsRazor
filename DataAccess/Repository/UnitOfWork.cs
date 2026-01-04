@@ -12,7 +12,7 @@ namespace DataAccess.Repository
     {
         private ApplicationDbContext _db;
 
-        public ITradeRepository Trade { get; private set; }
+        public IBaseTradeRepository BaseTrade { get; private set; }
 
         public IReviewRepository Review { get; private set; }
 
@@ -33,7 +33,7 @@ namespace DataAccess.Repository
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
-            Trade = new TradeRepository(_db);
+            BaseTrade = new BaseTradeRepository(_db);
             Review = new ReviewRepository(_db);
             Journal = new JournalRepository(_db);
             SampleSize = new SampleSizeRepository(_db);

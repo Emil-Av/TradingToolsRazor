@@ -73,7 +73,7 @@ namespace TradingToolsRazor.Services
             var newTrade = SetNewTradeData(researchData, _files, 20);
             newTrade.JournalId = await CreateJournal();
 
-            _unitOfWork.Trade.Add(newTrade);
+            _unitOfWork.BaseTrade.Add(newTrade);
             await _unitOfWork.SaveAsync();
         }
 
@@ -228,7 +228,7 @@ namespace TradingToolsRazor.Services
                         .Count(),
 
                 ETradeType.Trade =>
-                    (await _unitOfWork.Trade.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
+                    (await _unitOfWork.BaseTrade.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
                 _ => 0
             };

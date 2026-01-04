@@ -7,13 +7,12 @@ using TradingToolsRazor.Services.Interfaces;
 
 namespace TradingToolsRazor.Pages.Trades
 {
-    public class IndexModel(ITradesService tradesService, IWebHostEnvironment webHostEnvironment) : PageModel
+    public class IndexModel(ITradesService tradesService) : PageModel
     {
 
         #region Private Properties
 
         private readonly ITradesService _tradesService = tradesService;
-        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
 
         #endregion
 
@@ -31,13 +30,8 @@ namespace TradingToolsRazor.Pages.Trades
             return Page();
         }
 
-        public async Task<IActionResult> OnPostUpdateTradeDataAsync([FromBody] Trade tradeData)
-        {
-            if (!ModelState.IsValid)
-            {
-                return new JsonResult(new { error = "Invalid model state" });
-            }
-
+        public async Task<IActionResult> OnPostUpdateTradeDataAsync([FromBody] BaseTrade tradeData)
+        { 
             try
             {
                 await _tradesService.UpdateTradeDataAsync(tradeData);

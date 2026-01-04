@@ -10,14 +10,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repository
 {
-    public class UserSettingsRepository : Repository<UserSettings>, IUserSettingsRepository
+    public class UserSettingsRepository(ApplicationDbContext db) : Repository<UserSettings>(db), IUserSettingsRepository
     {
-        private ApplicationDbContext _db;
-
-        public UserSettingsRepository(ApplicationDbContext db) : base(db)
-        {
-            _db = db;
-        }
+        private readonly ApplicationDbContext _db = db;
 
         public async Task UpdateAsync(UserSettings userSettings)
         {

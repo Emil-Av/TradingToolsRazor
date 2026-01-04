@@ -64,7 +64,7 @@
                                 <div class="row align-items-center">
                                     <div class="col-auto">
                                         <div class="dropdown">
-                                            <a class="dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <a class="dropdown-toggle" role="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <span id="currentMenu" class="min-width-60">Trade Data</span>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="headerMenu">
@@ -79,7 +79,7 @@
                             <div class="card-body" id="cardBody">
                                 <div class="col mr-md-5 d-flex mt-1 justify-content-center">
                                     <div id="tradeData">
-                                        @await Html.PartialAsync("_TradeData", Model.TradesVM)
+                                        @await Html.PartialAsync("_TradeData", Model.NewTradeVM.TradesVM)
                                     </div>
                                     <div id="researchFirstBarPullbackData" class="d-none">
                                         @await Html.PartialAsync("_ResearchFirstBarPullbackData", Model.NewTradeParentVM)
@@ -91,7 +91,7 @@
                                         @await Html.PartialAsync("_ResearchCandleBracketingData", Model.NewTradeParentVM)
                                     </div>
                                     <div id="researchSRSData" class="col-12 d-none">
-                                        @await Html.PartialAsync("_ResearchSRSData", Model.NewTradeParentVM)
+                                        @await Html.PartialAsync("_ResearchSRSData", Model.NewTradeVM.SRSTrade)
                                     </div>
                                 </div>
                             </div>

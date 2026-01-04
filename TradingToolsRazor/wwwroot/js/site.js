@@ -1,5 +1,4 @@
-﻿
-// Left bar (menu 'Trades'): Hide the menu if it's clicked outside of it
+﻿// Left bar (menu 'Trades'): Hide the menu if it's clicked outside of it
 $(document).on('click', function (event) {
     var menu = $('#dropdownBtnTrades');
     var target = $(event.target);
@@ -10,7 +9,6 @@ $(document).on('click', function (event) {
         menu.removeClass('show');
     }
 });
-
 
 // Gets the data from the elements which have data-trade-data attribute. Used in multiple views.
 function getTradeData() {
@@ -24,7 +22,14 @@ function getTradeData() {
             tradeData[bindProperty] = $(this).val();
         }
     });
-    tradeData['Id'] = $('#spanTradeIdInput').val();
+    
+    // Relevant for Trades page when updating trade trade data
+    if (typeof window.tradeData !== 'undefined') {
+        tradeData['Id'] = window.tradeData.tradeId;
+        tradeData['journalId'] = window.tradeData.journalId;
+        tradeData['screenshotsUrls'] = window.tradeData.screenshotsUrls;
+        tradeData['sampleSizeId'] = window.tradeData.sampleSizeId;
+    }
 
     return tradeData;
 }

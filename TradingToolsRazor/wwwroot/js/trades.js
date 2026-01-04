@@ -23,7 +23,16 @@ $(function () {
     const CARD_MENU = {
         TRADING_DATA: 'itemTradingData',
         JOURNAL: 'itemJournal',
+        REVIEW: 'itemReview',
         RESEARCH: 'itemResearch'
+    };
+
+    // Strategy enum constants
+    const STRATEGY = {
+        FIRST_BAR_PULLBACK: 0,
+        CRADLE: 1,
+        CANDLE_BRACKETING: 2,
+        SRS: 3
     };
 
     /**
@@ -48,18 +57,18 @@ $(function () {
     function updateReview() {
         const dataToSend = {
             CurrentTrade: {
-                Id: $('#spanTradeIdInput').val()
+                Id: window.tradeData.tradeId
             },
             CurrentSampleSize: {
                 Review: {
-                    Id: $('#spanReviewIdInput').val(),
+                    Id: window.tradeData.reviewId,
                     First: $('#first').html(),
                     Second: $('#second').html(),
                     Third: $('#third').html(),
                     Forth: $('#forth').html(),
                     summary: $('#summary').html()
                 },
-                Id: $('#spanSampleSizeIdInput').val(),
+                Id: window.tradeData.sampleSizeId,
             }
         };
 
@@ -73,25 +82,25 @@ $(function () {
             },
             body: JSON.stringify(dataToSend)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success !== undefined) {
-                toastr.success(data.success);
-            } else {
-                toastr.error(data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error updating review:', error);
-            toastr.error('Error updating review. See console for details.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success !== undefined) {
+                    toastr.success(data.success);
+                } else {
+                    toastr.error(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating review:', error);
+                toastr.error('Error updating review. See console for details.');
+            });
     }
 
     function updateTradeData() {
         const tradeData = getTradeData();
         const token = document.getElementById('__RequestVerificationToken')?.value;
 
-        fetch('/trades/updateTradeData', {
+        fetch('/trades?handler=UpdateTradeData', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
@@ -99,26 +108,26 @@ $(function () {
             },
             body: JSON.stringify(tradeData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success !== undefined) {
-                toastr.success(data.success);
-            } else {
-                toastr.error(data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error updating trade data:', error);
-            toastr.error('Error updating trade data. See console for details.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success !== undefined) {
+                    toastr.success(data.success);
+                } else {
+                    toastr.error(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating trade data:', error);
+                toastr.error('Error updating trade data. See console for details.');
+            });
     }
 
     // Send the journal data to the controller
     function updateJournal() {
         const dataToSend = {
             CurrentTrade: {
-                Id: $('#spanTradeIdInput').val(),
-                JournalId: $('#spanJournalIdInput').val(),
+                Id: window.tradeData.tradeId,
+                JournalId: window.tradeData.journalId,
                 Journal: {
                     Pre: $('#pre').html(),
                     During: $('#during').html(),
@@ -138,18 +147,18 @@ $(function () {
             },
             body: JSON.stringify(dataToSend)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success !== undefined) {
-                toastr.success(data.success);
-            } else {
-                toastr.error(data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error updating journal:', error);
-            toastr.error('Error updating journal. See console for details.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success !== undefined) {
+                    toastr.success(data.success);
+                } else {
+                    toastr.error(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating journal:', error);
+                toastr.error('Error updating journal. See console for details.');
+            });
     }
 
     // When the content is double clicked, it can be edited (summernote is displayed)
@@ -208,7 +217,7 @@ $(function () {
     function saveEditorText() {
         $('#cardBody').addClass('card-body');
         isEditorShown = false;
-        
+
         // Save the text from the editor
         const editorText = $($('#summernote').summernote('code')).text().trim();
         // Save the text from the tab
@@ -221,7 +230,7 @@ $(function () {
         $('#summernote').summernote('code', '');
         $('#summernote').summernote('destroy');
         toggleFooterButtons();
-        
+
         // If a change has been made, save it
         if (editorText !== oldTabContent) {
             if (currentCardMenuId === CARD_MENU.JOURNAL) {
@@ -236,7 +245,7 @@ $(function () {
     function openEditor() {
         $('#cardBody').removeClass('card-body');
         toggleFooterButtons();
-        
+
         // Hide the tabContent of the journal and show the summernote instead
         // Get the text from the tabContent
         const currentTabContent = $(currentTabSelector).html();
@@ -269,7 +278,6 @@ $(function () {
         }
 
         currentCardMenuId = $(this).attr('id');
-
         if (currentCardMenuId === CARD_MENU.TRADING_DATA) {
             showTradingDataContent();
         } else if (currentCardMenuId === CARD_MENU.JOURNAL) {
@@ -289,6 +297,7 @@ $(function () {
         $('#journalTabContent').addClass('d-none');
         $('#reviewTabHeaders').addClass('d-none');
         $('#reviewTabContent').addClass('d-none');
+        $('#researchTabContent').addClass('d-none');
         $('#btnEdit').addClass('d-none');
         $('#btnUpdate').removeClass('d-none');
     }
@@ -300,13 +309,18 @@ $(function () {
         $('#reviewTabHeaders').addClass('d-none');
         $('#reviewTabContent').addClass('d-none');
         $('#tradeDataTabContent').addClass('d-none');
+        $('#researchTabContent').addClass('d-none');
         $('#btnEdit').removeClass('d-none');
         $('#btnUpdate').addClass('d-none');
     }
 
     function showResearchContent() {
-        // TODO: Implement research content display
-        // This section needs to be implemented based on your requirements
+        $('#researchTabContent').removeClass('d-none');
+        $('#tradeDataTabContent').addClass('d-none');
+        $('#journalTabHeaders').addClass('d-none');
+        $('#journalTabContent').addClass('d-none');
+        $('#reviewTabHeaders').addClass('d-none');
+        $('#reviewTabContent').addClass('d-none');
     }
 
     function showReviewContent() {
@@ -316,6 +330,7 @@ $(function () {
         $('#journalTabHeaders').addClass('d-none');
         $('#journalTabContent').addClass('d-none');
         $('#tradeDataTabContent').addClass('d-none');
+        $('#researchTabContent').addClass('d-none');
         $('#btnEdit').removeClass('d-none');
         $('#btnUpdate').addClass('d-none');
     }
@@ -328,7 +343,11 @@ $(function () {
                 menuText = 'Trade Data';
             } else if (currentCardMenuId === CARD_MENU.JOURNAL) {
                 menuText = 'Journal';
-            } else {
+            }
+            else if (currentCardMenuId === CARD_MENU.RESEARCH) {
+                menuText = 'Research';
+            }
+            else {
                 menuText = 'Review';
             }
             $('#currentMenu').text(menuText);
@@ -373,13 +392,13 @@ $(function () {
     for (const key in menuButtons) {
         (function (buttonSelector) {
             setSelectedItemClass(buttonSelector);
-            
+
             // Change the value of the span in the button
             $(buttonSelector).on('click', '.dropdown-item', function () {
                 // Save the old value. If there is no trade in the DB for the selected trade, the menu's old value should be displayed.
                 clickedMenu = $(menuButtons[buttonSelector]);
                 clickedMenuValue = $(menuButtons[buttonSelector]).text();
-                
+
                 // If the time frame, the strategy or the sample size has changed, then the latest trade must always be displayed. 
                 // Used in setMenuValues()
                 if (buttonSelector !== '#dropdownBtnTrade') {
@@ -400,7 +419,7 @@ $(function () {
                 // Set the new value
                 const selectedValue = $(this).text();
                 $(menuButtons[buttonSelector]).text(selectedValue);
-                
+
                 loadTrade(
                     $('#spanStatus').text(),
                     $('#spanTimeFrame').text(),
@@ -462,38 +481,40 @@ $(function () {
             },
             body: JSON.stringify({ tradeParams })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error !== undefined) {
-                toastr.error(data.error);
-                // Set the old value
+            .then(response => response.json())
+            .then(data => {
+                if (data.error !== undefined) {
+                    toastr.error(data.error);
+                    // Set the old value
+                    clickedMenu.text(clickedMenuValue);
+                    return;
+                } else if (data.info !== undefined) {
+                    toastr.info(data.info);
+                    // Set the old value
+                    clickedMenu.text(clickedMenuValue);
+                    return;
+                }
+
+                tradesViewModel = data;
+                setHiddenSpansValues(tradesViewModel);
+                loadViewData(trade);
+            })
+            .catch(error => {
+                console.error('Error loading trade:', error);
+                toastr.error('Error loading trade. See console for details.');
+                // Restore old value on error
                 clickedMenu.text(clickedMenuValue);
-                return;
-            } else if (data.info !== undefined) {
-                toastr.info(data.info);
-                // Set the old value
-                clickedMenu.text(clickedMenuValue);
-                return;
-            }
-            
-            tradesViewModel = data;
-            setHiddenSpansValues(tradesViewModel);
-            loadViewData(trade);
-        })
-        .catch(error => {
-            console.error('Error loading trade:', error);
-            toastr.error('Error loading trade. See console for details.');
-            // Restore old value on error
-            clickedMenu.text(clickedMenuValue);
-        });
+            });
     }
 
     function setHiddenSpansValues(viewModel) {
-        // Set the new trade id
-        $("#spanTradeIdInput").val(viewModel.tradesVM.currentTrade.id);
-        // Set the sample size id
-        $("#spanSampleSizeIdInput").val(viewModel.tradesVM.currentTrade.sampleSizeId);
-        $('#spanJournalIdInput').val(viewModel.tradesVM.currentTrade.journalId);
+        // Update the trade data object with new values
+        window.tradeData = {
+            tradeId: viewModel.tradesVM.currentTrade.id,
+            journalId: viewModel.tradesVM.currentTrade.journalId,
+            sampleSizeId: viewModel.tradesVM.currentTrade.sampleSizeId,
+            reviewId: viewModel.tradesVM.currentSampleSize.review.id
+        };
     }
 
     function loadViewData(tradeNumber) {
@@ -507,7 +528,7 @@ $(function () {
 
     function loadTradeData() {
         const currentTrade = tradesViewModel.tradesVM.currentTrade;
-        
+
         $('#SymbolInput').val(currentTrade.symbol);
         $('#StatusInput').val(currentTrade.status);
         $('#TriggerPriceInput').val(currentTrade.triggerPriceInput);
@@ -523,9 +544,9 @@ $(function () {
     function loadReview() {
         // Activate the 'First' tab
         $('#first-tab').trigger('click');
-        
+
         const review = tradesViewModel.tradesVM.currentSampleSize.review;
-        
+
         // Set the values
         $('#first').html(review.first);
         $('#second').html(review.second);
@@ -538,9 +559,9 @@ $(function () {
     function loadJournal() {
         // Activate the 'Pre' tab
         $('#pre-tab').trigger('click');
-        
+
         const journal = tradesViewModel.tradesVM.currentTrade.journal;
-        
+
         // Set the values
         $('#pre').html(journal.pre);
         $('#during').html(journal.during);
@@ -551,7 +572,7 @@ $(function () {
     // Populate the drop down items after a new trade has been selected and set the values in the spans.
     function setMenuValues(displayedTradeNumber) {
         const viewModel = tradesViewModel.tradesVM;
-        
+
         // Menu Buttons
         const numberSampleSizes = viewModel.numberSampleSizes !== -1 ? viewModel.numberSampleSizes : '-';
         const numberTrades = viewModel.tradesInSampleSize !== 0 ? viewModel.tradesInSampleSize : viewModel.tradesInTimeFrame;
@@ -559,7 +580,7 @@ $(function () {
         // Set the SampleSize menu
         $('#spanSampleSize').text(viewModel.currentSampleSizeNumber);
         $('#dropdownBtnSampleSize').empty();
-        
+
         let sampleSizesHtml = '';
         for (let i = numberSampleSizes; i > 0; i--) {
             sampleSizesHtml += '<a class="dropdown-item" role="button">' + i + '</a>';
@@ -583,8 +604,8 @@ $(function () {
         $('#dropdownBtnTrade').html(tradesHtml);
 
         setTimeFrameMenu(
-            viewModel.availableTimeframes, 
-            getTimeFrameMapping(), 
+            viewModel.availableTimeframes,
+            getTimeFrameMapping(),
             viewModel.currentSampleSize.timeFrame
         );
 
@@ -640,5 +661,33 @@ $(function () {
     * Region menu buttons ends
     * ***************************
     */
+
+    /**
+     * ***************************
+     * Region helper functions starts
+     * ***************************
+     */
+
+    // Parse strategy text to enum value
+    // EStrategy enum values:
+    // FirstBarPullback = 0
+    // Cradle = 1
+    // CandleBracketing = 2
+    // SRS = 3
+    function getStrategyEnumValue(strategyText) {
+        const strategyMap = {
+            'First Bar Pullback': STRATEGY.FIRST_BAR_PULLBACK,
+            'Cradle': STRATEGY.CRADLE,
+            'Candle Bracketing': STRATEGY.CANDLE_BRACKETING,
+            'SRS': STRATEGY.SRS
+        };
+        return strategyMap[strategyText.trim()];
+    }
+
+    /**
+     * ***************************
+     * Region helper functions ends
+     * ***************************
+     */
 });
 

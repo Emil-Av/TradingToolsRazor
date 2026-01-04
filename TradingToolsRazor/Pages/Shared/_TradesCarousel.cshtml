@@ -6,7 +6,7 @@
         <div id="carouselTrades" class="carousel slide" data-bs-ride="false">
             <div id="imageContainer">
                 <div class="carousel-indicators">
-                    @for (int i = 0; i < Model.TradesVM.CurrentTrade.ScreenshotsUrls.Count; i++)
+                    @for (int i = 0; i < Model.TradesVM.CurrentTrade.ScreenshotsUrls!.Count; i++)
                     {
                         <button type="button" data-bs-target="#carouselTrades" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "false")" aria-label="Slide @(i + 1)"></button>
                     }

@@ -53,7 +53,7 @@ namespace TradingToolsRazor.Services
 
             SetCurrentSampleSize(sampleSizes, tradeParams);
 
-            List<Trade> listTrades = await GetAllTrades(tradeParams);
+            List<BaseTrade> listTrades = await GetAllTrades(tradeParams);
             await SetCurrentTrade();
 
             await SetViewData(sampleSizes, listTrades.Count, tradeParams);
@@ -61,16 +61,9 @@ namespace TradingToolsRazor.Services
             return _tradesVM;
         }
 
-        public async Task UpdateTradeDataAsync(Trade tradeData)
+        public async Task UpdateTradeDataAsync(BaseTrade tradeData)
         {
-            Trade trade = await _unitOfWork.Trade.GetAsync(x => x.Id == tradeData.Id, includeProperties: "SampleSize");
-            if (trade == null)
-            {
-                throw new InvalidOperationException($"Trade with ID {tradeData.Id} not found.");
-            }
-
-            EntityMapper.ViewModelToEntity(trade, tradeData);
-            await _unitOfWork.Trade.UpdateAsync(trade);
+            await _unitOfWork.BaseTrade.UpdateAsync(tradeData);
             await _unitOfWork.SaveAsync();
         }
 
@@ -244,7 +237,7 @@ namespace TradingToolsRazor.Services
         {
             if (tradeParams.Status == EStatus.All)
             {
-                return [.. (await _unitOfWork.Trade
+                return [.. (await _unitOfWork.BaseTrade
                                     .GetAllAsync(trade =>
                                                     trade.SampleSize!.Strategy == tradeParams.Strategy &&
                                                     trade.SampleSize.TradeType == tradeParams.TradeType &&
@@ -255,7 +248,7 @@ namespace TradingToolsRazor.Services
             }
             else
             {
-                return [.. (await _unitOfWork.Trade
+                return [.. (await _unitOfWork.BaseTrade
                                     .GetAllAsync(trade =>
                                                     trade.SampleSize!.Strategy == tradeParams.Strategy &&
                                                     trade.SampleSize.TradeType == tradeParams.TradeType &&
@@ -302,15 +295,15 @@ namespace TradingToolsRazor.Services
             }
         }
 
-        private async Task<List<Trade>> GetAllTrades(LoadTradeParams tradeParams)
+        private async Task<List<BaseTrade>> GetAllTrades(LoadTradeParams tradeParams)
         {
             if (tradeParams.Status == EStatus.All)
             {
-                return [.. await _unitOfWork.Trade.GetAllAsync(x => x.SampleSizeId == _tradesVM.CurrentSampleSize.Id)];
+                return [.. await _unitOfWork.BaseTrade.GetAllAsync(x => x.SampleSizeId == _tradesVM.CurrentSampleSize.Id)];
             }
             else
             {
-                return [.. (await _unitOfWork.Trade.GetAllAsync(x => x.SampleSizeId == _tradesVM.CurrentSampleSize.Id && x.Status == tradeParams.Status))];
+                return [.. (await _unitOfWork.BaseTrade.GetAllAsync(x => x.SampleSizeId == _tradesVM.CurrentSampleSize.Id && x.Status == tradeParams.Status))];
             }
         }
 

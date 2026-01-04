@@ -1,17 +1,15 @@
-﻿@model PartialViewsVM
+﻿@model SRS
 
 <div class="row justify-content-center">
     <div class="text-center">
-        <div class="@(ViewData["Title"]?.ToString() == "New Trade" ? "" : "card-header")">
-            <div class="row align-items-center">
-                <div class="col mr-md-5 d-flex justify-content-center">
-                    <div id="researchDataTabHeaders">
-                        <ul class="nav nav-tabs" id="srsTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="srsData-tab" data-toggle="tab" data-target="#srsData" type="button" role="tab" aria-controls="srsData" aria-selected="true">SRS Data</button>
-                            </li>
-                        </ul>
-                    </div>
+        <div class="row align-items-center">
+            <div class="col mr-md-5 d-flex justify-content-center">
+                <div id="researchDataTabHeaders">
+                    <ul class="nav nav-tabs" id="srsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="srsData-tab" data-toggle="tab" data-target="#srsData" type="button" role="tab" aria-controls="srsData" aria-selected="true">SRS Data</button>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -23,7 +21,7 @@
                     <div class="row mb-2">
                         <div class="col-12 col-md-6">
                             <label for="IsGreenCandleInput" class="d-block">Is Green Candle</label>
-                            <select class="form-control text-center" id="IsGreenCandleInput" data-trade-data="IsGreenCandle" asp-for="SRS.IsGreenCandle">
+                            <select class="form-control text-center" id="IsGreenCandleInput" data-trade-data="IsGreenCandle" asp-for="IsGreenCandle">
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </select>
@@ -31,7 +29,7 @@
 
                         <div class="col-12 col-md-6">
                             <label for="IsInOverNightRangeInput" class="d-block">Is In Over Night Range</label>
-                            <select class="form-control text-center" id="IsInOverNightRangeInput" data-trade-data="IsInOverNightRange" asp-for="SRS.IsInOverNightRange">
+                            <select class="form-control text-center" id="IsInOverNightRangeInput" data-trade-data="IsInOverNightRange" asp-for="IsInOverNightRange">
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </select>

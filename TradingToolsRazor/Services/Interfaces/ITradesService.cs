@@ -9,7 +9,7 @@ namespace TradingToolsRazor.Services.Interfaces
         TradesVM InitializeNewTradeTradesViewModel();
         Task<TradesVM> InitializeTradesViewModelAsync();
         Task<TradesVM> LoadTradeAsync(LoadTradeParams tradeParams);
-        Task UpdateTradeDataAsync(Trade tradeData);
+        Task UpdateTradeDataAsync(BaseTrade tradeData);
         Task UpdateReviewAsync(TradesVM data);
         Task UpdateJournalAsync(TradesVM data);
     }
