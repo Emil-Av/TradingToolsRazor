@@ -1,4 +1,5 @@
 ﻿@using global::Shared.Enums
+@using global::SharedEnums.Enums
 @model TradesVM
 
 <div class="row justify-content-center">
@@ -33,6 +34,20 @@
                                     <input class="text-center form-control" id="InputSymbol" data-trade-data="Symbol" value="@Model.CurrentTrade.Symbol" />
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg">
+                                    <label class="d-block text-nowrap min-width-60" for="InputDirection">Direction</label>
+                                    <select class="text-center form-control" id="InputDirection" data-trade-data="Direction" value="@Model.CurrentTrade.Direction">
+                                        @{
+                                            int enumIntValue = 0;
+                                            foreach (EDirection direction in Enum.GetValues(typeof(EDirection)))
+                                            {
+                                                string selected = Model.CurrentTrade != null && direction == Model.CurrentTrade.Direction ? "selected" : null;
+                                                <option value="@enumIntValue" selected=@selected>@direction</option>
+                                                enumIntValue++;
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg">
                                     <label class="d-block text-nowrap min-width-60" for="InputAmount">Amount</label>
                                     <input class="text-center form-control number-input" id="InputAmount" data-trade-data="Amount" value="@(Model.CurrentTrade.Amount ?? 0)" />
                                 </div>
@@ -40,7 +55,7 @@
                                     <label class="d-block text-nowrap min-width-60" for="InputStatus">Status</label>
                                     <select class="text-center form-control" id="InputStatus" data-trade-data="Status" value="@Model.CurrentTrade.Status">
                                         @{
-                                            int enumIntValue = 0;
+                                            enumIntValue = 0;
                                             foreach (EStatus status in Enum.GetValues(typeof(EStatus)))
                                             {
                                                 if (status == EStatus.All)

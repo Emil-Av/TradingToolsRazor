@@ -20,16 +20,24 @@
 
                     <div class="row mb-2">
                         <div class="col-12 col-md-6">
-                            <label for="IsGreenCandleInput" class="d-block">Is Green Candle</label>
-                            <select class="form-control text-center" id="IsGreenCandleInput" data-trade-data="IsGreenCandle" asp-for="IsGreenCandle">
+                            <label for="InputCandleType" class="d-block">Candle Type</label>
+                            <select class="form-control text-center" id="InputCandleType" data-research-data="CandleType" 
+                                    asp-for="CandleType"
+                                    asp-items="Html.GetEnumSelectList<SharedEnums.Enums.ECandleType>()">
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="InputIsInOverNightRange" class="d-block">Is In Over Night Range</label>
+                            <select class="form-control text-center" id="InputIsInOverNightRange" data-research-data="IsInOverNightRange" asp-for="IsInOverNightRange">
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </select>
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <label for="IsInOverNightRangeInput" class="d-block">Is In Over Night Range</label>
-                            <select class="form-control text-center" id="IsInOverNightRangeInput" data-trade-data="IsInOverNightRange" asp-for="IsInOverNightRange">
+                            <label for="InputFlippedTheSwitch" class="d-block">Flipped The Switch</label>
+                            <select class="form-control text-center" id="InputFlippedTheSwitch" data-research-data="IsFlippedTheSwitch" asp-for="IsFlippedTheSwitch">
                                 <option value="true">Yes</option>
                                 <option value="false">No</option>
                             </select>

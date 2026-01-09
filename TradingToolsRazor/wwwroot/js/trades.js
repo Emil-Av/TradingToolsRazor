@@ -41,11 +41,6 @@ $(function () {
     * ******************************
     */
 
-    // After a .zip file is uploaded, the 'change' event is triggered, this submits the form and sends the .zip file to the controller
-    $('#fileInput').on('change', function () {
-        $('#formUploadFile').trigger('submit');
-    });
-
 
     /**
     * *************************
@@ -96,6 +91,37 @@ $(function () {
             });
     }
 
+    function updateResearchData() {
+        const researchData = getResearchData();
+        const tradeData = getTradeData();
+
+        // Merge both objects - tradeData properties take precedence if there are conflicts
+        const mergedData = { ...researchData, ...tradeData };
+
+        const token = document.getElementById('__RequestVerificationToken')?.value;
+
+        fetch('/trades?handler=UpdateResearchData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                ...(token && { 'RequestVerificationToken': token })
+            },
+            body: JSON.stringify({ Data: JSON.stringify(mergedData), Strategy: GetStrategy() })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success !== undefined) {
+                    toastr.success(data.success);
+                } else {
+                    toastr.error(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating research data:', error);
+                toastr.error('Error updating research data. See console for details.');
+            });
+    }
+
     function updateTradeData() {
         const tradeData = getTradeData();
         const token = document.getElementById('__RequestVerificationToken')?.value;
@@ -124,28 +150,17 @@ $(function () {
 
     // Send the journal data to the controller
     function updateJournal() {
-        const dataToSend = {
-            CurrentTrade: {
-                Id: window.tradeData.tradeId,
-                JournalId: window.tradeData.journalId,
-                Journal: {
-                    Pre: $('#pre').html(),
-                    During: $('#during').html(),
-                    Exit: $('#exit').html(),
-                    Post: $('#post').html()
-                }
-            }
-        };
+        const journal = getJournalData();
 
         const token = document.getElementById('__RequestVerificationToken')?.value;
 
-        fetch('/trades/updatejournal', {
+        fetch('/trades?handler=updateJournal ', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
                 ...(token && { 'RequestVerificationToken': token })
             },
-            body: JSON.stringify(dataToSend)
+            body: JSON.stringify(journal)
         })
             .then(response => response.json())
             .then(data => {
@@ -179,8 +194,16 @@ $(function () {
     });
 
     $('#btnUpdate').on('click', function () {
-        if (validateNumberInputs()) {
+        if (!validateNumberInputs()) {
+            toastr.error('Please enter valid numeric values for trade data fields.');
+            return;
+        }
+
+        if (currentCardMenuId === CARD_MENU.TRADING_DATA) {
             updateTradeData();
+        }
+        else if (currentCardMenuId === CARD_MENU.RESEARCH) {
+            updateResearchData();
         }
     });
 
@@ -321,6 +344,8 @@ $(function () {
         $('#journalTabContent').addClass('d-none');
         $('#reviewTabHeaders').addClass('d-none');
         $('#reviewTabContent').addClass('d-none');
+        $('#btnEdit').addClass('d-none');
+        $('#btnUpdate').removeClass('d-none');
     }
 
     function showReviewContent() {
@@ -668,21 +693,41 @@ $(function () {
      * ***************************
      */
 
-    // Parse strategy text to enum value
-    // EStrategy enum values:
-    // FirstBarPullback = 0
-    // Cradle = 1
-    // CandleBracketing = 2
-    // SRS = 3
-    function getStrategyEnumValue(strategyText) {
-        const strategyMap = {
-            'First Bar Pullback': STRATEGY.FIRST_BAR_PULLBACK,
-            'Cradle': STRATEGY.CRADLE,
-            'Candle Bracketing': STRATEGY.CANDLE_BRACKETING,
-            'SRS': STRATEGY.SRS
-        };
-        return strategyMap[strategyText.trim()];
+    // Get the current strategy enum value from the select dropdown
+    function GetStrategy() {
+        const strategyValue = $('#selectStrategy').val();
+        return strategyValue ? parseInt(strategyValue) : null;
     }
+
+    // Get research data based on current strategy
+    function getResearchData() {
+        let researchData = {};
+
+        if (GetStrategy() === STRATEGY.SRS) {
+            $('#cardBody [data-research-data]').each(function () {
+                var bindProperty = $(this).data('research-data');
+                var value = $(this).val();
+                
+                // Handle CandleType as integer enum value
+                if (bindProperty === 'CandleType') {
+                    researchData[bindProperty] = value ? parseInt(value) : null;
+                }
+                // Handle boolean values
+                else if (value === "true") {
+                    researchData[bindProperty] = true;
+                } else if (value === "false") {
+                    researchData[bindProperty] = false;
+                } else if (value === "") {
+                    researchData[bindProperty] = null;
+                } else {
+                    researchData[bindProperty] = value;
+                }
+            });
+        }
+
+        return researchData;
+    }
+
 
     /**
      * ***************************

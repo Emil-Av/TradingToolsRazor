@@ -2,16 +2,16 @@
 
 <div id="journalTabContent" class="d-none">
     <div class="tab-content">
-        <div class="tab-pane fade show active tundora text-start" id="pre" role="tabpanel" aria-labelledby="pre-tab">
+        <div class="tab-pane fade show active tundora text-start" id="pre" data-journal-data="Pre" role="tabpanel" aria-labelledby="pre-tab">
             @Html.Raw(Model.CurrentTrade!.Journal!.Pre)
         </div>
-        <div class="tab-pane fade tundora text-start" id="during" role="tabpanel" aria-labelledby="during-tab">
+        <div class="tab-pane fade tundora text-start" id="during" role="tabpanel" data-journal-data="During" aria-labelledby="during-tab">
             @Html.Raw(Model.CurrentTrade.Journal.During)
         </div>
-        <div class="tab-pane fade tundora text-start" id="exit" role="tabpanel" aria-labelledby="exit-tab">
+        <div class="tab-pane fade tundora text-start" id="exit" role="tabpanel" data-journal-data="Exit" aria-labelledby="exit-tab">
             @Html.Raw(Model.CurrentTrade.Journal.Exit)
         </div>
-        <div class="tab-pane fade tundora text-start" id="post" role="tabpanel" aria-labelledby="post-tab">
+        <div class="tab-pane fade tundora text-start" id="post" role="tabpanel" data-journal-data="Post" aria-labelledby="post-tab">
             @(Model.CurrentTrade.Journal.Post == null ? "Double click to add text" : Html.Raw(Model.CurrentTrade.Journal.Post))
         </div>
     </div>

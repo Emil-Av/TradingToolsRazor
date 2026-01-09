@@ -10,6 +10,28 @@ $(document).on('click', function (event) {
     }
 });
 
+function getJournalData() {
+    var journal = {};
+
+    $('#cardBody [data-journal-data]').each(function () {
+        var bindProperty = $(this).data('journal-data');
+        var content = $(this).html().trim();
+        
+        if (content === "" || content === "Double click to add text") {
+            journal[bindProperty] = null;
+        }
+        else {
+            journal[bindProperty] = content;
+        }
+    });
+
+    if (typeof window.tradeData !== 'undefined') {
+        journal['Id'] = window.tradeData.journalId;
+    }
+
+    return journal;
+}
+
 // Gets the data from the elements which have data-trade-data attribute. Used in multiple views.
 function getTradeData() {
     var tradeData = {};

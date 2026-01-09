@@ -22,12 +22,9 @@ namespace DataAccess.Repository
         public async Task UpdateAsync(Journal journal)
         {
             Journal? objFromDb = await _db.Journals.FindAsync(journal.Id);
-            if (objFromDb != null)
+            if (objFromDb is not null)
             {
-                objFromDb.Pre = journal.Pre;
-                objFromDb.During = journal.During;
-                objFromDb.Exit = journal.Exit;
-                objFromDb.Post = journal.Post;
+                _db.Entry(objFromDb).CurrentValues.SetValues(journal);
             }
         }
     }

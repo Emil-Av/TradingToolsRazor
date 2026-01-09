@@ -1,4 +1,5 @@
 using Models;
+using Models.RequestModels;
 using Models.ViewModels;
 using SharedEnums.Enums;
 
@@ -11,6 +12,7 @@ namespace TradingToolsRazor.Services.Interfaces
         Task<TradesVM> LoadTradeAsync(LoadTradeParams tradeParams);
         Task UpdateTradeDataAsync(BaseTrade tradeData);
         Task UpdateReviewAsync(TradesVM data);
-        Task UpdateJournalAsync(TradesVM data);
+        Task UpdateJournalAsync(Journal journal);
+        Task UpdateResearchData(UpdateResearchDataModel updateResearchData);
     }
 }

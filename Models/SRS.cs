@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharedEnums.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Models
 {
     public class SRS : BaseTrade
     {
-        public bool IsGreenCandle { get; set; }
+        public ECandleType CandleType { get; set; }
 
         public bool IsInOverNightRange { get; set; }
 

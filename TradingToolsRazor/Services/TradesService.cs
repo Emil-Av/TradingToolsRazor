@@ -1,7 +1,10 @@
 using DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.RequestModels;
 using Models.ViewModels;
 using Models.ViewModels.DisplayClasses;
+using Newtonsoft.Json;
 using Shared;
 using SharedEnums.Enums;
 using System.Diagnostics;
@@ -67,11 +70,21 @@ namespace TradingToolsRazor.Services
             await _unitOfWork.SaveAsync();
         }
 
+        public async Task UpdateResearchData([FromBody] UpdateResearchDataModel updateResearchData)
+        {
+            if (updateResearchData.Strategy == EStrategy.SRS)
+            {
+                SRS srs = JsonConvert.DeserializeObject<SRS>(updateResearchData.Data!)!;
+                await _unitOfWork.SRS.UpdateAsync(srs);
+                await _unitOfWork.SaveAsync();
+            }
+        }
+
         public async Task UpdateReviewAsync(TradesVM data)
         {
             ValidateReviewData(data);
 
-            Review review = await _unitOfWork.Review.GetAsync(x => x.Id == data.CurrentSampleSize.Review.Id);
+            Review review = await _unitOfWork.Review.GetAsync(x => x.Id == data.CurrentSampleSize.Review!.Id);
             if (review == null)
             {
                 throw new InvalidOperationException($"The review for sample size with ID {data.CurrentTrade.SampleSizeId} wasn't found in the database.");
@@ -82,20 +95,8 @@ namespace TradingToolsRazor.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task UpdateJournalAsync(TradesVM data)
+        public async Task UpdateJournalAsync(Journal journal)
         {
-            if (data.CurrentTrade.Journal == null)
-            {
-                throw new InvalidOperationException("Journal wasn't updated. Journal was null.");
-            }
-
-            Journal journal = await _unitOfWork.Journal.GetAsync(x => x.Id == data.CurrentTrade.JournalId);
-            if (journal == null)
-            {
-                throw new InvalidOperationException($"Journal with ID {data.CurrentTrade.JournalId} not found.");
-            }
-
-            SetJournalValues(journal, data);
             await _unitOfWork.Journal.UpdateAsync(journal);
             await _unitOfWork.SaveAsync();
         }
@@ -109,7 +110,7 @@ namespace TradingToolsRazor.Services
 
         private async Task<List<SampleSize>> GetSampleSizes(List<int> sampleSizeIds)
         {
-            List<SampleSize> list = new List<SampleSize>();
+            List<SampleSize> list = new();
             foreach (int id in sampleSizeIds)
             {
                 SampleSize sampleSize = await _unitOfWork.SampleSize.GetAsync(sampleSize => sampleSize.Id == id);
@@ -304,34 +305,6 @@ namespace TradingToolsRazor.Services
             else
             {
                 return [.. (await _unitOfWork.BaseTrade.GetAllAsync(x => x.SampleSizeId == _tradesVM.CurrentSampleSize.Id && x.Status == tradeParams.Status))];
-            }
-        }
-
-        private void SetCurrentTrade(TradesVM tradesVM, List<Trade> listTrades, LoadTradeParams tradeParams)
-        {
-            if (tradeParams.ShowLastTrade)
-            {
-                tradesVM.CurrentTrade = listTrades.LastOrDefault()!;
-            }
-            else if (listTrades.Count == 1)
-            {
-                tradesVM.CurrentTrade = listTrades.FirstOrDefault()!;
-            }
-            else if (tradeParams.Status != EStatus.All)
-            {
-                List<Trade> filteredTrades = listTrades.Where(trade => trade.Status == tradeParams.Status).ToList();
-                if (tradeParams.TradeNumber > filteredTrades.Count)
-                {
-                    tradesVM.CurrentTrade = filteredTrades.LastOrDefault()!;
-                }
-                else
-                {
-                    tradesVM.CurrentTrade = filteredTrades[tradeParams.TradeNumber - 1];
-                }
-            }
-            else
-            {
-                tradesVM.CurrentTrade = listTrades[tradeParams.TradeNumber - 1];
             }
         }
 

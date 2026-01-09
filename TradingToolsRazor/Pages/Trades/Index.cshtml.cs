@@ -2,12 +2,16 @@ using DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Models;
+using Models.RequestModels;
 using Models.ViewModels;
+using Newtonsoft.Json;
+using SharedEnums.Enums;
+using TradingToolsRazor.Pages.Shared;
 using TradingToolsRazor.Services.Interfaces;
 
 namespace TradingToolsRazor.Pages.Trades
 {
-    public class IndexModel(ITradesService tradesService) : PageModel
+    public class IndexModel(ITradesService tradesService) : BaseIndexModel
     {
 
         #region Private Properties
@@ -30,8 +34,21 @@ namespace TradingToolsRazor.Pages.Trades
             return Page();
         }
 
+        public async Task<IActionResult> OnPostUpdateResearchData([FromBody] UpdateResearchDataModel updateResearchData)
+        {
+            var jsonResult = ValidateModel();
+            if (jsonResult is not null)
+            {
+                return jsonResult; 
+            }
+
+            await _tradesService.UpdateResearchData(updateResearchData);
+
+            return new JsonResult(new { success = "Research data updated." });
+        }
+
         public async Task<IActionResult> OnPostUpdateTradeDataAsync([FromBody] BaseTrade tradeData)
-        { 
+        {
             try
             {
                 await _tradesService.UpdateTradeDataAsync(tradeData);
@@ -46,9 +63,10 @@ namespace TradingToolsRazor.Pages.Trades
 
         public async Task<IActionResult> OnPostUpdateReviewAsync([FromBody] TradesVM data)
         {
-            if (!ModelState.IsValid)
+            var jsonResult = ValidateModel();
+            if (jsonResult is not null)
             {
-                return new JsonResult(new { error = "Invalid model state" });
+                return jsonResult;
             }
 
             try
@@ -70,11 +88,17 @@ namespace TradingToolsRazor.Pages.Trades
             }
         }
 
-        public async Task<IActionResult> OnPostUpdateJournalAsync([FromBody] TradesVM data)
+        public async Task<IActionResult> OnPostUpdateJournalAsync([FromBody] Journal journal)
         {
+            var jsonResult = ValidateModel();
+            if (jsonResult is not null)
+            {
+                return jsonResult;
+            }
+
             try
             {
-                await _tradesService.UpdateJournalAsync(data);
+                await _tradesService.UpdateJournalAsync(journal);
                 return new JsonResult(new { success = "Journal updated." });
             }
             catch (InvalidOperationException ex)
@@ -89,15 +113,16 @@ namespace TradingToolsRazor.Pages.Trades
 
         public async Task<IActionResult> OnGetLoadTradeAsync([FromQuery] LoadTradeParams tradeParams)
         {
-            if (!ModelState.IsValid)
+            var jsonResult = ValidateModel();
+            if (jsonResult is not null)
             {
-                return new JsonResult(new { error = "Invalid model state" });
+                return jsonResult;
             }
 
             try
             {
                 TradesVM = await _tradesService.LoadTradeAsync(tradeParams);
-                
+
                 if (!string.IsNullOrEmpty(TradesVM.ErrorMsg))
                 {
                     return new JsonResult(new { info = TradesVM.ErrorMsg });
