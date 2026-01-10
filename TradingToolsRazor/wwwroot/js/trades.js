@@ -91,24 +91,9 @@ $(function () {
     */
 
     function updateReview() {
-        const dataToSend = {
-            CurrentTrade: {
-                Id: window.tradeData.tradeId
-            },
-            CurrentSampleSize: {
-                Review: {
-                    Id: window.tradeData.reviewId,
-                    First: $('#first').html(),
-                    Second: $('#second').html(),
-                    Third: $('#third').html(),
-                    Forth: $('#forth').html(),
-                    summary: $('#summary').html()
-                },
-                Id: window.tradeData.sampleSizeId,
-            }
-        };
+        const review = getReviewData();
 
-        sendPostRequest('/trades/updatereview', dataToSend)
+        sendPostRequest('/trades?handler=UpdateReview', review)
             .then(handleApiResponse)
             .catch(error => handleApiError('Error updating review', error));
     }
@@ -637,6 +622,22 @@ $(function () {
     function getStrategy() {
         const strategyValue = $('#selectStrategy').val();
         return strategyValue ? parseInt(strategyValue) : null;
+    }
+
+    function getReviewData() {
+        let review = {};
+        
+        $('#cardBody [data-review-data]').each(function () {
+            var bindProperty = $(this).data('review-data');
+            var content = $(this).html().trim();
+            review[bindProperty] = content;
+        });
+
+        if (typeof window.tradeData !== 'undefined') {
+            review['Id'] = window.tradeData.reviewId;
+        }
+
+        return review;
     }
 
     function getResearchData() {

@@ -10,25 +10,16 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repository
 {
-    public class ReviewRepository : Repository<Review>, IReviewRepository
+    public class ReviewRepository(ApplicationDbContext db) : Repository<Review>(db), IReviewRepository
     {
-        private ApplicationDbContext _db;
-
-        public ReviewRepository(ApplicationDbContext db) : base(db) 
-        {
-            _db = db;
-        }
+        private readonly ApplicationDbContext _db = db;
 
         public async Task UpdateAsync(Review review)
         {
             Review? objFromDb = await _db.Reviews.FindAsync(review.Id);
-            if (objFromDb != null)
+            if (objFromDb is not null)
             {
-                objFromDb.First = review.First;
-                objFromDb.Second = review.Second;
-                objFromDb.Third = review.Third;
-                objFromDb.Forth = review.Forth;
-                objFromDb.Summary = review.Summary;
+                _db.Entry(objFromDb).CurrentValues.SetValues(review);
             }
         }
     }

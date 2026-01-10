@@ -80,17 +80,8 @@ namespace TradingToolsRazor.Services
             }
         }
 
-        public async Task UpdateReviewAsync(TradesVM data)
+        public async Task UpdateReviewAsync(Review review)
         {
-            ValidateReviewData(data);
-
-            Review review = await _unitOfWork.Review.GetAsync(x => x.Id == data.CurrentSampleSize.Review!.Id);
-            if (review == null)
-            {
-                throw new InvalidOperationException($"The review for sample size with ID {data.CurrentTrade.SampleSizeId} wasn't found in the database.");
-            }
-
-            SetReviewValues(review, data);
             await _unitOfWork.Review.UpdateAsync(review);
             await _unitOfWork.SaveAsync();
         }
@@ -182,47 +173,6 @@ namespace TradingToolsRazor.Services
 
         #endregion
 
-        #region Helper Methods - Update
-
-        private void ValidateReviewData(TradesVM data)
-        {
-            if (data.CurrentSampleSize == null)
-            {
-                throw new ArgumentException("CurrentSampleSize is null.");
-            }
-            else if (data.CurrentSampleSize.Id == 0)
-            {
-                throw new ArgumentException("SampleSize Id is 0");
-            }
-            else if (data.CurrentSampleSize.Review == null)
-            {
-                throw new ArgumentException("Review is null.");
-            }
-            else if (data.CurrentSampleSize.Review.Id == 0)
-            {
-                throw new ArgumentException("Review Id is 0");
-            }
-        }
-
-        private void SetReviewValues(Review review, TradesVM data)
-        {
-            review.First = data.CurrentSampleSize.Review!.First;
-            review.Second = data.CurrentSampleSize.Review.Second;
-            review.Third = data.CurrentSampleSize.Review.Third;
-            review.Forth = data.CurrentSampleSize.Review.Forth;
-            review.Summary = data.CurrentSampleSize.Review.Summary;
-        }
-
-        private void SetJournalValues(Journal journal, TradesVM data)
-        {
-            journal.Pre = data.CurrentTrade.Journal!.Pre;
-            journal.During = data.CurrentTrade.Journal.During;
-            journal.Exit = data.CurrentTrade.Journal.Exit;
-            journal.Post = data.CurrentTrade.Journal.Post;
-        }
-
-        #endregion
-
         #region Helper Methods - LoadTrade
 
         private async Task<List<SampleSize>> GetSampleSizesForTradeParams(LoadTradeParams tradeParams)
@@ -261,15 +211,15 @@ namespace TradingToolsRazor.Services
 
         private void CheckIfTradeParamTimeframeExistsInSampleSizes(List<SampleSize> listSampleSizes, LoadTradeParams tradeParams)
         {
-            bool tfFound = false;
+            bool timeFrameFound = false;
             listSampleSizes.ForEach(sampleSize =>
             {
                 if (sampleSize.TimeFrame == tradeParams.TimeFrame)
                 {
-                    tfFound = true;
+                    timeFrameFound = true;
                 }
             });
-            if (!tfFound && listSampleSizes.Any())
+            if (!timeFrameFound && listSampleSizes.Any())
             {
                 tradeParams.TimeFrame = listSampleSizes.LastOrDefault()!.TimeFrame;
             }

@@ -15,9 +15,9 @@
                             </button>
                             <ul class="dropdown-menu" id="headerMenu" aria-labelledby="headerMenuToggle">
                                 <li><a class="dropdown-item bg-gray-400" role="button" id="itemTradingData">Trade Data</a></li>
+                                <li><a class="dropdown-item" role="button" id="itemResearch">Research</a></li>
                                 <li><a class="dropdown-item" role="button" id="itemJournal">Journal</a></li>
                                 <li><a class="dropdown-item" role="button" id="itemReview">Review</a></li>
-                                <li><a class="dropdown-item" role="button" id="itemResearch">Research</a></li>
                             </ul>
                         </div>
                     </div>
@@ -71,22 +71,15 @@
             <!-- Card Body -->
             <div class="card-body" id="cardBody">
 
-                <!-- Trade Data Content -->
-                <div id="tradeDataTabContent">
-                    @await Html.PartialAsync("_TradeData", Model.TradesVM)
-                </div>
+                @await Html.PartialAsync("_TradeData", Model.TradesVM)
 
-                <div id="researchTabContent" class="d-none">
-                    @if (Model.TradesVM.CurrentSampleSize.Strategy == EStrategy.SRS)
-                    {
-                        @await Html.PartialAsync("_ResearchSRSData", Model.TradesVM.SRSTrade)
-                    }
-                </div>
+                @if (Model.TradesVM.CurrentSampleSize.Strategy == EStrategy.SRS)
+                {
+                    @await Html.PartialAsync("_ResearchSRSData", Model.TradesVM.SRSTrade)
+                }
 
-                <!-- Journal Content -->
                 @await Html.PartialAsync("_JournalTabContent", Model.TradesVM)
 
-                <!-- Review Content -->
                 @await Html.PartialAsync("_ReviewTabContent", Model.TradesVM)
 
                 <div id="summernote" class="d-none"></div>

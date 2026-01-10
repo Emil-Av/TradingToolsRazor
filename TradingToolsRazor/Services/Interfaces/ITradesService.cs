@@ -11,7 +11,7 @@ namespace TradingToolsRazor.Services.Interfaces
         Task<TradesVM> InitializeTradesViewModelAsync();
         Task<TradesVM> LoadTradeAsync(LoadTradeParams tradeParams);
         Task UpdateTradeDataAsync(BaseTrade tradeData);
-        Task UpdateReviewAsync(TradesVM data);
+        Task UpdateReviewAsync(Review review);
         Task UpdateJournalAsync(Journal journal);
         Task UpdateResearchData(UpdateResearchDataModel updateResearchData);
     }

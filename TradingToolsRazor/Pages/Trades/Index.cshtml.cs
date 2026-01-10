@@ -61,7 +61,7 @@ namespace TradingToolsRazor.Pages.Trades
             return new JsonResult(new { success = "Trade updated" });
         }
 
-        public async Task<IActionResult> OnPostUpdateReviewAsync([FromBody] TradesVM data)
+        public async Task<IActionResult> OnPostUpdateReviewAsync([FromBody] Review review)
         {
             var jsonResult = ValidateModel();
             if (jsonResult is not null)
@@ -71,16 +71,8 @@ namespace TradingToolsRazor.Pages.Trades
 
             try
             {
-                await _tradesService.UpdateReviewAsync(data);
+                await _tradesService.UpdateReviewAsync(review);
                 return new JsonResult(new { success = "Review updated." });
-            }
-            catch (ArgumentException ex)
-            {
-                return new JsonResult(new { error = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return new JsonResult(new { error = ex.Message });
             }
             catch (Exception ex)
             {
