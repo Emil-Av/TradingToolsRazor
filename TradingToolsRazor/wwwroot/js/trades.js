@@ -3,7 +3,7 @@ $(function () {
 
     /**
     * ******************************
-    * Region global variables starts
+    * Region global variables and constants
     * ******************************
     */
 
@@ -35,20 +35,61 @@ $(function () {
         SRS: 3
     };
 
+    // Create key, value array: key is the button menu, value is the span element. 
+    // The span element is the selected value from the dropdown menu.
+    const menuButtons = {
+        '#dropdownBtnStatus': '#spanStatus',
+        '#dropdownBtnTimeFrame': '#spanTimeFrame',
+        '#dropdownBtnStrategy': '#spanStrategy',
+        '#dropdownBtnTradeType': '#spanTradeType',
+        '#dropdownBtnSampleSize': '#spanSampleSize',
+        '#dropdownBtnTrade': '#spanTrade'
+    };
+
     /**
     * ******************************
-    * Region global variables ends
+    * Region initialization
     * ******************************
     */
 
+    function initialize() {
+        initializeEventHandlers();
+        initializeMenuButtons();
+    }
+
+    function initializeEventHandlers() {
+        // Summernote editor events
+        $('#tabContentJournal').on('dblclick', openEditor);
+        $('#tabContentReview').on('dblclick', openEditor);
+        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', handleTabChange);
+        
+        // Button click events
+        $('#btnUpdate').on('click', handleUpdateClick);
+        $('#btnEdit').on('click', openEditor);
+        $('#btnSave').on('click', saveEditorText);
+        $('#btnCancel').on('click', handleCancelClick);
+        
+        // Card menu events
+        $('#headerMenu').on('click', '.dropdown-item', handleCardMenuClick);
+    }
+
+    function initializeMenuButtons() {
+        for (const key in menuButtons) {
+            (function (buttonSelector) {
+                setSelectedItemClass(buttonSelector);
+                $(buttonSelector).on('click', '.dropdown-item', function () {
+                    handleMenuButtonClick(buttonSelector, $(this));
+                });
+            })(key);
+        }
+    }
 
     /**
-    * *************************
-    * Region summernote starts
-    * *************************
+    * ******************************
+    * Region API calls
+    * ******************************
     */
 
-    // Send the review data to the controller
     function updateReview() {
         const dataToSend = {
             CurrentTrade: {
@@ -67,133 +108,118 @@ $(function () {
             }
         };
 
-        const token = document.getElementById('__RequestVerificationToken')?.value;
-
-        fetch('/trades/updatereview', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                ...(token && { 'RequestVerificationToken': token })
-            },
-            body: JSON.stringify(dataToSend)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success !== undefined) {
-                    toastr.success(data.success);
-                } else {
-                    toastr.error(data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating review:', error);
-                toastr.error('Error updating review. See console for details.');
-            });
+        sendPostRequest('/trades/updatereview', dataToSend)
+            .then(handleApiResponse)
+            .catch(error => handleApiError('Error updating review', error));
     }
 
     function updateResearchData() {
         const researchData = getResearchData();
         const tradeData = getTradeData();
-
-        // Merge both objects - tradeData properties take precedence if there are conflicts
         const mergedData = { ...researchData, ...tradeData };
 
-        const token = document.getElementById('__RequestVerificationToken')?.value;
+        const requestData = { 
+            Data: JSON.stringify(mergedData), 
+            Strategy: getStrategy() 
+        };
 
-        fetch('/trades?handler=UpdateResearchData', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                ...(token && { 'RequestVerificationToken': token })
-            },
-            body: JSON.stringify({ Data: JSON.stringify(mergedData), Strategy: getStrategy() })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success !== undefined) {
-                    toastr.success(data.success);
-                } else {
-                    toastr.error(data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating research data:', error);
-                toastr.error('Error updating research data. See console for details.');
-            });
+        sendPostRequest('/trades?handler=UpdateResearchData', requestData)
+            .then(handleApiResponse)
+            .catch(error => handleApiError('Error updating research data', error));
     }
 
     function updateTradeData() {
         const tradeData = getTradeData();
-        const token = document.getElementById('__RequestVerificationToken')?.value;
 
-        fetch('/trades?handler=UpdateTradeData', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                ...(token && { 'RequestVerificationToken': token })
-            },
-            body: JSON.stringify(tradeData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success !== undefined) {
-                    toastr.success(data.success);
-                } else {
-                    toastr.error(data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating trade data:', error);
-                toastr.error('Error updating trade data. See console for details.');
-            });
+        sendPostRequest('/trades?handler=UpdateTradeData', tradeData)
+            .then(handleApiResponse)
+            .catch(error => handleApiError('Error updating trade data', error));
     }
 
-    // Send the journal data to the controller
     function updateJournal() {
         const journal = getJournalData();
 
+        sendPostRequest('/trades?handler=updateJournal ', journal)
+            .then(handleApiResponse)
+            .catch(error => handleApiError('Error updating journal', error));
+    }
+
+    function loadTrade(status, timeFrame, strategy, tradeType, sampleSize, trade, showLastTrade, loadLastSampleSize, statusChanged) {
+        const tradeParams = {
+            StatusFromView: status,
+            TimeFrameFromView: timeFrame,
+            StrategyFromView: strategy,
+            TradeTypeFromView: tradeType,
+            SampleSizeNumberFromView: sampleSize,
+            TradeNumberFromView: trade,
+            ShowLastTradeFromView: showLastTrade,
+            LoadLastSampleSizeFromView: loadLastSampleSize,
+            StatusChangedFromView: statusChanged
+        };
+
+        sendPostRequest('/trades/loadtrade', { tradeParams })
+            .then(data => {
+                if (data.error !== undefined) {
+                    toastr.error(data.error);
+                    clickedMenu.text(clickedMenuValue);
+                    return;
+                } else if (data.info !== undefined) {
+                    toastr.info(data.info);
+                    clickedMenu.text(clickedMenuValue);
+                    return;
+                }
+
+                tradesViewModel = data;
+                setHiddenSpansValues(tradesViewModel);
+                loadViewData(trade);
+            })
+            .catch(error => {
+                handleApiError('Error loading trade', error);
+                clickedMenu.text(clickedMenuValue);
+            });
+    }
+
+    function sendPostRequest(url, data) {
         const token = document.getElementById('__RequestVerificationToken')?.value;
 
-        fetch('/trades?handler=updateJournal ', {
+        return fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
                 ...(token && { 'RequestVerificationToken': token })
             },
-            body: JSON.stringify(journal)
+            body: JSON.stringify(data)
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success !== undefined) {
-                    toastr.success(data.success);
-                } else {
-                    toastr.error(data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating journal:', error);
-                toastr.error('Error updating journal. See console for details.');
-            });
+        .then(response => response.json());
     }
 
-    // When the content is double clicked, it can be edited (summernote is displayed)
-    $('#tabContentJournal').on('dblclick', function () {
-        openEditor();
-    });
+    function handleApiResponse(data) {
+        if (data.success !== undefined) {
+            toastr.success(data.success);
+        } else {
+            toastr.error(data.error);
+        }
+    }
 
-    $('#tabContentReview').on('dblclick', function () {
-        openEditor();
-    });
+    function handleApiError(message, error) {
+        console.error(message + ':', error);
+        toastr.error(message + '. See console for details.');
+    }
 
-    // On tab change
-    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (event) {
+    /**
+    * ******************************
+    * Region event handlers
+    * ******************************
+    */
+
+    function handleTabChange(event) {
         if (isEditorShown) {
             saveEditorText();
         }
         currentTabSelector = '#' + $(event.target).attr('aria-controls');
-    });
+    }
 
-    $('#btnUpdate').on('click', function () {
+    function handleUpdateClick() {
         if (!validateNumberInputs()) {
             toastr.error('Please enter valid numeric values for trade data fields.');
             return;
@@ -205,38 +231,96 @@ $(function () {
         else if (currentCardMenuId === CARD_MENU.RESEARCH) {
             updateResearchData();
         }
-    });
+    }
 
-    // Open editor and show the buttons
-    $('#btnEdit').on('click', function () {
-        openEditor();
-    });
-
-    // Save the journal changes
-    $('#btnSave').on('click', function () {
-        saveEditorText();
-    });
-
-    // Close the editor and show 'Edit' button
-    $('#btnCancel').on('click', function () {
+    function handleCancelClick() {
         $('#summernote').summernote('destroy');
         $(currentTabSelector).removeClass('d-none');
         $('#cardBody').addClass('card-body');
         isEditorShown = false;
         toggleFooterButtons();
-    });
-
-    function toggleFooterButtons() {
-        if ($('#btnEdit').hasClass('d-none')) {
-            $('#btnEdit').removeClass('d-none');
-            $('.editorOnBtns').addClass('d-none');
-        } else {
-            $('#btnEdit').addClass('d-none');
-            $('.editorOnBtns').removeClass('d-none');
-        }
     }
 
-    // Save the journal in the DB and toggle the buttons
+    function handleCardMenuClick() {
+        if (isEditorShown) {
+            saveEditorText();
+        }
+
+        currentCardMenuId = $(this).attr('id');
+        if (currentCardMenuId === CARD_MENU.TRADING_DATA) {
+            showTradingDataContent();
+        } else if (currentCardMenuId === CARD_MENU.JOURNAL) {
+            showJournalContent();
+        } else if (currentCardMenuId === CARD_MENU.RESEARCH) {
+            showResearchContent();
+        } else {
+            showReviewContent();
+        }
+
+        updateCardMenuHeader($(this));
+    }
+
+    function handleMenuButtonClick(buttonSelector, clickedElement) {
+        // Save the old value. If there is no trade in the DB for the selected trade, the menu's old value should be displayed.
+        clickedMenu = $(menuButtons[buttonSelector]);
+        clickedMenuValue = $(menuButtons[buttonSelector]).text();
+
+        // If the time frame, the strategy or the sample size has changed, then the latest trade must always be displayed. 
+        // Used in setMenuValues()
+        if (buttonSelector !== '#dropdownBtnTrade') {
+            shouldShowLastTrade = true;
+        } else {
+            shouldShowLastTrade = false;
+        }
+
+        if (buttonSelector === '#dropdownBtnTimeFrame') {
+            shouldLoadLastSampleSize = true;
+        } else if (buttonSelector === '#dropdownBtnStatus') {
+            hasStatusChanged = true;
+        } else {
+            shouldLoadLastSampleSize = false;
+            hasStatusChanged = false;
+        }
+
+        // Set the new value
+        const selectedValue = clickedElement.text();
+        $(menuButtons[buttonSelector]).text(selectedValue);
+
+        loadTrade(
+            $('#spanStatus').text(),
+            $('#spanTimeFrame').text(),
+            $('#spanStrategy').text(),
+            $('#spanTradeType').text(),
+            $('#spanSampleSize').text(),
+            $('#spanTrade').text(),
+            shouldShowLastTrade,
+            shouldLoadLastSampleSize,
+            hasStatusChanged
+        );
+    }
+
+    /**
+    * ******************************
+    * Region summernote editor
+    * ******************************
+    */
+
+    function openEditor() {
+        $('#cardBody').removeClass('card-body');
+        toggleFooterButtons();
+
+        // Hide the tabContent of the journal and show the summernote instead
+        // Get the text from the tabContent
+        const currentTabContent = $(currentTabSelector).html();
+        // Hide the tabContent
+        $(currentTabSelector).addClass('d-none');
+        // Set the text into the editor
+        $('#summernote').summernote('code', currentTabContent);
+        $('#summernote').summernote('justifyLeft');
+        // Display the editor
+        isEditorShown = true;
+    }
+
     function saveEditorText() {
         $('#cardBody').addClass('card-body');
         isEditorShown = false;
@@ -264,55 +348,21 @@ $(function () {
         }
     }
 
-    // Open the summernote editor
-    function openEditor() {
-        $('#cardBody').removeClass('card-body');
-        toggleFooterButtons();
-
-        // Hide the tabContent of the journal and show the summernote instead
-        // Get the text from the tabContent
-        const currentTabContent = $(currentTabSelector).html();
-        // Hide the tabContent
-        $(currentTabSelector).addClass('d-none');
-        // Set the text into the editor
-        $('#summernote').summernote('code', currentTabContent);
-        $('#summernote').summernote('justifyLeft');
-        // Display the editor
-        isEditorShown = true;
+    function toggleFooterButtons() {
+        if ($('#btnEdit').hasClass('d-none')) {
+            $('#btnEdit').removeClass('d-none');
+            $('.editorOnBtns').addClass('d-none');
+        } else {
+            $('#btnEdit').addClass('d-none');
+            $('.editorOnBtns').removeClass('d-none');
+        }
     }
 
     /**
-    * ************************
-    * Region summernote ends
-    * ************************
+    * ******************************
+    * Region card menu content display
+    * ******************************
     */
-
-
-    /**
-     * ***************************
-     * Card dropdown menu starts
-     * ***************************
-     */
-
-    // Event fired when an item from the dropdown menu in the card header is clicked
-    $('#headerMenu').on('click', '.dropdown-item', function () {
-        if (isEditorShown) {
-            saveEditorText();
-        }
-
-        currentCardMenuId = $(this).attr('id');
-        if (currentCardMenuId === CARD_MENU.TRADING_DATA) {
-            showTradingDataContent();
-        } else if (currentCardMenuId === CARD_MENU.JOURNAL) {
-            showJournalContent();
-        } else if (currentCardMenuId === CARD_MENU.RESEARCH) {
-            showResearchContent();
-        } else {
-            showReviewContent();
-        }
-
-        updateCardMenuHeader($(this));
-    });
 
     function showTradingDataContent() {
         $('#tradeDataTabContent').removeClass('d-none');
@@ -395,147 +445,10 @@ $(function () {
     }
 
     /**
-    * ***************************
-    * Card dropdown menu ends
-    * ***************************
+    * ******************************
+    * Region data loading
+    * ******************************
     */
-
-
-    /**
-    * ***************************
-    * Region menu buttons starts
-    * ***************************
-    */
-
-    // Create key, value array: key is the button menu, value is the span element. 
-    // The span element is the selected value from the dropdown menu.
-    const menuButtons = {
-        '#dropdownBtnStatus': '#spanStatus',
-        '#dropdownBtnTimeFrame': '#spanTimeFrame',
-        '#dropdownBtnStrategy': '#spanStrategy',
-        '#dropdownBtnTradeType': '#spanTradeType',
-        '#dropdownBtnSampleSize': '#spanSampleSize',
-        '#dropdownBtnTrade': '#spanTrade'
-    };
-
-    // Attach a click event for each <a> element of each menu.
-    for (const key in menuButtons) {
-        (function (buttonSelector) {
-            setSelectedItemClass(buttonSelector);
-
-            // Change the value of the span in the button
-            $(buttonSelector).on('click', '.dropdown-item', function () {
-                // Save the old value. If there is no trade in the DB for the selected trade, the menu's old value should be displayed.
-                clickedMenu = $(menuButtons[buttonSelector]);
-                clickedMenuValue = $(menuButtons[buttonSelector]).text();
-
-                // If the time frame, the strategy or the sample size has changed, then the latest trade must always be displayed. 
-                // Used in setMenuValues()
-                if (buttonSelector !== '#dropdownBtnTrade') {
-                    shouldShowLastTrade = true;
-                } else {
-                    shouldShowLastTrade = false;
-                }
-
-                if (buttonSelector === '#dropdownBtnTimeFrame') {
-                    shouldLoadLastSampleSize = true;
-                } else if (buttonSelector === '#dropdownBtnStatus') {
-                    hasStatusChanged = true;
-                } else {
-                    shouldLoadLastSampleSize = false;
-                    hasStatusChanged = false;
-                }
-
-                // Set the new value
-                const selectedValue = $(this).text();
-                $(menuButtons[buttonSelector]).text(selectedValue);
-
-                loadTrade(
-                    $('#spanStatus').text(),
-                    $('#spanTimeFrame').text(),
-                    $('#spanStrategy').text(),
-                    $('#spanTradeType').text(),
-                    $('#spanSampleSize').text(),
-                    $('#spanTrade').text(),
-                    shouldShowLastTrade,
-                    shouldLoadLastSampleSize,
-                    hasStatusChanged
-                );
-            });
-        })(key);
-    }
-
-    // Mark the selected drop down item of the buttons on the top
-    function setSelectedItemClass(buttonSelector) {
-        if (buttonSelector) {
-            $(buttonSelector + ' a').each(function () {
-                if ($(this).text() === $(menuButtons[buttonSelector]).text()) {
-                    $(this).addClass('bg-gray-400');
-                } else {
-                    $(this).removeClass('bg-gray-400');
-                }
-            });
-        } else {
-            for (const key in menuButtons) {
-                $(key + ' a').each(function () {
-                    if ($(this).text() === $(menuButtons[key]).text()) {
-                        $(this).addClass('bg-gray-400');
-                    } else {
-                        $(this).removeClass('bg-gray-400');
-                    }
-                });
-            }
-        }
-    }
-
-    function loadTrade(status, timeFrame, strategy, tradeType, sampleSize, trade, showLastTrade, loadLastSampleSize, statusChanged) {
-        const tradeParams = {
-            StatusFromView: status,
-            TimeFrameFromView: timeFrame,
-            StrategyFromView: strategy,
-            TradeTypeFromView: tradeType,
-            SampleSizeNumberFromView: sampleSize,
-            TradeNumberFromView: trade,
-            ShowLastTradeFromView: showLastTrade,
-            LoadLastSampleSizeFromView: loadLastSampleSize,
-            StatusChangedFromView: statusChanged
-        };
-
-        const token = document.getElementById('__RequestVerificationToken')?.value;
-
-        fetch('/trades/loadtrade', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8',
-                ...(token && { 'RequestVerificationToken': token })
-            },
-            body: JSON.stringify({ tradeParams })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error !== undefined) {
-                    toastr.error(data.error);
-                    // Set the old value
-                    clickedMenu.text(clickedMenuValue);
-                    return;
-                } else if (data.info !== undefined) {
-                    toastr.info(data.info);
-                    // Set the old value
-                    clickedMenu.text(clickedMenuValue);
-                    return;
-                }
-
-                tradesViewModel = data;
-                setHiddenSpansValues(tradesViewModel);
-                loadViewData(trade);
-            })
-            .catch(error => {
-                console.error('Error loading trade:', error);
-                toastr.error('Error loading trade. See console for details.');
-                // Restore old value on error
-                clickedMenu.text(clickedMenuValue);
-            });
-    }
 
     function setHiddenSpansValues(viewModel) {
         // Update the trade data object with new values
@@ -570,7 +483,6 @@ $(function () {
         $('#FeeInput').val(currentTrade.feeInput);
     }
 
-    // Loads the review of the sample size
     function loadReview() {
         // Activate the 'First' tab
         $('#first-tab').trigger('click');
@@ -585,7 +497,6 @@ $(function () {
         $('#summary').html(review.summary);
     }
 
-    // Loads the journal of the trade
     function loadJournal() {
         // Reset all journal tab panes
         $('#journalTabContent .tab-pane').removeClass('show active');
@@ -604,7 +515,40 @@ $(function () {
         $('#post').html(journal.post);
     }
 
-    // Populate the drop down items after a new trade has been selected and set the values in the spans.
+    function loadImages() {
+        $('#imageContainer').empty();
+        const screenshots = tradesViewModel.tradesVM.currentTrade.screenshotsUrls;
+
+        let carouselHtml = '<ol class="carousel-indicators">';
+        for (let i = 0; i < screenshots.length; i++) {
+            if (i === 0) {
+                carouselHtml += '<li data-bs-target="#carouselTrades" data-slide-to="' + i + '" class="active"></li>';
+            } else {
+                carouselHtml += '<li data-bs-target="#carouselTrades" data-slide-to="' + i + '"></li>';
+            }
+        }
+        carouselHtml += '</ol>';
+
+        carouselHtml += '<div class="carousel-inner">';
+        for (let i = 0; i < screenshots.length; i++) {
+            const imageUrl = screenshots[i];
+            if (i === 0) {
+                carouselHtml += '<div class="carousel-item active"><img src="' + imageUrl + '" class="d-block w-100" alt="..." /></div>';
+            } else {
+                carouselHtml += '<div class="carousel-item"><img src="' + imageUrl + '" class="d-block w-100" alt="..." /></div>';
+            }
+        }
+        carouselHtml += '</div>';
+
+        $('#imageContainer').html(carouselHtml);
+    }
+
+    /**
+    * ******************************
+    * Region menu management
+    * ******************************
+    */
+
     function setMenuValues(displayedTradeNumber) {
         const viewModel = tradesViewModel.tradesVM;
 
@@ -649,6 +593,34 @@ $(function () {
         $('#cardMenuTradeData').trigger('click');
     }
 
+    function setSelectedItemClass(buttonSelector) {
+        if (buttonSelector) {
+            $(buttonSelector + ' a').each(function () {
+                if ($(this).text() === $(menuButtons[buttonSelector]).text()) {
+                    $(this).addClass('bg-gray-400');
+                } else {
+                    $(this).removeClass('bg-gray-400');
+                }
+            });
+        } else {
+            for (const key in menuButtons) {
+                $(key + ' a').each(function () {
+                    if ($(this).text() === $(menuButtons[key]).text()) {
+                        $(this).addClass('bg-gray-400');
+                    } else {
+                        $(this).removeClass('bg-gray-400');
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+    * ******************************
+    * Region helper functions
+    * ******************************
+    */
+
     function getTimeFrameMapping() {
         return {
             "M5": "5M",
@@ -662,54 +634,11 @@ $(function () {
         };
     }
 
-    // Load the images into the carousel
-    function loadImages() {
-        $('#imageContainer').empty();
-        const screenshots = tradesViewModel.tradesVM.currentTrade.screenshotsUrls;
-
-        let carouselHtml = '<ol class="carousel-indicators">';
-        for (let i = 0; i < screenshots.length; i++) {
-            if (i === 0) {
-                carouselHtml += '<li data-bs-target="#carouselTrades" data-slide-to="' + i + '" class="active"></li>';
-            } else {
-                carouselHtml += '<li data-bs-target="#carouselTrades" data-slide-to="' + i + '"></li>';
-            }
-        }
-        carouselHtml += '</ol>';
-
-        carouselHtml += '<div class="carousel-inner">';
-        for (let i = 0; i < screenshots.length; i++) {
-            const imageUrl = screenshots[i];
-            if (i === 0) {
-                carouselHtml += '<div class="carousel-item active"><img src="' + imageUrl + '" class="d-block w-100" alt="..." /></div>';
-            } else {
-                carouselHtml += '<div class="carousel-item"><img src="' + imageUrl + '" class="d-block w-100" alt="..." /></div>';
-            }
-        }
-        carouselHtml += '</div>';
-
-        $('#imageContainer').html(carouselHtml);
-    }
-
-    /**
-    * ***************************
-    * Region menu buttons ends
-    * ***************************
-    */
-
-    /**
-     * ***************************
-     * Region helper functions starts
-     * ***************************
-     */
-
-    // Get the current strategy enum value from the select dropdown
     function getStrategy() {
         const strategyValue = $('#selectStrategy').val();
         return strategyValue ? parseInt(strategyValue) : null;
     }
 
-    // Get research data based on current strategy
     function getResearchData() {
         let researchData = {};
 
@@ -738,11 +667,12 @@ $(function () {
         return researchData;
     }
 
-
     /**
-     * ***************************
-     * Region helper functions ends
-     * ***************************
-     */
+    * ******************************
+    * Region initialization call
+    * ******************************
+    */
+
+    initialize();
 });
 
