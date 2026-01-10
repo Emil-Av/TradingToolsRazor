@@ -9,10 +9,10 @@
             @Html.Raw(Model.CurrentTrade.Journal.During)
         </div>
         <div class="tab-pane fade tundora text-start" id="exit" role="tabpanel" data-journal-data="Exit" aria-labelledby="exit-tab">
-            @Html.Raw(Model.CurrentTrade.Journal.Exit)
+            @Html.Raw(Model.CurrentTrade.Journal.Exit )
         </div>
         <div class="tab-pane fade tundora text-start" id="post" role="tabpanel" data-journal-data="Post" aria-labelledby="post-tab">
-            @(Model.CurrentTrade.Journal.Post == null ? "Double click to add text" : Html.Raw(Model.CurrentTrade.Journal.Post))
+            @Html.Raw(Model.CurrentTrade.Journal.Post)
         </div>
     </div>
 </div>

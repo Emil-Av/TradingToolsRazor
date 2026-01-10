@@ -106,7 +106,7 @@ $(function () {
                 'Content-Type': 'application/json; charset=utf-8',
                 ...(token && { 'RequestVerificationToken': token })
             },
-            body: JSON.stringify({ Data: JSON.stringify(mergedData), Strategy: GetStrategy() })
+            body: JSON.stringify({ Data: JSON.stringify(mergedData), Strategy: getStrategy() })
         })
             .then(response => response.json())
             .then(data => {
@@ -186,7 +186,7 @@ $(function () {
     });
 
     // On tab change
-    $('button[data-toggle="tab"]').on('shown.bs.tab', function (event) {
+    $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (event) {
         if (isEditorShown) {
             saveEditorText();
         }
@@ -327,6 +327,11 @@ $(function () {
 
     function showJournalContent() {
         currentTabSelector = '#pre';
+        // Ensure the Pre tab is active when showing journal content
+        $('#pre').addClass('show active').siblings('.tab-pane').removeClass('show active');
+        $('#pre-tab').addClass('active').attr('aria-selected', 'true')
+            .siblings('.nav-link').removeClass('active').attr('aria-selected', 'false');
+        
         $('#journalTabHeaders').removeClass('d-none');
         $('#journalTabContent').removeClass('d-none');
         $('#reviewTabHeaders').addClass('d-none');
@@ -582,8 +587,13 @@ $(function () {
 
     // Loads the journal of the trade
     function loadJournal() {
-        // Activate the 'Pre' tab
-        $('#pre-tab').trigger('click');
+        // Reset all journal tab panes
+        $('#journalTabContent .tab-pane').removeClass('show active');
+        // Activate the 'Pre' tab pane
+        $('#pre').addClass('show active');
+        // Reset and activate the 'Pre' tab button
+        $('#journalTabHeaders .nav-link').removeClass('active').attr('aria-selected', 'false');
+        $('#pre-tab').addClass('active').attr('aria-selected', 'true');
 
         const journal = tradesViewModel.tradesVM.currentTrade.journal;
 
@@ -694,7 +704,7 @@ $(function () {
      */
 
     // Get the current strategy enum value from the select dropdown
-    function GetStrategy() {
+    function getStrategy() {
         const strategyValue = $('#selectStrategy').val();
         return strategyValue ? parseInt(strategyValue) : null;
     }
@@ -703,7 +713,7 @@ $(function () {
     function getResearchData() {
         let researchData = {};
 
-        if (GetStrategy() === STRATEGY.SRS) {
+        if (getStrategy() === STRATEGY.SRS) {
             $('#cardBody [data-research-data]').each(function () {
                 var bindProperty = $(this).data('research-data');
                 var value = $(this).val();
