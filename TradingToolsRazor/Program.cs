@@ -18,7 +18,7 @@ builder.Services.AddRazorPages().AddNewtonsoftJson(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<DeleteTradeHelper>();
+builder.Services.AddScoped<DeleteTradeService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 builder.Services.AddScoped<INewTradeService, NewTradeService>();
 builder.Services.AddScoped<ITradesService, TradesService>();

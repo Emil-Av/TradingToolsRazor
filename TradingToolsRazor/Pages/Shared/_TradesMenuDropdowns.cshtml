@@ -24,7 +24,7 @@
                 <select class="select-dropdown-styled" id="selectTradeType" data-menu-type="tradeType">
                     @foreach (ETradeType tradeType in Enum.GetValues<ETradeType>())
                     {
-                        <option value="@((int)tradeType)" selected="@(tradeType == Model.TradesVM.CurrentTrade.SampleSize.TradeType)">Type: @MyEnumConverter.TradeTypeFromEnum(tradeType)</option>
+                        <option value="@((int)tradeType)" selected="@(tradeType == Model.TradesVM.CurrentTrade.SampleSize?.TradeType)">Type: @MyEnumConverter.TradeTypeFromEnum(tradeType)</option>
                     }
                 </select>
             </div>

@@ -1,24 +1,79 @@
 ﻿using DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Models;
+using SharedEnums.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Formats.Asn1;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using System.Formats.Asn1;
 
 namespace Utilities.Trade
 {
-    public class DeleteTradeHelper
+    public class DeleteTradeService(IUnitOfWork unitOfWork)
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public DeleteTradeHelper(IUnitOfWork unitOfWork)
+        public async Task DeleteTrade(EStrategy strategy, int id, string webRootPath)
         {
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            BaseTrade removedTrade = await DeleteTrade(strategy, id);
+
+            await DeleteJournal(removedTrade.JournalId);
+
+            var tradesInSampleSize = await _unitOfWork.BaseTrade.GetAllAsync(trade => trade.SampleSizeId == removedTrade.SampleSizeId);
+            if (!tradesInSampleSize.Any())
+            {
+                int reviewId = await DeleteSampleSize(removedTrade.SampleSizeId);
+                await DeleteReview(reviewId);
+            }
+
+            await UpdateScreenshotPathsAfterDeletion(removedTrade.ScreenshotsUrls!.First(), tradesInSampleSize, webRootPath);
+        }
+
+        private async Task DeleteJournal(int? journalId)
+        {
+            Journal journal = await _unitOfWork.Journal.GetAsync(journal => journal.Id == journalId);
+            _unitOfWork.Journal.Remove(journal);
+            await _unitOfWork.SaveAsync();
+        }
+
+        private async Task DeleteReview(int reviewId)
+        {
+            Review review = await _unitOfWork.Review.GetAsync(review => review.Id == reviewId);
+            _unitOfWork.Review.Remove(review);
+            await _unitOfWork.SaveAsync();
+        }
+
+        private async Task<BaseTrade> DeleteTrade(EStrategy strategy, int id)
+        {
+            return strategy switch
+            {
+                EStrategy.SRS => await RemoveSRSTrade(id),
+                _ => new()
+            };
+        }
+
+        private async Task<SRS> RemoveSRSTrade(int Id)
+        {
+            SRS? trade = await _unitOfWork.SRS.GetAsync(trade => trade.Id == Id) ?? throw new ArgumentException($"Failed to find trade with id {Id}");
+
+            _unitOfWork.SRS.Remove(trade);
+            await _unitOfWork.SaveAsync();
+
+            return trade;
+        }
+
+        private async Task<int> DeleteSampleSize(int sampleSizeId)
+        {
+            SampleSize sampleSize = await _unitOfWork.SampleSize.GetAsync(sampleSize => sampleSize.Id == sampleSizeId);
+            _unitOfWork.SampleSize.Remove(sampleSize);
+            await _unitOfWork.SaveAsync();
+
+            return (int)sampleSize.ReviewId!;
         }
 
         public async Task UpdateScreenshotPathsAfterDeletion(string screenshotPath, List<BaseTrade> tradesInSampleSize, string webRootPath)
@@ -35,7 +90,7 @@ namespace Utilities.Trade
                 if (trade.ScreenshotsUrls == null)
                     continue;
 
-                List<string> updatedScreenshotUrls = new List<string>();
+                List<string> updatedScreenshotUrls = [];
                 foreach (string oldUrl in trade.ScreenshotsUrls)
                 {
                     string newUrl = ReplaceTradeNumberInUrl(oldUrl, i + 1);
@@ -51,25 +106,9 @@ namespace Utilities.Trade
                     updatedScreenshotUrls.Add(newUrl);
                 }
                 trade.ScreenshotsUrls = updatedScreenshotUrls;
-                await UpdateEntityAsync(trade);
+                await _unitOfWork.BaseTrade.UpdateAsync(trade);
             }
             await _unitOfWork.SaveAsync();
-        }
-
-        private async Task UpdateEntityAsync(BaseTrade trade)
-        {
-            switch (trade)
-            {
-                case ResearchCandleBracketing candleBracketing:
-                    await _unitOfWork.ResearchCandleBracketing.UpdateAsync(candleBracketing);
-                    break;
-                case ResearchCradle researchCradle:
-                    await _unitOfWork.ResearchCradle.UpdateAsync(researchCradle);
-                    break;
-                // Add other cases for different BaseTrade derived types if needed
-                default:
-                    throw new InvalidOperationException("Unsupported trade type");
-            }
         }
 
         private void DeleteTradeDirectory(string screenshotPath, string webRootPath)

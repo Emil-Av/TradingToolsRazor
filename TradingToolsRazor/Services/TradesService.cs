@@ -13,12 +13,15 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using TradingToolsRazor.Services.Interfaces;
 using Utilities;
+using Utilities.Trade;
 
 namespace TradingToolsRazor.Services
 {
-    public class TradesService(IUnitOfWork unitOfWork) : ITradesService
+    public class TradesService(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, DeleteTradeService deleteTradeService) : ITradesService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IWebHostEnvironment webHostEnvironment = webHostEnvironment;
+        private readonly DeleteTradeService _deleteTradeService = deleteTradeService;
         private List<SampleSize> _allSampleSizes = [];
         private TradesVM _tradesVM = new();
 
@@ -272,6 +275,11 @@ namespace TradingToolsRazor.Services
             _tradesVM.CurrentTrade.Journal = await _unitOfWork.Journal.GetAsync(x => x.Id == _tradesVM.CurrentTrade!.JournalId);
             int? reviewID = (await _unitOfWork.SampleSize.GetAsync(x => x.Id == _tradesVM.CurrentTrade!.SampleSizeId)).ReviewId;
             _tradesVM.CurrentSampleSize.Review = await _unitOfWork.Review.GetAsync(x => x.Id == reviewID);
+        }
+
+        public async Task DeleteTrade(DeleteTradeRequestModel deleteTradeRequest)
+        {
+            await _deleteTradeService.DeleteTrade(deleteTradeRequest.Strategy, deleteTradeRequest.Id, webHostEnvironment.WebRootPath);
         }
 
         #endregion

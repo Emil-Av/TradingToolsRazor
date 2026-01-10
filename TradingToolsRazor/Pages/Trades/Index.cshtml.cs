@@ -34,6 +34,19 @@ namespace TradingToolsRazor.Pages.Trades
             return Page();
         }
 
+        public async Task<IActionResult> OnPostDeleteTrade([FromBody] DeleteTradeRequestModel deleteTradeRequest)
+        {
+            var jsonResult = ValidateModel();
+            if (jsonResult is not null)
+            {
+                return jsonResult;
+            }
+
+            await _tradesService.DeleteTrade(deleteTradeRequest);
+
+            return new JsonResult(new { success = "Trade deleted." });
+        }
+
         public async Task<IActionResult> OnPostUpdateResearchData([FromBody] UpdateResearchDataModel updateResearchData)
         {
             var jsonResult = ValidateModel();

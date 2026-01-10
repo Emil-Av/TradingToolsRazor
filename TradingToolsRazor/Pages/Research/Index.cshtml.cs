@@ -25,9 +25,9 @@ namespace TradingToolsRazor.Pages.Research
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private const int IndexMethod = 0;
-        private readonly DeleteTradeHelper _deleteTradeHelper;
+        private readonly DeleteTradeService _deleteTradeHelper;
 
-        public IndexModel(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, DeleteTradeHelper deleteTradeHelper)
+        public IndexModel(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, DeleteTradeService deleteTradeHelper)
         {
             ResearchVM = new ();
             _unitOfWork = unitOfWork;
@@ -223,10 +223,10 @@ namespace TradingToolsRazor.Pages.Research
             ResearchCandleBracketing trade = await DeleteCandleBracketingEntity(id);
 
             var tradesInSampleSize = await CheckAndDeleteSampleSize(trade);
-            var samplesizes = await _unitOfWork.SampleSize
-                .GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.CandleBracketing);
 
             await _deleteTradeHelper.UpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls!.First(), [.. tradesInSampleSize.Cast<BaseTrade>()], _webHostEnvironment.WebRootPath);
+
+            var samplesizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.CandleBracketing);
 
             if (!TrySetLastSampleSizeId(tradesInSampleSize, samplesizes, trade, out int lastSampleSizeId))
                 return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });

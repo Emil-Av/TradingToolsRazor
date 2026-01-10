@@ -14,5 +14,6 @@ namespace TradingToolsRazor.Services.Interfaces
         Task UpdateReviewAsync(Review review);
         Task UpdateJournalAsync(Journal journal);
         Task UpdateResearchData(UpdateResearchDataModel updateResearchData);
+        Task DeleteTrade(DeleteTradeRequestModel deleteTradeRequest);
     }
 }

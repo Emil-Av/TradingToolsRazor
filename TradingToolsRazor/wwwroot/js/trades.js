@@ -62,13 +62,14 @@ $(function () {
         $('#tabContentJournal').on('dblclick', openEditor);
         $('#tabContentReview').on('dblclick', openEditor);
         $('button[data-bs-toggle="tab"]').on('shown.bs.tab', handleTabChange);
-        
+
         // Button click events
         $('#btnUpdate').on('click', handleUpdateClick);
+        $('#btnDelete').on('click', handleDeleteClick);
         $('#btnEdit').on('click', openEditor);
         $('#btnSave').on('click', saveEditorText);
         $('#btnCancel').on('click', handleCancelClick);
-        
+
         // Card menu events
         $('#headerMenu').on('click', '.dropdown-item', handleCardMenuClick);
     }
@@ -103,9 +104,9 @@ $(function () {
         const tradeData = getTradeData();
         const mergedData = { ...researchData, ...tradeData };
 
-        const requestData = { 
-            Data: JSON.stringify(mergedData), 
-            Strategy: getStrategy() 
+        const requestData = {
+            Data: JSON.stringify(mergedData),
+            Strategy: getStrategy()
         };
 
         sendPostRequest('/trades?handler=UpdateResearchData', requestData)
@@ -175,7 +176,7 @@ $(function () {
             },
             body: JSON.stringify(data)
         })
-        .then(response => response.json());
+            .then(response => response.json());
     }
 
     function handleApiResponse(data) {
@@ -284,6 +285,48 @@ $(function () {
         );
     }
 
+    function handleDeleteClick() {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "All data incl. screenshots will be gone.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const deleteTradeRequest = {
+                    Id: window.tradeData.tradeId,
+                    Strategy: getStrategy()
+                };
+
+                sendPostRequest('/trades?handler=DeleteTrade', deleteTradeRequest)
+                    .then(data => {
+                        if (data.success) {
+                            toastr.success(data.success);
+
+                            // Reload the trades or update the UI
+                            loadTrade(
+                                $('#spanStatus').text(),
+                                $('#spanTimeFrame').text(),
+                                $('#spanStrategy').text(),
+                                $('#spanTradeType').text(),
+                                $('#spanSampleSize').text(),
+                                $('#spanTrade').text(),
+                                true, // shouldShowLastTrade
+                                false, // shouldLoadLastSampleSize
+                                true // hasStatusChanged
+                            );
+                        } else if (data.error) {
+                            toastr.error(data.error);
+                        }
+                    })
+                    .catch(error => handleApiError('Error deleting trade', error));
+            }
+        });
+    }
+
     /**
     * ******************************
     * Region summernote editor
@@ -358,6 +401,7 @@ $(function () {
         $('#researchTabContent').addClass('d-none');
         $('#btnEdit').addClass('d-none');
         $('#btnUpdate').removeClass('d-none');
+        $('#btnDelete').removeClass('d-none');
     }
 
     function showJournalContent() {
@@ -366,7 +410,7 @@ $(function () {
         $('#pre').addClass('show active').siblings('.tab-pane').removeClass('show active');
         $('#pre-tab').addClass('active').attr('aria-selected', 'true')
             .siblings('.nav-link').removeClass('active').attr('aria-selected', 'false');
-        
+
         $('#journalTabHeaders').removeClass('d-none');
         $('#journalTabContent').removeClass('d-none');
         $('#reviewTabHeaders').addClass('d-none');
@@ -375,6 +419,7 @@ $(function () {
         $('#researchTabContent').addClass('d-none');
         $('#btnEdit').removeClass('d-none');
         $('#btnUpdate').addClass('d-none');
+        $('#btnDelete').addClass('d-none');
     }
 
     function showResearchContent() {
@@ -386,6 +431,7 @@ $(function () {
         $('#reviewTabContent').addClass('d-none');
         $('#btnEdit').addClass('d-none');
         $('#btnUpdate').removeClass('d-none');
+        $('#btnDelete').removeClass('d-none');
     }
 
     function showReviewContent() {
@@ -398,6 +444,7 @@ $(function () {
         $('#researchTabContent').addClass('d-none');
         $('#btnEdit').removeClass('d-none');
         $('#btnUpdate').addClass('d-none');
+        $('#btnDelete').addClass('d-none');
     }
 
     function updateCardMenuHeader(clickedElement) {
@@ -626,7 +673,7 @@ $(function () {
 
     function getReviewData() {
         let review = {};
-        
+
         $('#cardBody [data-review-data]').each(function () {
             var bindProperty = $(this).data('review-data');
             var content = $(this).html().trim();
@@ -647,7 +694,7 @@ $(function () {
             $('#cardBody [data-research-data]').each(function () {
                 var bindProperty = $(this).data('research-data');
                 var value = $(this).val();
-                
+
                 // Handle CandleType as integer enum value
                 if (bindProperty === 'CandleType') {
                     researchData[bindProperty] = value ? parseInt(value) : null;
