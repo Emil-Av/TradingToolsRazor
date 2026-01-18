@@ -75,7 +75,9 @@
 
                 @if (Model.TradesVM.CurrentSampleSize.Strategy == EStrategy.SRS)
                 {
-                    @await Html.PartialAsync("_ResearchSRSData", Model.TradesVM.SRSTrade)
+                    <div id="researchTabContent" class="d-none">
+                        @await Html.PartialAsync("_ResearchSRSData", Model.TradesVM.SRSTrade)
+                    </div>
                 }
 
                 @await Html.PartialAsync("_JournalTabContent", Model.TradesVM)

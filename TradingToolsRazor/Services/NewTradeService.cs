@@ -58,23 +58,12 @@ namespace TradingToolsRazor.Services
         {
             switch (_viewModel.SampleSizeViewData.Strategy)
             {
-                case EStrategy.FirstBarPullback:
-                    await SaveResearchFirstBarPullbackTrade();
-                    break;
                 case EStrategy.SRS:
                     await SaveSRSTrade();
                     break;
+                default:
+                    throw new ArgumentException("Unknown strategy");
             }
-        }
-
-        private async Task SaveResearchFirstBarPullbackTrade()
-        {
-            var researchData = await SaveResearchDataFirstbarPullback(maxTradesProSampleSize: 20);
-            var newTrade = SetNewTradeData(researchData, _files, 20);
-            newTrade.JournalId = await CreateJournal();
-
-            _unitOfWork.BaseTrade.Add(newTrade);
-            await _unitOfWork.SaveAsync();
         }
 
         private async Task SaveSRSTrade()
@@ -103,19 +92,6 @@ namespace TradingToolsRazor.Services
             await _unitOfWork.SaveAsync();
 
             return journal.Id;
-        }
-
-        private Trade SetNewTradeData(ResearchFirstBarPullback researchData, IFormFile[] files, int maxTradesProSampleSize)
-        {
-            //var newTrade = EntityMapper.ViewModelDisplayToEntity<Trade, TradeDisplay>(_viewModel.TradeData, existingEntity: null);
-
-            //newTrade.ResearchId = researchData.Id;
-            //newTrade.SampleSizeId = researchData.SampleSizeId;
-            //newTrade.Status = _viewModel.Status;
-            //newTrade.SampleSize = researchData.SampleSize;
-
-            //return newTrade;
-            return new();
         }
 
         private async Task SaveCandleBracketingData(int maxTradesProSampleSize)
@@ -204,16 +180,16 @@ namespace TradingToolsRazor.Services
             bool isFull = false;
 
             var listSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x =>
-                x.TimeFrame == _viewModel.TimeFrame &&
-                x.Strategy == _viewModel.Strategy &&
-                x.TradeType == _viewModel.TradeType);
+                x.TimeFrame == _viewModel.SampleSizeViewData.TimeFrame &&
+                x.Strategy == _viewModel.SampleSizeViewData.Strategy &&
+                x.TradeType == _viewModel.SampleSizeViewData.TradeType);
 
             if (!listSampleSizes.Any())
                 return (0, false);
 
             var sampleSize = listSampleSizes.Last();
 
-            int numberTradesInSampleSize = _viewModel.TradeType switch
+            int numberTradesInSampleSize = _viewModel.SampleSizeViewData.TradeType switch
             {
                 ETradeType.Research when _viewModel.Strategy == EStrategy.FirstBarPullback =>
                     (await _unitOfWork.ResearchFirstBarPullback.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,

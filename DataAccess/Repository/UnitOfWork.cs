@@ -10,7 +10,7 @@ namespace DataAccess.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private ApplicationDbContext _db;
+        private readonly ApplicationDbContext _db;
 
         public IBaseTradeRepository BaseTrade { get; private set; }
 

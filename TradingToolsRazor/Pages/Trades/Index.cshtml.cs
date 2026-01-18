@@ -116,31 +116,6 @@ namespace TradingToolsRazor.Pages.Trades
             }
         }
 
-        public async Task<IActionResult> OnGetLoadTradeAsync([FromQuery] LoadTradeParams tradeParams)
-        {
-            var jsonResult = ValidateModel();
-            if (jsonResult is not null)
-            {
-                return jsonResult;
-            }
-
-            try
-            {
-                TradesVM = await _tradesService.LoadTradeAsync(tradeParams);
-
-                if (!string.IsNullOrEmpty(TradesVM.ErrorMsg))
-                {
-                    return new JsonResult(new { info = TradesVM.ErrorMsg });
-                }
-
-                return new JsonResult(new { tradesVM = TradesVM });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new { error = $"An error occurred while loading trade: {ex.Message}" });
-            }
-        }
-
         #endregion
     }
 }

@@ -8,24 +8,19 @@ namespace Models.ViewModels
     {
         public TradesVM()
         {
-            AvailableStrategies = new List<EStrategy>();
-            AvailableTimeframes = new List<ETimeFrame>();
-            TradeRatingOptions = new List<SelectListItem>
-            {
+            AvailableStrategies = [];
+            AvailableTimeframes = [];
+            TradeRatingOptions =
+            [
                 new SelectListItem { Value = "0", Text = "A+"},
                 new SelectListItem { Value = "1", Text = "A"},
                 new SelectListItem { Value = "2", Text = "A-" },
                 new SelectListItem { Value = "3", Text = "Book of Horror" }
-            };
+            ];
             TradeData = new();
             CurrentTrade = new();
+            AllTradesInSampleSize = [];
         }
-        public int TradesInSampleSize { get; set; }
-
-        /// <summary>
-        ///  Relevant when Status != All
-        /// </summary>
-        public int TradesInTimeFrame { get; set; }
 
         // The number of sample sizes for a strategy and time frame
         public int NumberSampleSizes { get; set; }
@@ -43,6 +38,9 @@ namespace Models.ViewModels
 
         public SampleSize CurrentSampleSize { get; set; }
 
+        // All trades in the current sample size (for client-side navigation)
+        public List<object> AllTradesInSampleSize { get; set; }
+
         // The current number of trades for the latest sample size
         public List<EStrategy> AvailableStrategies { get; set; }
 
@@ -51,8 +49,6 @@ namespace Models.ViewModels
         public List<SelectListItem> TradeRatingOptions { get; set; }
 
         public EStatus DefaultTradeStatus { get; set; } = EStatus.All;
-
-        public ETimeFrame DefaultTimeFrame { get; set; } = ETimeFrame.M10;
 
     }
 }

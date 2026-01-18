@@ -45,8 +45,11 @@
                 sampleSizeId = Model.TradesVM.CurrentTrade.SampleSizeId,
                 reviewId = Model.TradesVM.CurrentSampleSize.ReviewId
             }));
+            
+            // Store all trades for client-side navigation
+            window.allTradesData = @Html.Raw(JsonSerializer.Serialize(Model.TradesVM.AllTradesInSampleSize));
         </script>
     }
-    <script src="~/js/trades.js"></script>
+    <script src="~/js/trades/trades.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 }

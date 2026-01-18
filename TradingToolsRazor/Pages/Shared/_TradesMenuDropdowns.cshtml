@@ -59,14 +59,22 @@
                 </select>
             </div>
 
-            <!-- Trade Menu -->
+            <!-- Trade Navigation Menu -->
             <div class="col-auto p-2">
-                <select class="select-dropdown-styled" id="selectTrade" data-menu-type="trade">
-                    @for (int i = 1; i <= Model.TradesVM.TradesInSampleSize; i++)
-                    {
-                        <option value="@i">Trade: @i</option>
-                    }
-                </select>
+                <div class="input-group">
+                    <div class="input-group-prepend" style="margin-right: 1px;">
+                        <button type="button" class="btn btn-primary" id="btnPrev">
+                            <i class="fa-regular fa-square-caret-left fa-lg"></i>
+                        </button>
+                    </div>
+                    <input type="text" value="@Model.TradesVM.AllTradesInSampleSize.Count" id="tradeNumberInput" class="form-control text-center bg-gray-100 custom-input" style="max-width: 60px;" maxlength="3" />
+                    <div class="input-group-append">
+                        <input value="/@Model.TradesVM.AllTradesInSampleSize.Count" id="tradesInSampleSize" class="input-group-text bg-gray-200" style="max-width: 60px;" disabled />
+                        <button type="button" class="btn btn-primary" id="btnNext">
+                            <i class="fa-regular fa-square-caret-right fa-lg"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div>
