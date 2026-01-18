@@ -19,7 +19,10 @@ namespace Models.ViewModels
             ];
             TradeData = new();
             CurrentTrade = new();
+            SRSTrade = new();
+            CurrentSampleSize = new();
             AllTradesInSampleSize = [];
+            SampleSizes = [];
         }
 
         // The number of sample sizes for a strategy and time frame
@@ -37,6 +40,8 @@ namespace Models.ViewModels
         public TradeDisplay TradeData { get; set; }
 
         public SampleSize CurrentSampleSize { get; set; }
+
+        public List<SampleSize> SampleSizes { get; set; }
 
         // All trades in the current sample size (for client-side navigation)
         public List<object> AllTradesInSampleSize { get; set; }

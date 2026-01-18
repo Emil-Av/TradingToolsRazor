@@ -1,5 +1,6 @@
 using DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Models;
 using Models.RequestModels;
 using Models.ViewModels;
@@ -25,6 +26,20 @@ namespace TradingToolsRazor.Services
         private List<SampleSize> _allSampleSizes = [];
         private TradesVM _tradesVM = new();
 
+        public async Task<TradesVM> LoadSampleSizeAsync(int sampleSizeId)
+        {
+            _allSampleSizes = await GetAllSampleSizes();
+
+            if (!_allSampleSizes.Any())
+            {
+                return _tradesVM;
+            }
+
+            await SetViewModel(sampleSizeId);
+
+            return _tradesVM;
+        }
+
         public async Task<TradesVM> InitializeTradesViewModelAsync()
         {
             _allSampleSizes = await GetAllSampleSizes();
@@ -42,7 +57,7 @@ namespace TradingToolsRazor.Services
 
         public TradesVM InitializeNewTradeTradesViewModel()
         {
-            return new TradesVM { CurrentTrade = new() };
+            return new();
         }
 
         public async Task UpdateTradeDataAsync(BaseTrade tradeData)
@@ -80,14 +95,25 @@ namespace TradingToolsRazor.Services
             return [.. await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == ETradeType.Trade, includeProperties: "Review")];
         }
 
+        // Overload that accepts a specific sample size ID
+        private async Task SetViewModel(int sampleSizeId)
+        {
+            _tradesVM.CurrentSampleSize = _allSampleSizes.FirstOrDefault(sampleSize => sampleSize.Id == sampleSizeId)!;
+            _tradesVM.SampleSizes = _allSampleSizes;
+
+            await SetCurrentTrade();
+            await SetAvailableMenus();
+        }
+
         private async Task SetViewModel()
         {
             _tradesVM.CurrentSampleSize = _allSampleSizes.Last();
+            _tradesVM.SampleSizes = _allSampleSizes;
 
             await SetCurrentTrade();
-            SetMenuNumberSampleSizes();
             await SetAvailableMenus();
         }
+
 
         private async Task SetCurrentTrade()
         {
@@ -100,11 +126,6 @@ namespace TradingToolsRazor.Services
                 _tradesVM.CurrentTrade = _tradesVM.AllTradesInSampleSize.Last() as BaseTrade;
                 _tradesVM.SRSTrade = _tradesVM.AllTradesInSampleSize.Last() as SRS;
             }
-        }
-
-        private void SetMenuNumberSampleSizes()
-        {
-            _tradesVM.NumberSampleSizes = _allSampleSizes.Where(x => x.Strategy == _tradesVM.CurrentSampleSize.Strategy && x.TimeFrame == _tradesVM.CurrentSampleSize.TimeFrame).Count();
         }
 
         private async Task SetAvailableMenus(List<SampleSize> sampleSizes = null, EStatus? status = null)

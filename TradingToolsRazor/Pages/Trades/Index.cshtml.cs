@@ -34,6 +34,12 @@ namespace TradingToolsRazor.Pages.Trades
             return Page();
         }
 
+        public async Task<IActionResult> OnGetLoadSampleSizeAsync(int sampleSizeId)
+        {
+            TradesVM = await _tradesService.LoadSampleSizeAsync(sampleSizeId);
+            return Page();
+        }
+
         public async Task<IActionResult> OnPostDeleteTrade([FromBody] DeleteTradeRequestModel deleteTradeRequest)
         {
             var jsonResult = ValidateModel();

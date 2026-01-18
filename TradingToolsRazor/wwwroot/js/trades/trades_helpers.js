@@ -10,6 +10,71 @@
  * - setTimeFrameMenu()
  */
 
+function tradesLoadRequest(sampleSizeId) {
+    // Get values from the select elements
+    const strategy = parseInt($('#selectStrategy').val());
+    const tradeType = parseInt($('#selectTradeType').val());
+    const status = parseInt($('#selectStatus').val());
+    const timeFrame = parseInt($('#selectTimeFrame').val());
+
+    // Construct the request object matching TradesLoadRequestModel
+    const requestModel = {
+        Strategy: strategy,
+        TradeType: tradeType,
+        Status: status,
+        TimeFrame: timeFrame,
+        SampleSizeId: sampleSizeId
+    };
+
+    return requestModel;
+}
+
+
+/**
+ * Updates the local trade data in the allTrades array and window.tradeData
+ * @param {object} updatedData - The updated trade data from the form
+ */
+function updateLocalTradeData(updatedData) {
+    if (!allTrades || allTrades.length === 0 || tradeIndex < 0 || tradeIndex >= allTrades.length) {
+        console.warn('Cannot update local trade data: invalid state');
+        return;
+    }
+
+    // Update the trade in the allTrades array
+    const currentTrade = allTrades[tradeIndex];
+
+    // Merge updated data into the current trade object
+    // This preserves all existing properties and only updates the ones that changed
+    Object.keys(updatedData).forEach(key => {
+        // Skip properties that shouldn't be updated from the form
+        if (key !== 'Id' && key !== 'JournalId' && key !== 'SampleSizeId' &&
+            key !== 'ScreenshotsUrls' && key !== 'Journal') {
+            // Convert string values to appropriate types
+            let value = updatedData[key];
+
+            // Handle null or empty string
+            if (value === '' || value === 'null') {
+                value = null;
+            }
+            // Handle boolean strings
+            else if (value === 'true') {
+                value = true;
+            }
+            else if (value === 'false') {
+                value = false;
+            }
+            // Convert numeric strings to numbers
+            else if (value !== null && !isNaN(value) && value !== '' && typeof value === 'string') {
+                value = parseFloat(value);
+            }
+
+            currentTrade[key] = value;
+        }
+    });
+
+    console.log('Updated local trade data at index ' + tradeIndex);
+}
+
 function getTimeFrameMapping() {
     return {
         "M5": "5M",

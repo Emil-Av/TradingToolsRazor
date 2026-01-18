@@ -34,14 +34,15 @@ function initializeEventHandlers() {
 }
 
 function initializeMenuButtons() {
-    for (const key in menuButtons) {
-        (function (buttonSelector) {
-            setSelectedItemClass(buttonSelector);
-            $(buttonSelector).on('click', '.dropdown-item', function () {
-                handleMenuButtonClick(buttonSelector, $(this));
-            });
-        })(key);
-    }
+    // Attach change event handlers for each select element
+    $('#selectStrategy, #selectTradeType, #selectStatus, #selectTimeFrame, #selectSampleSize').on('change', function() {
+        const selectId = this.id;
+        const selectedValue = $(this).val();
+        const selectedText = $(this).find('option:selected').text();
+        
+        // Handle specific select changes
+        handleMenuSelectChange(selectId, selectedValue, selectedText);
+    });
 }
 
 function initializeTradeNavigation() {

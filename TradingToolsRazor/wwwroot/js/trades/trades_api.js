@@ -4,6 +4,10 @@
  * ******************************
  */
 
+function loadSampleSize(sampleSizeId) {
+    window.location.href = `/trades?handler=LoadSampleSize&sampleSizeId=${sampleSizeId}`;
+}
+
 function updateReview() {
     const review = getReviewData();
 
@@ -69,92 +73,50 @@ function updateJournal() {
         .catch(error => handleApiError('Error updating journal', error));
 }
 
-function loadTrade(status, timeFrame, strategy, tradeType, sampleSize, trade, showLastTrade, loadLastSampleSize, statusChanged) {
-    const tradeParams = {
-        StatusFromView: status,
-        TimeFrameFromView: timeFrame,
-        StrategyFromView: strategy,
-        TradeTypeFromView: tradeType,
-        SampleSizeNumberFromView: sampleSize,
-        TradeNumberFromView: trade,
-        ShowLastTradeFromView: showLastTrade,
-        LoadLastSampleSizeFromView: loadLastSampleSize,
-        StatusChangedFromView: statusChanged
-    };
+function handleDeleteClick() {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "All data incl. screenshots will be gone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const deleteTradeRequest = {
+                Id: window.tradeData.tradeId,
+                Strategy: getStrategy()
+            };
 
-    sendPostRequest('/trades?handler=loadtrade', { tradeParams })
-        .then(data => {
-            if (data.error !== undefined) {
-                toastr.error(data.error);
-                clickedMenu.text(clickedMenuValue);
-                return;
-            } else if (data.info !== undefined) {
-                toastr.info(data.info);
-                clickedMenu.text(clickedMenuValue);
-                return;
-            }
+            sendPostRequest('/trades?handler=DeleteTrade', deleteTradeRequest)
+                .then(data => {
+                    if (data.success) {
+                        toastr.success(data.success);
 
-            tradesViewModel = data;
-            
-            // Update local trades array with new data
-            if (data.tradesVM && data.tradesVM.allTradesInSampleSize) {
-                allTrades = data.tradesVM.allTradesInSampleSize;
-                totalTradesInSampleSize = allTrades.length;
-                console.log('Loaded ' + allTrades.length + ' trades after menu change');
-            }
-            
-            setHiddenSpansValues(tradesViewModel);
-            loadViewData(trade);
-        })
-        .catch(error => {
-            handleApiError('Error loading trade', error);
-            clickedMenu.text(clickedMenuValue);
-        });
-}
+                        // Remove the trade from local array
+                        if (allTrades && allTrades.length > 0) {
+                            allTrades.splice(tradeIndex, 1);
+                            totalTradesInSampleSize = allTrades.length;
+                            updateTotalTradesDisplay(totalTradesInSampleSize);
 
-/**
- * Updates the local trade data in the allTrades array and window.tradeData
- * @param {object} updatedData - The updated trade data from the form
- */
-function updateLocalTradeData(updatedData) {
-    if (!allTrades || allTrades.length === 0 || tradeIndex < 0 || tradeIndex >= allTrades.length) {
-        console.warn('Cannot update local trade data: invalid state');
-        return;
-    }
-
-    // Update the trade in the allTrades array
-    const currentTrade = allTrades[tradeIndex];
-    
-    // Merge updated data into the current trade object
-    // This preserves all existing properties and only updates the ones that changed
-    Object.keys(updatedData).forEach(key => {
-        // Skip properties that shouldn't be updated from the form
-        if (key !== 'Id' && key !== 'JournalId' && key !== 'SampleSizeId' && 
-            key !== 'ScreenshotsUrls' && key !== 'Journal') {
-            // Convert string values to appropriate types
-            let value = updatedData[key];
-            
-            // Handle null or empty string
-            if (value === '' || value === 'null') {
-                value = null;
-            }
-            // Handle boolean strings
-            else if (value === 'true') {
-                value = true;
-            }
-            else if (value === 'false') {
-                value = false;
-            }
-            // Convert numeric strings to numbers
-            else if (value !== null && !isNaN(value) && value !== '' && typeof value === 'string') {
-                value = parseFloat(value);
-            }
-            
-            currentTrade[key] = value;
+                            // Navigate to previous trade or first trade if we deleted the first one
+                            if (allTrades.length > 0) {
+                                const newIndex = Math.max(0, Math.min(tradeIndex, allTrades.length - 1));
+                                tradeIndex = newIndex;
+                                loadTradeByIndex(newIndex + 1);
+                            } else {
+                                // No more trades, reload page to show "No Trades Yet"
+                                window.location.reload();
+                            }
+                        }
+                    } else if (data.error) {
+                        toastr.error(data.error);
+                    }
+                })
+                .catch(error => handleApiError('Error deleting trade', error));
         }
     });
-
-    console.log('Updated local trade data at index ' + tradeIndex);
 }
 
 function sendPostRequest(url, data) {

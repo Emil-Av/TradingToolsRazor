@@ -52,104 +52,6 @@ function handleCardMenuClick() {
     updateCardMenuHeader($(this));
 }
 
-function handleMenuButtonClick(buttonSelector, clickedElement) {
-    // Save the old value. If there is no trade in the DB for the selected trade, the menu's old value should be displayed.
-    clickedMenu = $(menuButtons[buttonSelector]);
-    clickedMenuValue = $(menuButtons[buttonSelector]).text();
-
-    // If the time frame, the strategy or the sample size has changed, then the latest trade must always be displayed. 
-    // Used in setMenuValues()
-    if (buttonSelector !== '#dropdownBtnTrade') {
-        shouldShowLastTrade = true;
-    } else {
-        shouldShowLastTrade = false;
-    }
-
-    if (buttonSelector === '#dropdownBtnTimeFrame') {
-        shouldLoadLastSampleSize = true;
-    } else if (buttonSelector === '#dropdownBtnStatus') {
-        hasStatusChanged = true;
-    } else {
-        shouldLoadLastSampleSize = false;
-        hasStatusChanged = false;
-    }
-
-    // Set the new value
-    const selectedValue = clickedElement.text();
-    $(menuButtons[buttonSelector]).text(selectedValue);
-
-    loadTrade(
-        $('#spanStatus').text(),
-        $('#spanTimeFrame').text(),
-        $('#spanStrategy').text(),
-        $('#spanTradeType').text(),
-        $('#spanSampleSize').text(),
-        $('#spanTrade').text(),
-        shouldShowLastTrade,
-        shouldLoadLastSampleSize,
-        hasStatusChanged
-    );
-}
-
-function handleDeleteClick() {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "All data incl. screenshots will be gone.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            const deleteTradeRequest = {
-                Id: window.tradeData.tradeId,
-                Strategy: getStrategy()
-            };
-
-            sendPostRequest('/trades?handler=DeleteTrade', deleteTradeRequest)
-                .then(data => {
-                    if (data.success) {
-                        toastr.success(data.success);
-
-                        // Remove the trade from local array
-                        if (allTrades && allTrades.length > 0) {
-                            allTrades.splice(tradeIndex, 1);
-                            totalTradesInSampleSize = allTrades.length;
-                            updateTotalTradesDisplay(totalTradesInSampleSize);
-                            
-                            // Navigate to previous trade or first trade if we deleted the first one
-                            if (allTrades.length > 0) {
-                                const newIndex = Math.max(0, Math.min(tradeIndex, allTrades.length - 1));
-                                tradeIndex = newIndex;
-                                loadTradeByIndex(newIndex + 1);
-                            } else {
-                                // No more trades, reload page to show "No Trades Yet"
-                                window.location.reload();
-                            }
-                        } else {
-                            // Fallback: reload via API
-                            loadTrade(
-                                $('#selectStatus option:selected').text().replace('Status: ', ''),
-                                $('#selectTimeFrame option:selected').text().replace('Time Frame: ', ''),
-                                $('#selectStrategy option:selected').text().replace('Strategy: ', ''),
-                                $('#selectTradeType option:selected').text().replace('Type: ', ''),
-                                $('#selectSampleSize').val(),
-                                1,
-                                true, // shouldShowLastTrade
-                                false, // shouldLoadLastSampleSize
-                                false // hasStatusChanged
-                            );
-                        }
-                    } else if (data.error) {
-                        toastr.error(data.error);
-                    }
-                })
-                .catch(error => handleApiError('Error deleting trade', error));
-        }
-    });
-}
-
 // Menu button "Next" click event handler
 function handleNextClick() {
     showNextTrade(1);
@@ -182,5 +84,33 @@ function handleKeyboardNavigation(event) {
     // Right arrow key pressed
     else if (event.which === 39) {
         showNextTrade(1);
+    }
+}
+
+// Handle changes to menu select dropdowns
+function handleMenuSelectChange(selectId, selectedValue, selectedText) {
+    // You can implement specific logic for each select element here
+    switch(selectId) {
+        case 'selectStrategy':
+            console.log('Strategy changed:', selectedText);
+            // Add strategy-specific logic here
+            break;
+        case 'selectTradeType':
+            console.log('Trade Type changed:', selectedText);
+            // Add trade type-specific logic here
+            break;
+        case 'selectStatus':
+            console.log('Status changed:', selectedText);
+            // Add status-specific logic here
+            break;
+        case 'selectTimeFrame':
+            console.log('Time Frame changed:', selectedText);
+            // Add time frame-specific logic here
+            break;
+        case 'selectSampleSize':
+            loadSampleSize(selectedValue);
+            break;
+        default:
+            console.log('Unknown select changed:', selectId);
     }
 }

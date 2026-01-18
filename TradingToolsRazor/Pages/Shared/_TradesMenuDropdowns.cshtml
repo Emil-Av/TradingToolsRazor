@@ -52,9 +52,9 @@
             <!-- Sample Size Menu -->
             <div class="col-auto p-2">
                 <select class="select-dropdown-styled" id="selectSampleSize" data-menu-type="sampleSize">
-                    @for (int i = 1; i <= Model.TradesVM.NumberSampleSizes; i++)
+                    @for (int i = 1; i < Model.TradesVM.SampleSizes.Count; i++)
                     {
-                        <option value="@i" selected="@(i == Model.TradesVM.CurrentSampleSizeNumber)">Sample Size: @i</option>
+                        <option value="@Model.TradesVM.SampleSizes[i].Id" selected="@(Model.TradesVM.SampleSizes[i].Id == Model.TradesVM.CurrentSampleSize.Id)">Sample Size: @i</option>
                     }
                 </select>
             </div>
