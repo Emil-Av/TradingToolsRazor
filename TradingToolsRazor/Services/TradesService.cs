@@ -26,7 +26,23 @@ namespace TradingToolsRazor.Services
         private List<SampleSize> _allSampleSizes = [];
         private TradesVM _tradesVM = new();
 
-        public async Task<TradesVM> LoadSampleSizeAsync(int sampleSizeId)
+        public async Task<TradesVM> LoadTimeFrameAsync(TradesLoadRequestModel requestModel)
+        {
+            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == requestModel.Strategy &&
+                                                                                     sampleSize.TradeType == requestModel.TradeType &&
+                                                                                     sampleSize.TimeFrame == requestModel.TimeFrame);
+
+            if (!_allSampleSizes.Any())
+            {
+                await InitializeTradesViewModelAsync();
+            }
+
+            await SetViewModel();
+
+            return _tradesVM;
+        }
+
+        public async Task<TradesVM> LoadSampleSizeNumberAsync(int sampleSizeId)
         {
             _allSampleSizes = await GetAllSampleSizes();
 
@@ -102,7 +118,7 @@ namespace TradingToolsRazor.Services
             _tradesVM.SampleSizes = _allSampleSizes;
 
             await SetCurrentTrade();
-            await SetAvailableMenus();
+            SetAvailableMenus();
         }
 
         private async Task SetViewModel()
@@ -111,7 +127,7 @@ namespace TradingToolsRazor.Services
             _tradesVM.SampleSizes = _allSampleSizes;
 
             await SetCurrentTrade();
-            await SetAvailableMenus();
+            SetAvailableMenus();
         }
 
 
@@ -128,19 +144,18 @@ namespace TradingToolsRazor.Services
             }
         }
 
-        private async Task SetAvailableMenus(List<SampleSize> sampleSizes = null, EStatus? status = null)
+        private void SetAvailableMenus()
         {
-            if (status != null && status != EStatus.All)
-            {
-                _allSampleSizes = sampleSizes;
-            }
-            else if (_allSampleSizes == null)
-            {
-                _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync();
-            }
-
+            SetSampleSizeMenu();
             SetTimeframesAndStrategies();
             SortMenus();
+        }
+
+        private void SetSampleSizeMenu()
+        {
+            _tradesVM.SampleSizes = [.. _allSampleSizes.Where(sampleSize => sampleSize.TimeFrame == _tradesVM.CurrentSampleSize.TimeFrame &&
+                                                                            sampleSize.TradeType == _tradesVM.CurrentSampleSize.TradeType &&
+                                                                            sampleSize.Strategy == _tradesVM.CurrentSampleSize.Strategy)];
         }
 
         private void SetTimeframesAndStrategies()

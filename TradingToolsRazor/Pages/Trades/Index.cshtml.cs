@@ -34,9 +34,16 @@ namespace TradingToolsRazor.Pages.Trades
             return Page();
         }
 
-        public async Task<IActionResult> OnGetLoadSampleSizeAsync(int sampleSizeId)
+        public async Task<IActionResult> OnPostLoadTimeFrameAsync([FromBody] TradesLoadRequestModel requestModel)
         {
-            TradesVM = await _tradesService.LoadSampleSizeAsync(sampleSizeId);
+            TradesVM = await _tradesService.LoadTimeFrameAsync(requestModel);
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetLoadSampleSizeNumberAsync(int sampleSizeId)
+        {
+            TradesVM = await _tradesService.LoadSampleSizeNumberAsync(sampleSizeId);
             return Page();
         }
 

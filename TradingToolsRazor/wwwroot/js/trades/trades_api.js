@@ -4,8 +4,22 @@
  * ******************************
  */
 
+function loadTimeFrame() {
+    const request = getTradesLoadRequest();
+    
+    sendPostRequest('/trades?handler=LoadTimeFrame', request)
+        .then(data => {
+            handleApiResponse(data);
+            if (data.success) {
+                // Reload trades or update UI with new timeframe data
+                window.location.reload();
+            }
+        })
+        .catch(error => handleApiError('Error loading timeframe', error));
+}
+
 function loadSampleSize(sampleSizeId) {
-    window.location.href = `/trades?handler=LoadSampleSize&sampleSizeId=${sampleSizeId}`;
+    window.location.href = `/trades?handler=LoadSampleSizeNumber&sampleSizeId=${sampleSizeId}`;
 }
 
 function updateReview() {

@@ -10,7 +10,7 @@
  * - setTimeFrameMenu()
  */
 
-function tradesLoadRequest(sampleSizeId) {
+function getTradesLoadRequest() {
     // Get values from the select elements
     const strategy = parseInt($('#selectStrategy').val());
     const tradeType = parseInt($('#selectTradeType').val());
@@ -23,7 +23,6 @@ function tradesLoadRequest(sampleSizeId) {
         TradeType: tradeType,
         Status: status,
         TimeFrame: timeFrame,
-        SampleSizeId: sampleSizeId
     };
 
     return requestModel;

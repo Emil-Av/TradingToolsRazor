@@ -17,6 +17,5 @@ namespace Models.RequestModels
 
         public ETimeFrame TimeFrame { get; set; }
 
-        public int SampleSizeId { get; set; }
     }
 }

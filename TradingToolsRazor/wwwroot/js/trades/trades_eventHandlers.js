@@ -25,6 +25,10 @@ function handleUpdateClick() {
     }
 }
 
+function handleDeleteClick() {
+
+}
+
 function handleCancelClick() {
     $('#summernote').summernote('destroy');
     $(currentTabSelector).removeClass('d-none');
@@ -104,7 +108,7 @@ function handleMenuSelectChange(selectId, selectedValue, selectedText) {
             // Add status-specific logic here
             break;
         case 'selectTimeFrame':
-            console.log('Time Frame changed:', selectedText);
+            loadTimeFrame()
             // Add time frame-specific logic here
             break;
         case 'selectSampleSize':
