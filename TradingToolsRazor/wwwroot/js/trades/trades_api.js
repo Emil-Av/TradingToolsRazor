@@ -4,18 +4,13 @@
  * ******************************
  */
 
+function loadStrategy(strategy) {
+    window.location.href = `/trades?handler=LoadStrategy&strategy=${strategy}`;
+}
+
 function loadTimeFrame() {
     const request = getTradesLoadRequest();
-    
-    sendPostRequest('/trades?handler=LoadTimeFrame', request)
-        .then(data => {
-            handleApiResponse(data);
-            if (data.success) {
-                // Reload trades or update UI with new timeframe data
-                window.location.reload();
-            }
-        })
-        .catch(error => handleApiError('Error loading timeframe', error));
+    window.location.href = `/trades?handler=LoadTimeFrame&strategy=${request.Strategy}&tradeType=${request.TradeType}&timeFrame=${request.TimeFrame}`;
 }
 
 function loadSampleSize(sampleSizeId) {

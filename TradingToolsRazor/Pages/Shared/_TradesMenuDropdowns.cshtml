@@ -29,16 +29,6 @@
                 </select>
             </div>
 
-            <!-- Status Menu -->
-            <div class="col-auto p-2">
-                <select class="select-dropdown-styled" id="selectStatus" data-menu-type="status">
-                    @foreach (EStatus status in Enum.GetValues<EStatus>())
-                    {
-                        <option value="@((int)status)" selected="@(status == Model.TradesVM.DefaultTradeStatus)">Status: @status</option>
-                    }
-                </select>
-            </div>
-
             <!-- Time Frame Menu -->
             <div class="col-auto p-2">
                 <select class="select-dropdown-styled" id="selectTimeFrame" data-menu-type="timeFrame">

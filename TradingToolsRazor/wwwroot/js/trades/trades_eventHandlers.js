@@ -97,16 +97,11 @@ function handleMenuSelectChange(selectId, selectedValue, selectedText) {
     switch(selectId) {
         case 'selectStrategy':
             console.log('Strategy changed:', selectedText);
-            // Add strategy-specific logic here
+            loadStrategy(selectedValue)
             break;
         case 'selectTradeType':
             console.log('Trade Type changed:', selectedText);
             // Add trade type-specific logic here
-            break;
-        case 'selectStatus':
-            console.log('Status changed:', selectedText);
-            // Add status-specific logic here
-            break;
         case 'selectTimeFrame':
             loadTimeFrame()
             // Add time frame-specific logic here

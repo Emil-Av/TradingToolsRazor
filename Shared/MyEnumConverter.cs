@@ -152,7 +152,8 @@ namespace Shared
                 { "Cradle", EStrategy.Cradle },
                 { "First Bar Pullback", EStrategy.FirstBarPullback },
                 { "Candle Bracketing", EStrategy.CandleBracketing },
-                { "SRS", EStrategy.SRS }
+                { "SRS", EStrategy.SRS },
+                { "BrunchBreak", EStrategy.BrunchBreak }
             };
 
             try
@@ -173,6 +174,7 @@ namespace Shared
                 { EStrategy.FirstBarPullback, "First Bar Pullback" },
                 { EStrategy.CandleBracketing, "Candle Bracketing" },
                 { EStrategy.SRS, "SRS" },
+                { EStrategy.BrunchBreak, "BrunchBreak" }
             };
 
             return strategies[strategy];

@@ -69,13 +69,23 @@ namespace TradingToolsRazor.Pages.NewTrade
             }
         }
 
-        public async Task<JsonResult> OnPostSaveNewTradeOldAsync([FromForm] IFormFile[] files, [FromForm] string tradeParams, [FromForm] string researchData, [FromForm] string tradeData)
+        public async Task<JsonResult> OnPostSaveNewTradeOldAsync([FromForm] IFormFile[] files, [FromForm] string sampleSizeViewData, [FromForm] string researchData, [FromForm] string tradeData)
         {
             var validationResult = ValidateModelState();
             if (validationResult != null) 
                 return validationResult;
 
-            string errorMsg = NewTradeVM.SetValues(tradeParams, researchData, tradeData);
+            // Deserialize sampleSizeViewData
+            try
+            {
+                NewTradeVM.SampleSizeViewData = JsonConvert.DeserializeObject<SampleSizeViewData>(sampleSizeViewData)!;
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = $"Error parsing sample size data: {ex.Message}" });
+            }
+
+            string errorMsg = NewTradeVM.SetValues(researchData, tradeData);
             if (!string.IsNullOrEmpty(errorMsg)) 
                 return new JsonResult(new { error = errorMsg });
 

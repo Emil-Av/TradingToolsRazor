@@ -14,14 +14,12 @@ function getTradesLoadRequest() {
     // Get values from the select elements
     const strategy = parseInt($('#selectStrategy').val());
     const tradeType = parseInt($('#selectTradeType').val());
-    const status = parseInt($('#selectStatus').val());
     const timeFrame = parseInt($('#selectTimeFrame').val());
 
     // Construct the request object matching TradesLoadRequestModel
     const requestModel = {
         Strategy: strategy,
         TradeType: tradeType,
-        Status: status,
         TimeFrame: timeFrame,
     };
 
@@ -111,7 +109,7 @@ function getReviewData() {
 function getResearchData() {
     let researchData = {};
 
-    if (getStrategy() === STRATEGY.SRS) {
+    if (getStrategy() === STRATEGY.SRS || getStrategy() === STRATEGY.BRUNCH_BREAK) {
         // Collect all research data fields to ensure all properties are included in the update
         $('#cardBody [data-research-data]').each(function () {
             var bindProperty = $(this).data('research-data');

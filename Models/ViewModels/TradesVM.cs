@@ -20,6 +20,7 @@ namespace Models.ViewModels
             TradeData = new();
             CurrentTrade = new();
             SRSTrade = new();
+            BrunchBreakTrade = new();
             CurrentSampleSize = new();
             AllTradesInSampleSize = [];
             SampleSizes = [];
@@ -36,6 +37,8 @@ namespace Models.ViewModels
         public BaseTrade CurrentTrade { get; set; }
 
         public SRS SRSTrade { get; set; }
+
+        public BrunchBreak BrunchBreakTrade { get; set; }
 
         public TradeDisplay TradeData { get; set; }
 

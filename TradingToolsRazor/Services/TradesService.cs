@@ -26,11 +26,22 @@ namespace TradingToolsRazor.Services
         private List<SampleSize> _allSampleSizes = [];
         private TradesVM _tradesVM = new();
 
+        public async Task<TradesVM> LoadStrategyAsync(EStrategy strategy)
+        {
+            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == strategy, includeProperties: "Review");
+            if (!_allSampleSizes.Any())
+            {
+                await InitializeTradesViewModelAsync();
+            }
+            await SetViewModel();
+            return _tradesVM;
+        }
+
         public async Task<TradesVM> LoadTimeFrameAsync(TradesLoadRequestModel requestModel)
         {
             _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == requestModel.Strategy &&
                                                                                      sampleSize.TradeType == requestModel.TradeType &&
-                                                                                     sampleSize.TimeFrame == requestModel.TimeFrame);
+                                                                                     sampleSize.TimeFrame == requestModel.TimeFrame, includeProperties: "Review");
 
             if (!_allSampleSizes.Any())
             {
@@ -90,6 +101,12 @@ namespace TradingToolsRazor.Services
                 await _unitOfWork.SRS.UpdateAsync(srs);
                 await _unitOfWork.SaveAsync();
             }
+            else if (updateResearchData.Strategy == EStrategy.BrunchBreak)
+            {
+                BrunchBreak brunchBreak = JsonConvert.DeserializeObject<BrunchBreak>(updateResearchData.Data!)!;
+                await _unitOfWork.BrunchBreak.UpdateAsync(brunchBreak);
+                await _unitOfWork.SaveAsync();
+            }
         }
 
         public async Task UpdateReviewAsync(Review review)
@@ -118,7 +135,7 @@ namespace TradingToolsRazor.Services
             _tradesVM.SampleSizes = _allSampleSizes;
 
             await SetCurrentTrade();
-            SetAvailableMenus();
+            await SetAvailableMenus();
         }
 
         private async Task SetViewModel()
@@ -127,28 +144,70 @@ namespace TradingToolsRazor.Services
             _tradesVM.SampleSizes = _allSampleSizes;
 
             await SetCurrentTrade();
-            SetAvailableMenus();
+            await SetAvailableMenus();
         }
 
 
         private async Task SetCurrentTrade()
         {
-            if (_tradesVM.CurrentSampleSize.Strategy == EStrategy.SRS)
+            switch (_tradesVM.CurrentSampleSize.Strategy)
             {
-                _tradesVM.AllTradesInSampleSize = [.. (await _unitOfWork.SRS.GetAllAsync(trade => trade.SampleSizeId == _tradesVM.CurrentSampleSize.Id,
-                                                                                        includeProperties: "Journal")).OrderBy(t => t.Id).Cast<object>()];
+                case EStrategy.SRS:
+                    await SetSRSCurrentTrade();
+                    break;
 
-                // Set current trade and calculate its position
-                _tradesVM.CurrentTrade = _tradesVM.AllTradesInSampleSize.Last() as BaseTrade;
-                _tradesVM.SRSTrade = _tradesVM.AllTradesInSampleSize.Last() as SRS;
+                case EStrategy.BrunchBreak:
+                    await SetBrunchBreakCurrentTrade();
+                    break;
             }
         }
 
-        private void SetAvailableMenus()
+        private async Task SetBrunchBreakCurrentTrade()
+        {
+            _tradesVM.AllTradesInSampleSize = [.. (await _unitOfWork.BrunchBreak.GetAllAsync(trade => trade.SampleSizeId == _tradesVM.CurrentSampleSize.Id,
+                                                                                            includeProperties: "Journal")).OrderBy(t => t.Id).Cast<object>()];
+
+            _tradesVM.CurrentTrade = _tradesVM.AllTradesInSampleSize.Last() as BaseTrade;
+            _tradesVM.BrunchBreakTrade = _tradesVM.AllTradesInSampleSize.Last() as BrunchBreak;
+        }
+
+        private async Task SetSRSCurrentTrade()
+        {
+            _tradesVM.AllTradesInSampleSize = [.. (await _unitOfWork.SRS.GetAllAsync(trade => trade.SampleSizeId == _tradesVM.CurrentSampleSize.Id,
+                                                                                            includeProperties: "Journal")).OrderBy(t => t.Id).Cast<object>()];
+
+            _tradesVM.CurrentTrade = _tradesVM.AllTradesInSampleSize.Last() as BaseTrade;
+            _tradesVM.SRSTrade = _tradesVM.AllTradesInSampleSize.Last() as SRS;
+        }
+
+        private async Task SetAvailableMenus()
         {
             SetSampleSizeMenu();
-            SetTimeframesAndStrategies();
+            await SetTimeFrames();
+            SetStrategies();
             SortMenus();
+        }
+
+        private void SetStrategies()
+        {
+            foreach (SampleSize sampleSize in _allSampleSizes)
+            {
+                if (!_tradesVM.AvailableStrategies.Contains(sampleSize.Strategy))
+                {
+                    _tradesVM.AvailableStrategies.Add(sampleSize.Strategy);
+                }
+            }
+        }
+
+        private async Task SetTimeFrames()
+        {
+            foreach (SampleSize sampleSize in await GetAllSampleSizes())
+            {
+                if (!_tradesVM.AvailableTimeframes.Contains(sampleSize.TimeFrame))
+                {
+                    _tradesVM.AvailableTimeframes.Add(sampleSize.TimeFrame);
+                }
+            }
         }
 
         private void SetSampleSizeMenu()
@@ -156,21 +215,6 @@ namespace TradingToolsRazor.Services
             _tradesVM.SampleSizes = [.. _allSampleSizes.Where(sampleSize => sampleSize.TimeFrame == _tradesVM.CurrentSampleSize.TimeFrame &&
                                                                             sampleSize.TradeType == _tradesVM.CurrentSampleSize.TradeType &&
                                                                             sampleSize.Strategy == _tradesVM.CurrentSampleSize.Strategy)];
-        }
-
-        private void SetTimeframesAndStrategies()
-        {
-            foreach (SampleSize sampleSize in _allSampleSizes)
-            {
-                if (!_tradesVM.AvailableTimeframes.Contains(sampleSize.TimeFrame))
-                {
-                    _tradesVM.AvailableTimeframes.Add(sampleSize.TimeFrame);
-                }
-                if (!_tradesVM.AvailableStrategies.Contains(sampleSize.Strategy))
-                {
-                    _tradesVM.AvailableStrategies.Add(sampleSize.Strategy);
-                }
-            }
         }
 
         private void SortMenus()

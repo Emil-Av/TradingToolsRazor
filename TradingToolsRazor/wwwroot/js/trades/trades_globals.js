@@ -35,7 +35,8 @@ const STRATEGY = {
     FIRST_BAR_PULLBACK: 0,
     CRADLE: 1,
     CANDLE_BRACKETING: 2,
-    SRS: 3
+    SRS: 3,
+    BRUNCH_BREAK: 4
 };
 
 // Create key, value array: key is the button menu, value is the span element. 

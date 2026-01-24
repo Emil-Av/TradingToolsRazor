@@ -23,7 +23,8 @@
         Cradle: "Cradle",
         FirstBarPullback: "First Bar Pullback",
         CandleBracketing: "Candle Bracketing",
-        SRS: "SRS"
+        SRS: "SRS",
+        BrunchBreak: "BrunchBreak"
     };
 
     // Helper function to extract value after colon and trim
@@ -57,7 +58,19 @@
             else if (selectedText == strategies.SRS) {
                 ShowSRSPartialView();
             }
+            else if (selectedText == strategies.BrunchBreak) {
+                ShowBrunchBreakPartialView();
+            }
         }
+    }
+
+    function ShowBrunchBreakPartialView() {
+        $('#researchBrunchBreakData').removeClass('d-none');
+
+        $('#researchSRSData').addClass('d-none');
+        $('#researchCandleBracketingData').addClass('d-none');
+        $('#researchCradleData').addClass('d-none');
+        $('#researchFirstBarPullbackData').addClass('d-none');
     }
 
     function ShowSRSPartialView() {
@@ -66,6 +79,7 @@
         $('#researchCandleBracketingData').addClass('d-none');
         $('#researchCradleData').addClass('d-none');
         $('#researchFirstBarPullbackData').addClass('d-none');
+        $('#researchBrunchBreakData').addClass('d-none');
     }
 
     function ShowCandleBracketingPartialView() {
@@ -73,6 +87,7 @@
         $('#researchCradleData').addClass('d-none');
         $('#researchFirstBarPullbackData').addClass('d-none');
         $('#researchSRSData').addClass('d-none');
+        $('#researchBrunchBreakData').addClass('d-none');
     }
 
     function ShowResearchCradlePartialView() {
@@ -81,6 +96,7 @@
         $('#researchFirstBarPullbackData').addClass('d-none');
         $('#researchCandleBracketingData').addClass('d-none');
         $('#researchSRSData').addClass('d-none');
+        $('#researchBrunchBreakData').addClass('d-none');
     }
 
     function ShowFirstBarPullbackPartialView() {
@@ -89,6 +105,7 @@
         $('#researchCradleData').addClass('d-none');
         $('#researchCandleBracketingData').addClass('d-none');
         $('#researchSRSData').addClass('d-none');
+        $('#researchBrunchBreakData').addClass('d-none');
     }
 
     /**
@@ -113,6 +130,7 @@
             $('#researchCradleData').addClass('d-none');
             $('#researchCandleBracketingData').addClass('d-none');
             $('#researchSRSData').addClass('d-none');
+            $('#researchBrunchBreakData').addClass('d-none');
 
         }
         // Display Research Partial View
@@ -131,6 +149,10 @@
             }
             else if (selectedStrategy == strategies.SRS) {
                 ShowSRSPartialView();
+                $('#tradeData').addClass('d-none');
+            }
+            else if (selectedStrategy == strategies.BrunchBreak) {
+                ShowBrunchBreakPartialView();
                 $('#tradeData').addClass('d-none');
             }
         }
@@ -157,7 +179,7 @@
     $('#btnSave').on('click', function () {
         if (validateNumberInputs()) {
             var selectedStrategy = getSelectValue('#selectStrategy');
-            if (selectedStrategy == strategies.SRS) {
+            if (selectedStrategy == strategies.SRS || selectedStrategy == strategies.BrunchBreak) {
                 if (ValidateMenuButtonsAndScreenshots()) {
                     saveTrade();
                 }
@@ -323,38 +345,45 @@
             formData.append('files', uploadedFiles[i]);
         }
 
-        var tradeParams = {};
-        tradeParams['timeFrame'] = getSelectValue('#selectTimeFrame');
-        tradeParams['strategy'] = getSelectValue('#selectStrategy');
-        tradeParams['tradeType'] = getSelectValue('#selectTradeType');
-        tradeParams['orderType'] = getSelectValue('#selectOrderType');
+        var sampleSizeViewData = {
+            TimeFrame: parseInt($('#selectTimeFrame').val()),
+            Strategy: parseInt($('#selectStrategy').val()),
+            TradeType: parseInt($('#selectTradeType').val())
+        };
 
-        formData.append('tradeParams', JSON.stringify(tradeParams));
+        formData.append('sampleSizeViewData', JSON.stringify(sampleSizeViewData));
 
+        var selectedStrategy = getSelectValue('#selectStrategy');
         var researchData = {};
-        if (tradeParams['strategy'] == strategies.Cradle) {
+        if (selectedStrategy == strategies.Cradle) {
             $('#cardBody [data-research-cradle]').each(function () {
                 var bindProperty = $(this).data('research-cradle');
                 researchData[bindProperty] = $(this).val();
             });
         }
-        else if (tradeParams['strategy'] == strategies.FirstBarPullback) {
+        else if (selectedStrategy == strategies.FirstBarPullback) {
 
             $('#cardBody [data-research-firstbar]').each(function () {
                 var bindProperty = $(this).data('research-firstbar');
                 researchData[bindProperty] = $(this).val();
             });
         }
-        else if (tradeParams['strategy'] == strategies.CandleBracketing) {
+        else if (selectedStrategy == strategies.CandleBracketing) {
             $('#cardBody [data-research-bracketing]').each(function () {
                 var bindProperty = $(this).data('research-bracketing');
                 researchData[bindProperty] = $(this).val();
             });
         }
 
-        else if (tradeParams['strategy'] == strategies.SRS) {
+        else if (selectedStrategy == strategies.SRS) {
             $('#cardBody [data-research-srs]').each(function () {
                 var bindProperty = $(this).data('research-srs');
+                researchData[bindProperty] = $(this).val();
+            });
+        }
+        else if (selectedStrategy == strategies.BrunchBreak) {
+            $('#cardBody [data-research-brunchbreak]').each(function () {
+                var bindProperty = $(this).data('research-brunchbreak');
                 researchData[bindProperty] = $(this).val();
             });
         }
@@ -407,7 +436,7 @@
         var timeValue = formatTimeForInput(now);
 
         // Clear and set sensible defaults for elements that belong to research partials
-        $('#cardBody [data-research], #cardBody [data-research-cradle], #cardBody [data-research-firstbar], #cardBody [data-research-bracketing], #cardBody [data-research-srs]').each(function () {
+        $('#cardBody [data-research], #cardBody [data-research-cradle], #cardBody [data-research-firstbar], #cardBody [data-research-bracketing], #cardBody [data-research-srs], #cardBody [data-research-brunchbreak]').each(function () {
             var element = $(this);
             if (element.is('input')) {
                 var elementType = (element.attr('type') || '').toLowerCase();

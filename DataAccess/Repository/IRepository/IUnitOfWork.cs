@@ -26,6 +26,8 @@ namespace DataAccess.Repository.IRepository
 
         ISRSRepository SRS { get; }
 
+        IBrunchBreakRepository BrunchBreak { get; }
+
         Task SaveAsync();
     }
 }

@@ -61,8 +61,29 @@ namespace TradingToolsRazor.Services
                 case EStrategy.SRS:
                     await SaveSRSTrade();
                     break;
+                case EStrategy.BrunchBreak:
+                    await SaveBrunchBreak();
+                    break;
                 default:
                     throw new ArgumentException("Unknown strategy");
+            }
+        }
+
+        private async Task SaveBrunchBreak()
+        {
+            try
+            {
+                var (sampleSizeId, isFull) = await ProcessSampleSize(maxTradesProSampleSize: 20, _viewModel.BrunchBreakTrade.IsFlippedTheSwitch);
+                _viewModel.BrunchBreakTrade.SampleSizeId = sampleSizeId;
+                _viewModel.BrunchBreakTrade.JournalId = await CreateJournal();
+                _viewModel.BrunchBreakTrade.ScreenshotsUrls = await ScreenshotsService.SaveFilesAsync(_webHostEnvironment.WebRootPath, _viewModel, _viewModel.BrunchBreakTrade, _files, isFull);
+
+                _unitOfWork.BrunchBreak.Add(_viewModel.BrunchBreakTrade);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in NewTradeService.SaveBrunchBreak(): {ex.Message}");
             }
         }
 

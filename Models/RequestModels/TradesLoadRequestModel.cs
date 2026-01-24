@@ -13,8 +13,6 @@ namespace Models.RequestModels
 
         public ETradeType TradeType { get; set; }
 
-        public EStatus Status { get; set; }
-
         public ETimeFrame TimeFrame { get; set; }
 
     }

@@ -29,6 +29,8 @@ namespace DataAccess.Data
 
         public DbSet<SRS> SRS { get; set; }
 
+        public DbSet<BrunchBreak> BrunchBreak { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -40,6 +42,7 @@ namespace DataAccess.Data
             modelBuilder.Entity<ResearchCradle>().ToTable("ResearchCradles");
             modelBuilder.Entity<ResearchCandleBracketing>().ToTable("ResearchCandleBracketing");
             modelBuilder.Entity<SRS>().ToTable("SRS");
+            modelBuilder.Entity<BrunchBreak>().ToTable("BrunchBreak");
 
             // Configure the primary key inheritance (TPT) - derived -> BaseTrade (shared PK)
             modelBuilder.Entity<Trade>()
@@ -71,6 +74,13 @@ namespace DataAccess.Data
                 .WithOne()
                 .HasForeignKey<SRS>(t => t.Id)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<BrunchBreak>()
+                .HasOne<BaseTrade>()
+                .WithOne()
+                .HasForeignKey<BrunchBreak>(t => t.Id)
+                .OnDelete(DeleteBehavior.NoAction);
+
 
             // Include SampleSize relationship on BaseTrade
             modelBuilder.Entity<BaseTrade>()

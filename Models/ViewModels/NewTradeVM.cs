@@ -49,11 +49,6 @@ namespace Models.ViewModels
         /// </summary>
         public ETradeType TradeType { get; set; }
 
-        /// <summary>
-        /// Obsolete. Should use SampleSizeViewData instead.
-        /// </summary>
-        public EOrderType OrderType { get; set; }
-
         public object ResearchData { get; set; }
 
         public ResearchFirstBarPullbackDisplay ResearchFirstBarPullbackDisplay { get; set; }
@@ -70,6 +65,7 @@ namespace Models.ViewModels
 
         public SRS SRSTrade { get; set; }
 
+        public BrunchBreak BrunchBreakTrade { get; set; }
         public SampleSizeViewData SampleSizeViewData { get; set; }
 
         public TradesVM TradesVM { get; set; }
@@ -84,9 +80,14 @@ namespace Models.ViewModels
             {
                 SampleSizeViewData = JsonConvert.DeserializeObject<SampleSizeViewData>(sampleSizeViewData)!;
                 
-                if (SampleSizeViewData.Strategy == EStrategy.SRS)
+                switch (SampleSizeViewData.Strategy)
                 {
-                    SRSTrade = JsonConvert.DeserializeObject<SRS>(viewData)!;
+                    case EStrategy.SRS:
+                        SRSTrade = JsonConvert.DeserializeObject<SRS>(viewData)!;
+                        break;
+                    case EStrategy.BrunchBreak:
+                        BrunchBreakTrade = JsonConvert.DeserializeObject<BrunchBreak>(viewData)!;
+                        break;
                 }
             }
             catch (Exception ex)
@@ -105,16 +106,10 @@ namespace Models.ViewModels
         /// <param name="researchData"></param>
         /// <param name="tradeData"></param>
         /// <returns></returns>
-        public string SetValues(string tradeParams, string researchData, string tradeData)
+        public string SetValues(string researchData, string tradeData)
         {
             try
             {
-                var validationResult = ValidateAndSetTradeParameters(tradeParams);
-                if (!string.IsNullOrEmpty(validationResult))
-                {
-                    return validationResult;
-                }
-
                 SetResearchData(researchData);
                 TradeData = JsonConvert.DeserializeObject<TradeDisplay>(tradeData)!;
 
@@ -124,50 +119,6 @@ namespace Models.ViewModels
             {
                 return $"Error in NewTradeVM.SetValues(): {ex.Message}";
             }
-        }
-
-        private string ValidateAndSetTradeParameters(string tradeParams)
-        {
-            var errors = new List<string>();
-            var tradeDataObject = JsonConvert.DeserializeObject<Dictionary<string, string>>(tradeParams)!;
-
-            var timeFrameResult = MyEnumConverter.TimeFrameFromString(tradeDataObject["timeFrame"]);
-            var strategyResult = MyEnumConverter.StrategyFromString(tradeDataObject["strategy"]);
-            var typeResult = MyEnumConverter.TradeTypeFromString(tradeDataObject["tradeType"]);
-
-            ValidateResult(timeFrameResult, "Time frame", errors);
-            ValidateResult(strategyResult, "Strategy", errors);
-            ValidateResult(typeResult, "Type", errors);
-
-            Result<EStatus>? statusResult = null;
-            Result<EOrderType>? orderTypeResult = null;
-
-            // Status and OrderType are only required for non-Research trades
-            if (typeResult.Success && typeResult.Value != ETradeType.Research)
-            {
-                statusResult = MyEnumConverter.StatusFromString(tradeDataObject["status"]);
-                orderTypeResult = MyEnumConverter.OrderTypeFromString(tradeDataObject["orderType"]);
-
-                ValidateResult(statusResult, "Status", errors);
-                ValidateResult(orderTypeResult, "OrderType", errors);
-            }
-
-            if (errors.Any())
-            {
-                return string.Join("<br>", errors);
-            }
-
-            TimeFrame = timeFrameResult.Value;
-            Strategy = strategyResult.Value;
-            TradeType = typeResult.Value;
-
-            if (TradeType != ETradeType.Research)
-            {
-                Status = statusResult!.Value;
-                OrderType = orderTypeResult!.Value;
-            }
-
-            return string.Empty;
         }
 
         private void SetResearchData(string researchData)
@@ -180,14 +131,6 @@ namespace Models.ViewModels
                 EStrategy.SRS => JsonConvert.DeserializeObject<SRS>(researchData)!,
                 _ => throw new ArgumentException($"Unknown strategy: {Strategy}")
             };
-        }
-
-        private static void ValidateResult<T>(Result<T> result, string paramName, List<string> errors)
-        {
-            if (!result.Success)
-            {
-                errors.Add($"{paramName} not selected.");
-            }
         }
 
         #endregion
