@@ -45,7 +45,7 @@ const menuButtons = {
     '#dropdownBtnStatus': '#spanStatus',
     '#dropdownBtnTimeFrame': '#spanTimeFrame',
     '#dropdownBtnStrategy': '#spanStrategy',
-    '#dropdownBtnTradeType': '#spanTradeType',
+    '#dropdownBtnSampleSizeType': '#spanSampleSizeType',
     '#dropdownBtnSampleSize': '#spanSampleSize',
     '#dropdownBtnTrade': '#spanTrade'
 };

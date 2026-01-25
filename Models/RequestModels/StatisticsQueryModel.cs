@@ -13,7 +13,7 @@ namespace Models.RequestModels
 
         public Strategy? Strategy { get; set; }
 
-        public TradeType? TradeType { get; set; }
+        public SampleSizeType? SampleSizeType { get; set; }
 
         /// <summary>
         /// True if all nullable props are null.

@@ -105,15 +105,15 @@ function handleKeyboardNavigation(event) {
 
 // Handle changes to menu select dropdowns
 function handleMenuSelectChange(selectId, selectedValue, selectedText) {
-    // You can implement specific logic for each select element here
-    switch(selectId) {
+    switch (selectId) {
         case 'selectStrategy':
             console.log('Strategy changed:', selectedText);
             loadStrategy(selectedValue)
             break;
-        case 'selectTradeType':
-            console.log('Trade Type changed:', selectedText);
-            // Add trade type-specific logic here
+        case 'selectSampleSizeType':
+            loadSampleSizeType(selectedValue);
+            break;
+        // Add sample size type-specific logic here
         case 'selectTimeFrame':
             loadTimeFrame()
             // Add time frame-specific logic here

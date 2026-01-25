@@ -27,9 +27,20 @@ namespace TradingToolsRazor.Services
         private List<SampleSize> _allSampleSizes = [];
         private TradesVM _tradesVM = new();
 
-        public async Task<TradesVM> LoadStrategyAsync(Strategy strategy)
+        public async Task<TradesVM> LoadTypeAsync(SampleSizeType sampleSizeType, Strategy strategy)
         {
-            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == TradeType.Trade, includeProperties: "Review");
+            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.SampleSizeType == sampleSizeType, includeProperties: "Review");
+            if (!_allSampleSizes.Any())
+            {
+                await InitializeTradesViewModelAsync();
+            }
+            await SetViewModel(strategy);
+            return _tradesVM;
+        }
+
+        public async Task<TradesVM> LoadStrategyAsync(Strategy strategy, SampleSizeType sampleSizeType)
+        {
+            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.SampleSizeType == sampleSizeType, includeProperties: "Review");
             if (!_allSampleSizes.Any())
             {
                 await InitializeTradesViewModelAsync();
@@ -41,7 +52,7 @@ namespace TradingToolsRazor.Services
         public async Task<TradesVM> LoadTimeFrameAsync(TradesLoadTimeFrameRequestModel requestModel)
         {
             _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == requestModel.Strategy &&
-                                                                                     sampleSize.TradeType == requestModel.TradeType &&
+                                                                                     sampleSize.SampleSizeType == requestModel.SampleSizeType &&
                                                                                      sampleSize.TimeFrame == requestModel.TimeFrame, includeProperties: "Review");
 
             if (!_allSampleSizes.Any())
@@ -138,7 +149,7 @@ namespace TradingToolsRazor.Services
 
         private async Task<List<SampleSize>> GetAllSampleSizes()
         {
-            return [.. await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == TradeType.Trade, includeProperties: "Review")];
+            return [.. await _unitOfWork.SampleSize.GetAllAsync(includeProperties: "Review")];
         }
 
         private async Task SetViewModel(Strategy strategy)
@@ -220,7 +231,7 @@ namespace TradingToolsRazor.Services
 
         private async Task SetStrategies()
         {
-            var sampleSizes = (await GetAllSampleSizes()).Where(sampleSize => sampleSize.TradeType == _tradesVM.CurrentSampleSize.TradeType);
+            var sampleSizes = (await GetAllSampleSizes()).Where(sampleSize => sampleSize.SampleSizeType == _tradesVM.CurrentSampleSize.SampleSizeType);
             foreach (SampleSize sampleSize in sampleSizes)
             {
                 if (!_tradesVM.AvailableStrategies.Contains(sampleSize.Strategy))
@@ -232,7 +243,10 @@ namespace TradingToolsRazor.Services
 
         private async Task SetTimeFrames()
         {
-            var sampleSizesForCurrentStrategy = (await GetAllSampleSizes()).Where(sampleSize => sampleSize.Strategy == _tradesVM.CurrentSampleSize.Strategy);
+            var sampleSizesForCurrentStrategy = (await GetAllSampleSizes())
+                .Where(sampleSize => sampleSize.Strategy == _tradesVM.CurrentSampleSize.Strategy && 
+                       sampleSize.SampleSizeType == _tradesVM.CurrentSampleSize.SampleSizeType);
+
             foreach (SampleSize sampleSize in sampleSizesForCurrentStrategy)
             {
                 if (!_tradesVM.AvailableTimeframes.Contains(sampleSize.TimeFrame))
@@ -250,7 +264,7 @@ namespace TradingToolsRazor.Services
         private void SetSampleSizeMenu()
         {
             _tradesVM.SampleSizes = [.. _allSampleSizes.Where(sampleSize => sampleSize.TimeFrame == _tradesVM.CurrentSampleSize.TimeFrame &&
-                                                                            sampleSize.TradeType == _tradesVM.CurrentSampleSize.TradeType &&
+                                                                            sampleSize.SampleSizeType == _tradesVM.CurrentSampleSize.SampleSizeType &&
                                                                             sampleSize.Strategy == _tradesVM.CurrentSampleSize.Strategy)];
         }
 

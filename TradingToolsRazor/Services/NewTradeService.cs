@@ -28,7 +28,7 @@ namespace TradingToolsRazor.Services
             _viewModel = viewModel;
             _files = files;
 
-            if (_viewModel.SampleSizeViewData.TradeType == TradeType.Research)
+            if (_viewModel.SampleSizeViewData.SampleSizeType == SampleSizeType.Research)
             {
                 await SaveResearchTradeAsync();
             }
@@ -184,7 +184,7 @@ namespace TradingToolsRazor.Services
                 {
                     Strategy = _viewModel.SampleSizeViewData.Strategy,
                     TimeFrame = _viewModel.SampleSizeViewData.TimeFrame,
-                    TradeType = _viewModel.SampleSizeViewData.TradeType,
+                    SampleSizeType = _viewModel.SampleSizeViewData.SampleSizeType,
                     ReviewId = review?.Id
                 };
 
@@ -203,28 +203,28 @@ namespace TradingToolsRazor.Services
             var listSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x =>
                 x.TimeFrame == _viewModel.SampleSizeViewData.TimeFrame &&
                 x.Strategy == _viewModel.SampleSizeViewData.Strategy &&
-                x.TradeType == _viewModel.SampleSizeViewData.TradeType);
+                x.SampleSizeType == _viewModel.SampleSizeViewData.SampleSizeType);
 
             if (!listSampleSizes.Any())
                 return (0, false);
 
             var sampleSize = listSampleSizes.Last();
 
-            int numberTradesInSampleSize = _viewModel.SampleSizeViewData.TradeType switch
+            int numberTradesInSampleSize = _viewModel.SampleSizeViewData.SampleSizeType switch
             {
-                TradeType.Research when _viewModel.Strategy == Strategy.FirstBarPullback =>
+                SampleSizeType.Research when _viewModel.Strategy == Strategy.FirstBarPullback =>
                     (await _unitOfWork.ResearchFirstBarPullback.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
-                TradeType.Research when _viewModel.Strategy == Strategy.Cradle =>
+                SampleSizeType.Research when _viewModel.Strategy == Strategy.Cradle =>
                     (await _unitOfWork.ResearchCradle.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
-                TradeType.Research when _viewModel.Strategy == Strategy.CandleBracketing =>
+                SampleSizeType.Research when _viewModel.Strategy == Strategy.CandleBracketing =>
                     (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(x => x.SampleSizeId == sampleSize.Id))
                         .Select(trade => trade.Date)
                         .Distinct()
                         .Count(),
 
-                TradeType.Trade =>
+                SampleSizeType.Trade =>
                     (await _unitOfWork.BaseTrade.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
                 _ => 0

@@ -4,13 +4,19 @@
  * ******************************
  */
 
+function loadSampleSizeType(type) {
+    const strategy = getStrategy(); 
+        window.location.href = `/trades?handler=LoadType&sampleSizeType=${type}&strategy=${strategy}`;
+}
+
 function loadStrategy(strategy) {
-    window.location.href = `/trades?handler=LoadStrategy&strategy=${strategy}`;
+    type = getType();
+    window.location.href = `/trades?handler=LoadStrategy&strategy=${strategy}&sampleSizeType=${type}`;
 }
 
 function loadTimeFrame() {
-    const request = getTradesLoadRequest();
-    window.location.href = `/trades?handler=LoadTimeFrame&strategy=${request.Strategy}&tradeType=${request.TradeType}&timeFrame=${request.TimeFrame}`;
+    const request = getTradesLoadTimeFrameRequest();
+    window.location.href = `/trades?handler=LoadTimeFrame&strategy=${request.Strategy}&sampleSizeType=${request.SampleSizeType}&timeFrame=${request.TimeFrame}`;
 }
 
 function loadSampleSize(sampleSizeId) {
@@ -23,7 +29,7 @@ function deleteTrade() {
     sendPostRequest('/trades?handler=DeleteTrade', deleteTradeRequest)
         .then(data => {
             handleApiResponse(data);
-            // No need to update window.tradeData for review as it's sample-size level, not trade level
+            window.location.href = '/Trades';
         })
         .catch(error => handleApiError('Error updating review', error));
 }

@@ -33,14 +33,14 @@
     async function loadStatistics(isNewLoad) {
         const timeFrameText = (document.getElementById('spanTimeFrame')?.textContent || '').trim();
         const strategyText = (document.getElementById('spanStrategy')?.textContent || '').trim();
-        const tradeTypeText = (document.getElementById('spanTradeType')?.textContent || '').trim();
+        const sampleSizeTypeText = (document.getElementById('spanTradeType')?.textContent || '').trim();
         const sampleSizeText = (document.getElementById('spanSampleSize')?.textContent || '').trim();
         const timeText = (document.getElementById('spanTime')?.textContent || '').trim();
 
         const payload = {
             timeFrame: toEnumName('timeFrame', timeFrameText),
             strategy: toEnumName('strategy', strategyText),
-            tradeType: toEnumName('tradeType', tradeTypeText),
+            sampleSizeType: toEnumName('sampleSizeType', sampleSizeTypeText),
             sampleSizeNumber: sampleSizeText.toLowerCase() === 'all' ? 0 : parseInt(sampleSizeText, 10),
             time: timeText,
             isNewLoad: isNewLoad
@@ -49,7 +49,7 @@
         const params = new URLSearchParams();
         params.set('timeFrame', payload.timeFrame);
         params.set('strategy', payload.strategy);
-        params.set('tradeType', payload.tradeType);
+        params.set('sampleSizeType', payload.sampleSizeType);
         params.set('time', payload.time);
         params.set('sampleSizeNumber', payload.sampleSizeNumber);
         params.set('isNewLoad', payload.isNewLoad);

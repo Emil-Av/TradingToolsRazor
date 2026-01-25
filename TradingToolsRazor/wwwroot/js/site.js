@@ -95,7 +95,7 @@ function setTimeFrameMenu(timeframes, timeFrameMapping, currentTimeFrame) {
 // Enums:
 // ETimeFrame: M5, M10, M15, M30, H1, H2, H4, D
 // EStrategy: FirstBarPullback, Cradle, CandleBracketing
-// ETradeType: Trade, Research
+// ESampleSizeType: Trade, Research
 function toEnumName(menu, selectedValue) {
     const menuValue = selectedValue.trim();
 
@@ -124,7 +124,7 @@ function toEnumName(menu, selectedValue) {
         return map[menuValue] || menuValue.replace(/\s+/g, '');
     }
 
-    if (menu === 'tradeType') {
+    if (menu === 'sampleSizeType') {
         const map = {
             'Trade': 1,
             'Research': 2

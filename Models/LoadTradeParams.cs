@@ -16,7 +16,7 @@ namespace Models
             Result<EStatus> resultStatus = MyEnumConverter.StatusFromString(StatusFromView);
             Result<TimeFrame> resultTimeFrame = MyEnumConverter.TimeFrameFromString(TimeFrameFromView);
             Result<Strategy> resultStrategy = MyEnumConverter.StrategyFromString(StrategyFromView);
-            Result<TradeType> resultTradeType = MyEnumConverter.TradeTypeFromString(TradeTypeFromView);
+            Result<SampleSizeType> resultTradeType = MyEnumConverter.TradeTypeFromString(TradeTypeFromView);
 
             if (resultStatus.Success)
             {
@@ -32,7 +32,7 @@ namespace Models
             }
             if (resultTradeType.Success)
             {
-                TradeType = resultTradeType.Value;
+                SampleSizeType = resultTradeType.Value;
             }
 
             SampleSizeNumber = int.Parse(SampleSizeNumberFromView);
@@ -81,7 +81,7 @@ namespace Models
 
         public Strategy Strategy { get; set; }
 
-        public TradeType TradeType { get; set; }
+        public SampleSizeType SampleSizeType { get; set; }
 
         #endregion
     }

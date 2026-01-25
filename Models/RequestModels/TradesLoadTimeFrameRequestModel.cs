@@ -11,7 +11,7 @@ namespace Models.RequestModels
     {
         public Strategy Strategy { get; set; }
 
-        public TradeType TradeType { get; set; }
+        public SampleSizeType SampleSizeType { get; set; }
 
         public TimeFrame TimeFrame { get; set; }
 

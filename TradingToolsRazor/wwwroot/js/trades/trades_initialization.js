@@ -35,7 +35,7 @@ function initializeEventHandlers() {
 
 function initializeMenuButtons() {
     // Attach change event handlers for each select element
-    $('#selectStrategy, #selectTradeType, #selectStatus, #selectTimeFrame, #selectSampleSize').on('change', function() {
+    $('#selectStrategy, #selectSampleSizeType, #selectStatus, #selectTimeFrame, #selectSampleSize').on('change', function() {
         const selectId = this.id;
         const selectedValue = $(this).val();
         const selectedText = $(this).find('option:selected').text();

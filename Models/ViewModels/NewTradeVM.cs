@@ -47,7 +47,7 @@ namespace Models.ViewModels
         /// <summary>
         /// Obsolete. Should use SampleSizeViewData instead.
         /// </summary>
-        public TradeType TradeType { get; set; }
+        public SampleSizeType SampleSizeType { get; set; }
 
         public object ResearchData { get; set; }
 

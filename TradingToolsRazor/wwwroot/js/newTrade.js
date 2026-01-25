@@ -37,7 +37,7 @@
     }
 
     // Attach a change event for each select element
-    $('#selectTimeFrame, #selectStrategy, #selectTradeType, #selectOrderType').on('change', function () {
+    $('#selectTimeFrame, #selectStrategy, #selectSampleSizeType, #selectOrderType').on('change', function () {
         if (this.id === 'selectStrategy') {
             SetResearchPartialView();
         }
@@ -235,8 +235,8 @@
             missingSelections.push('Strategy');
         }
         
-        // Check Trade Type
-        if ($('#selectTradeType').val() === '' || $('#selectTradeType').val() === null) {
+        // Check Sample Size Type
+        if ($('#selectSampleSizeType').val() === '' || $('#selectSampleSizeType').val() === null) {
             missingSelections.push('Type');
         }
 
@@ -285,7 +285,7 @@
         var sampleSizeViewData = {
             TimeFrame: parseInt($('#selectTimeFrame').val()),
             Strategy: parseInt($('#selectStrategy').val()),
-            TradeType: parseInt($('#selectTradeType').val())
+            SampleSizeType: parseInt($('#selectSampleSizeType').val())
         };
 
         // Create FormData for multipart/form-data
@@ -348,7 +348,7 @@
         var sampleSizeViewData = {
             TimeFrame: parseInt($('#selectTimeFrame').val()),
             Strategy: parseInt($('#selectStrategy').val()),
-            TradeType: parseInt($('#selectTradeType').val())
+            SampleSizeType: parseInt($('#selectSampleSizeType').val())
         };
 
         formData.append('sampleSizeViewData', JSON.stringify(sampleSizeViewData));
@@ -478,12 +478,12 @@
         uploadedFiles = [];
 
         // Reset the menu selects to their placeholder option
-        $('#selectTimeFrame, #selectStrategy, #selectTradeType, #selectOrderType').each(function () {
+        $('#selectTimeFrame, #selectStrategy, #selectSampleSizeType, #selectOrderType').each(function () {
             $(this).prop('selectedIndex', 0);
         });
 
         // Reset selects that are not part of data-research
-        $('select:not([data-research])').not('#selectTimeFrame, #selectStrategy, #selectTradeType, #selectOrderType').each(function () {
+        $('select:not([data-research])').not('#selectTimeFrame, #selectStrategy, #selectSampleSizeType, #selectOrderType').each(function () {
             $(this).prop('selectedIndex', 1);
         });
     }

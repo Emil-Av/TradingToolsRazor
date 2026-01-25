@@ -16,6 +16,6 @@ namespace Models.ViewModels
 
         public Strategy Strategy { get; set; }
 
-        public TradeType TradeType { get; set; }
+        public SampleSizeType SampleSizeType { get; set; }
     }
 }

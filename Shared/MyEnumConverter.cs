@@ -72,30 +72,32 @@ namespace Shared
             }
         }
 
-        public static Result<TradeType> TradeTypeFromString(string tradeType)
+        public static Result<SampleSizeType> TradeTypeFromString(string tradeType)
         {
-            Dictionary<string, TradeType> tradeTypes = new()
+            Dictionary<string, SampleSizeType> tradeTypes = new()
             {
-                { "Trade", TradeType.Trade },
-                { "Research", TradeType.Research },
+                { "Trade", SampleSizeType.Trade },
+                { "Research", SampleSizeType.Research },
+                { "Paper Trade", SampleSizeType.PaperTrade }
             };
 
             try
             {
-                return Result<TradeType>.SuccessResult(tradeTypes[tradeType]);
+                return Result<SampleSizeType>.SuccessResult(tradeTypes[tradeType]);
             }
             catch
             {
-                return Result<TradeType>.ErrorResult($"Error converting the trade type from a string. Value given: {tradeType}");
+                return Result<SampleSizeType>.ErrorResult($"Error converting the trade type from a string. Value given: {tradeType}");
             }
         }
 
-        public static string TradeTypeFromEnum(TradeType tradeType)
+        public static string TradeTypeFromEnum(SampleSizeType tradeType)
         {
-            Dictionary<TradeType, string> tradeTypes = new()
+            Dictionary<SampleSizeType, string> tradeTypes = new()
             {
-                { TradeType.Trade , "Trade"},
-                { TradeType.Research, "Research" },
+                { SampleSizeType.Trade , "Trade"},
+                { SampleSizeType.Research, "Research" },
+                { SampleSizeType.PaperTrade, "Paper Trade" }
             };
 
             return tradeTypes[tradeType];

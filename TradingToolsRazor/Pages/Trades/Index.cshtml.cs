@@ -34,18 +34,24 @@ namespace TradingToolsRazor.Pages.Trades
             return Page();
         }
 
-        public async Task<IActionResult> OnGetLoadStrategy([FromQuery] Strategy strategy)
+        public async Task<IActionResult> OnGetLoadType(SampleSizeType sampleSizeType, Strategy strategy)
         {
-            TradesVM = await _tradesService.LoadStrategyAsync(strategy);
+            TradesVM = await _tradesService.LoadTypeAsync(sampleSizeType, strategy);
             return Page();
         }
 
-        public async Task<IActionResult> OnGetLoadTimeFrameAsync([FromQuery] Strategy strategy, [FromQuery] TradeType tradeType, [FromQuery] TimeFrame timeFrame)
+        public async Task<IActionResult> OnGetLoadStrategy([FromQuery] Strategy strategy, SampleSizeType sampleSizeType)
+        {
+            TradesVM = await _tradesService.LoadStrategyAsync(strategy, sampleSizeType);
+            return Page();
+        }
+
+        public async Task<IActionResult> OnGetLoadTimeFrameAsync([FromQuery] Strategy strategy, [FromQuery] SampleSizeType sampleSizeType, [FromQuery] TimeFrame timeFrame)
         {
             var requestModel = new TradesLoadTimeFrameRequestModel
             {
                 Strategy = strategy,
-                TradeType = tradeType,
+                SampleSizeType = sampleSizeType,
                 TimeFrame = timeFrame,
             };
 

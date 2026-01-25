@@ -42,7 +42,7 @@ namespace TradingToolsRazor.Pages.Research
         // Handler for GET /Research/Index
         public async Task<IActionResult> OnGetAsync()
         {
-            var sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == TradeType.Research);
+            var sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.SampleSizeType == SampleSizeType.Research);
 
             if (!sampleSizes.Any())
                 return Page();
@@ -92,7 +92,7 @@ namespace TradingToolsRazor.Pages.Research
                 return new JsonResult(new { error = errorMsg });
             }
 
-            List<SampleSize> sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == TradeType.Research && x.Strategy == ResearchVM.CurrentStrategy);
+            List<SampleSize> sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.SampleSizeType == SampleSizeType.Research && x.Strategy == ResearchVM.CurrentStrategy);
 
             if (!sampleSizes.Any())
             {
@@ -226,7 +226,7 @@ namespace TradingToolsRazor.Pages.Research
 
             await _deleteTradeHelper.UpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls!.First(), [.. tradesInSampleSize.Cast<BaseTrade>()], _webHostEnvironment.WebRootPath);
 
-            var samplesizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == TradeType.Research && x.Strategy == Strategy.CandleBracketing);
+            var samplesizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.SampleSizeType == SampleSizeType.Research && x.Strategy == Strategy.CandleBracketing);
 
             if (!TrySetLastSampleSizeId(tradesInSampleSize, samplesizes, trade, out int lastSampleSizeId))
                 return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });
@@ -256,7 +256,7 @@ namespace TradingToolsRazor.Pages.Research
 
             var tradesInSampleSize = await CheckAndDeleteSampleSize(trade);
             var sampleSizes = await _unitOfWork.SampleSize
-                .GetAllAsync(x => x.TradeType == TradeType.Research && x.Strategy == Strategy.Cradle);
+                .GetAllAsync(x => x.SampleSizeType == SampleSizeType.Research && x.Strategy == Strategy.Cradle);
 
             await _deleteTradeHelper.UpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls.First(), tradesInSampleSize.Cast<BaseTrade>().ToList(), _webHostEnvironment.WebRootPath);
 
@@ -311,7 +311,7 @@ namespace TradingToolsRazor.Pages.Research
                 }
 
                 // Check if there are more sample sizes for the paramaters. If yes get the last
-                sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.Strategy == sampleSize!.Strategy && x.TimeFrame == sampleSize.TimeFrame && x.TradeType == TradeType.Research);
+                sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.Strategy == sampleSize!.Strategy && x.TimeFrame == sampleSize.TimeFrame && x.SampleSizeType == SampleSizeType.Research);
 
                 int lastSampleSizeId = 0;
                 // No more sample sizes for these parameters. The trade that was deleted was the last for these paramaters
@@ -333,7 +333,7 @@ namespace TradingToolsRazor.Pages.Research
                 // Check if there are any other sample sizes (any TF, any Strategy)
                 else
                 {
-                    sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == TradeType.Research);
+                    sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.SampleSizeType == SampleSizeType.Research);
 
                     if (sampleSizes.Any())
                     {

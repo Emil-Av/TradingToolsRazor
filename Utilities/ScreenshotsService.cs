@@ -44,7 +44,7 @@ namespace Utilities
 
         private static string BuildTradeFolderPath(string screenshotsDir, NewTradeVM viewModel, object newTrade, bool isSampleSizeFull)
         {
-            string pathToSaveFiles = Path.Combine(screenshotsDir, MyEnumConverter.TradeTypeFromEnum(viewModel.SampleSizeViewData.TradeType));
+            string pathToSaveFiles = Path.Combine(screenshotsDir, MyEnumConverter.TradeTypeFromEnum(viewModel.SampleSizeViewData.SampleSizeType));
             EnsureDirectoryExists(pathToSaveFiles);
 
             pathToSaveFiles = Path.Combine(pathToSaveFiles, newTrade.GetType().Name);

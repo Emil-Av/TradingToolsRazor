@@ -47,7 +47,7 @@ namespace Statistics.Services
 
         private Task<List<SampleSize>> GetAllResearchSampleSizesAsync()
         {
-            return _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == TradeType.Research);
+            return _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.SampleSizeType == SampleSizeType.Research);
         }
 
         private static List<Strategy> BuildAvailableStrategies(List<SampleSize> allSampleSizes)
@@ -80,7 +80,7 @@ namespace Statistics.Services
                 return await ResolveSampleSizeForCandleBracketingAsync(allSampleSizes, query);
             }
 
-            var selectedSampleSize = allSampleSizes.First(sampleSize => sampleSize.TimeFrame == query.TimeFrame && sampleSize.Strategy == query.Strategy && sampleSize.TradeType == query.TradeType);
+            var selectedSampleSize = allSampleSizes.First(sampleSize => sampleSize.TimeFrame == query.TimeFrame && sampleSize.Strategy == query.Strategy && sampleSize.SampleSizeType == query.SampleSizeType);
             return (selectedSampleSize, 1);
         }
 
@@ -106,7 +106,7 @@ namespace Statistics.Services
 
             var trades = await _unitOfWork.ResearchCandleBracketing
                 .GetAllAsync(trade => trade.SampleSize!.TimeFrame == query.TimeFrame &&
-                             trade.SampleSize.TradeType == query.TradeType &&
+                             trade.SampleSize.SampleSizeType == query.SampleSizeType &&
                              trade.SampleSize.Strategy == query.Strategy,
                              includeProperties: "SampleSize");
 
@@ -121,13 +121,13 @@ namespace Statistics.Services
         private async Task<List<int>> ResolveSampleSizeForNewLoadAsync(List<SampleSize> allSampleSizes, StatisticsQueryModel query, List<int> sampleSizeIds)
         {
             var trades = await _unitOfWork.ResearchCandleBracketing.GetAllAsync(trade => trade.SampleSize!.TimeFrame == query.TimeFrame &&
-                                                                                                 trade.SampleSize.TradeType == query.TradeType &&
+                                                                                                 trade.SampleSize.SampleSizeType == query.SampleSizeType &&
                                                                                                  trade.SampleSize.Strategy == query.Strategy,
                                                                                                  includeProperties: "SampleSize");
 
             var lastSampleSize = allSampleSizes
                 .Where(sampleSize => sampleSize.TimeFrame == query.TimeFrame &&
-                             sampleSize.TradeType == query.TradeType &&
+                             sampleSize.SampleSizeType == query.SampleSizeType &&
                              sampleSize.Strategy == query.Strategy)
                 .OrderBy(sampleSize => sampleSize.Id)
                 .LastOrDefault();
@@ -163,7 +163,7 @@ namespace Statistics.Services
             }
             else
             {
-                numberOfSampleSizes = allSampleSizes.Count(sampleSize => sampleSize.TimeFrame == currentSampleSize.TimeFrame && sampleSize.Strategy == currentSampleSize.Strategy && sampleSize.TradeType == currentSampleSize.TradeType);
+                numberOfSampleSizes = allSampleSizes.Count(sampleSize => sampleSize.TimeFrame == currentSampleSize.TimeFrame && sampleSize.Strategy == currentSampleSize.Strategy && sampleSize.SampleSizeType == currentSampleSize.SampleSizeType);
             }
             return (currentSampleSize, numberOfSampleSizes);
         }

@@ -3,7 +3,7 @@
 @{
     TimeFrame currentTimeFrame = Model.ViewModel.CurrentSampleSize.TimeFrame;
     Strategy currentStrategy = Model.ViewModel.CurrentSampleSize.Strategy;
-    TradeType currentTradeType = Model.ViewModel.CurrentSampleSize.TradeType;
+    SampleSizeType currentTradeType = Model.ViewModel.CurrentSampleSize.TradeType;
 }
 
 <!-- Menu Time Frame -->
@@ -44,7 +44,7 @@
             Type: <span id="spanTradeType">@MyEnumConverter.TradeTypeFromEnum(currentTradeType)</span>
         </button>
         <div class="dropdown-menu animated--fade-in" id="dropdownBtnTradeType" aria-labelledby="dropdownMenuButton">
-            @foreach (TradeType tradeType in Enum.GetValues(typeof(TradeType)))
+            @foreach (SampleSizeType tradeType in Enum.GetValues(typeof(SampleSizeType)))
             {
                 var isSelected = tradeType == currentTradeType;
                 <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@MyEnumConverter.TradeTypeFromEnum(tradeType)</a>

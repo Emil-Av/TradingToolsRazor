@@ -11,7 +11,7 @@ namespace Models
 
         public TimeFrame TimeFrame { get; set; }
 
-        public TradeType TradeType { get; set; }
+        public SampleSizeType SampleSizeType { get; set; }
 
         /// <summary>
         ///  ReviewId is null for research trades.

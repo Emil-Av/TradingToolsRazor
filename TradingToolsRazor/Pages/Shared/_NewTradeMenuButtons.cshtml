@@ -24,13 +24,13 @@
     </select>
 </div>
 
-<!-- Menu Trade Type -->
+<!-- Menu Sample Size Type -->
 <div class="col-auto p-2">
-    <select class="select-dropdown-styled" id="selectTradeType" data-menu-type="tradeType">
+    <select class="select-dropdown-styled" id="selectSampleSizeType" data-menu-type="sampleSizeType">
         <option value="" selected disabled>Type: </option>
-        @foreach (TradeType tradeType in Enum.GetValues(typeof(TradeType)))
+        @foreach (SampleSizeType sampleSizeType in Enum.GetValues(typeof(SampleSizeType)))
         {
-            <option value="@((int)tradeType)">Type: @MyEnumConverter.TradeTypeFromEnum(tradeType)</option>
+            <option value="@((int)sampleSizeType)">Type: @MyEnumConverter.TradeTypeFromEnum(sampleSizeType)</option>
         }
     </select>
 </div>

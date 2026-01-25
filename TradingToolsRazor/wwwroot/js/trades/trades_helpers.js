@@ -19,16 +19,20 @@ function getDeleteTradeRequest() {
     return requestModel;
 }
 
-function getTradesLoadRequest() {
+function getType() {
+    return parseInt($('#selectSampleSizeType').val());
+}
+
+function getTradesLoadTimeFrameRequest() {
     // Get values from the select elements
     const strategy = parseInt($('#selectStrategy').val());
-    const tradeType = parseInt($('#selectTradeType').val());
+    const sampleSizeType = parseInt($('#selectSampleSizeType').val());
     const timeFrame = parseInt($('#selectTimeFrame').val());
 
     // Construct the request object matching TradesLoadRequestModel
     const requestModel = {
         Strategy: strategy,
-        TradeType: tradeType,
+        SampleSizeType: sampleSizeType,
         TimeFrame: timeFrame,
     };
 
