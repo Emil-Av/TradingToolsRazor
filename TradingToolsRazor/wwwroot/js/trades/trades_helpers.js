@@ -10,6 +10,32 @@
  * - setTimeFrameMenu()
  */
 
+/**
+ * Formats a Date string for date input
+ * @param {string} dateString - The Date string from the server (DateOnly)
+ * @returns {string} - Formatted string in yyyy-MM-dd format
+ */
+function formatDateForInput(dateString) {
+    if (!dateString) {
+        return '';
+    }
+    
+    // Parse the date string
+    const date = new Date(dateString);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+        return '';
+    }
+    
+    // Format as yyyy-MM-dd for date input
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+}
+
 function getDeleteTradeRequest() {
     const requestModel = {
         Id: window.tradeData.tradeId,

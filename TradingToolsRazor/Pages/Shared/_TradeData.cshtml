@@ -30,6 +30,10 @@
                             <div class="col">
                                 <div class="d-flex flex-wrap">
                                     <div class="form-group col-12 col-md-6 col-lg">
+                                        <label class="d-block text-nowrap min-width-60" for="InputDate">Date</label>
+                                        <input class="text-center form-control" type="date" id="InputDate" data-trade-data="Date" value="@Model.CurrentTrade.Date.ToString("yyyy-MM-dd")" />
+                                    </div>
+                                    <div class="form-group col-12 col-md-6 col-lg">
                                         <label class="d-block text-nowrap min-width-60" for="InputSymbol">Symbol</label>
                                         <input class="text-center form-control" id="InputSymbol" data-trade-data="Symbol" value="@Model.CurrentTrade.Symbol" />
                                     </div>

@@ -13,6 +13,8 @@ namespace Models
         }
 
         public int Id { get; set; }
+
+        public DateOnly Date { get; set; }
         public string? Symbol { get; set; }
 
         public double? TriggerPrice { get; set; }

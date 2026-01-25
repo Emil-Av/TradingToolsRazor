@@ -53,7 +53,8 @@ namespace TradingToolsRazor.Services
         {
             _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == requestModel.Strategy &&
                                                                                      sampleSize.SampleSizeType == requestModel.SampleSizeType &&
-                                                                                     sampleSize.TimeFrame == requestModel.TimeFrame, includeProperties: "Review");
+                                                                                     sampleSize.TimeFrame == requestModel.TimeFrame, 
+                                                                                     includeProperties: "Review");
 
             if (!_allSampleSizes.Any())
             {

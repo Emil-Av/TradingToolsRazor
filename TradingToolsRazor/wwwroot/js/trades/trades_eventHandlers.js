@@ -107,7 +107,6 @@ function handleKeyboardNavigation(event) {
 function handleMenuSelectChange(selectId, selectedValue, selectedText) {
     switch (selectId) {
         case 'selectStrategy':
-            console.log('Strategy changed:', selectedText);
             loadStrategy(selectedValue)
             break;
         case 'selectSampleSizeType':

@@ -5,12 +5,14 @@
  */
 
 function loadSampleSizeType(type) {
-    const strategy = getStrategy(); 
-        window.location.href = `/trades?handler=LoadType&sampleSizeType=${type}&strategy=${strategy}`;
+    const strategy = getStrategy();
+
+    window.location.href = `/trades?handler=LoadType&sampleSizeType=${type}&strategy=${strategy}`;
 }
 
 function loadStrategy(strategy) {
     type = getType();
+
     window.location.href = `/trades?handler=LoadStrategy&strategy=${strategy}&sampleSizeType=${type}`;
 }
 

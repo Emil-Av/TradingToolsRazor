@@ -101,6 +101,7 @@ function loadTradeByIndex(tradeNumber) {
 // Load trade data into form fields from local object
 function loadTradeDataLocally(trade) {
     // Basic Info tab (all properties PascalCase from C# serialization)
+    $('#InputDate').val(formatDateForInput(trade.Date));
     $('#InputSymbol').val(trade.Symbol || '');
     $('#InputDirection').val(trade.Direction !== null && trade.Direction !== undefined ? trade.Direction : '');
     $('#InputAmount').val(trade.Amount || 0);
