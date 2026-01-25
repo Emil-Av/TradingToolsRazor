@@ -17,6 +17,17 @@ function loadSampleSize(sampleSizeId) {
     window.location.href = `/trades?handler=LoadSampleSizeNumber&sampleSizeId=${sampleSizeId}`;
 }
 
+function deleteTrade() {
+    const deleteTradeRequest = getDeleteTradeRequest();
+
+    sendPostRequest('/trades?handler=DeleteTrade', deleteTradeRequest)
+        .then(data => {
+            handleApiResponse(data);
+            // No need to update window.tradeData for review as it's sample-size level, not trade level
+        })
+        .catch(error => handleApiError('Error updating review', error));
+}
+
 function updateReview() {
     const review = getReviewData();
 

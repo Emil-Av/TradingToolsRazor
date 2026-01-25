@@ -10,6 +10,15 @@
  * - setTimeFrameMenu()
  */
 
+function getDeleteTradeRequest() {
+    const requestModel = {
+        Id: window.tradeData.tradeId,
+        Strategy: getStrategy()
+    };
+
+    return requestModel;
+}
+
 function getTradesLoadRequest() {
     // Get values from the select elements
     const strategy = parseInt($('#selectStrategy').val());

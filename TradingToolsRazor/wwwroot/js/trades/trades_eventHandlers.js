@@ -26,7 +26,19 @@ function handleUpdateClick() {
 }
 
 function handleDeleteClick() {
-
+    Swal.fire({
+        title: "Are you sure?",
+        text: "All data incl. screenshots will be gone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            deleteTrade();
+        }
+    });
 }
 
 function handleCancelClick() {
