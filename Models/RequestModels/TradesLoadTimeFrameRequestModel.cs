@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Models.RequestModels
 {
-    public class TradesLoadRequestModel
+    public class TradesLoadTimeFrameRequestModel
     {
         public Strategy Strategy { get; set; }
 

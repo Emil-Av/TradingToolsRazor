@@ -42,7 +42,7 @@ namespace TradingToolsRazor.Pages.Trades
 
         public async Task<IActionResult> OnGetLoadTimeFrameAsync([FromQuery] Strategy strategy, [FromQuery] TradeType tradeType, [FromQuery] TimeFrame timeFrame)
         {
-            var requestModel = new TradesLoadRequestModel
+            var requestModel = new TradesLoadTimeFrameRequestModel
             {
                 Strategy = strategy,
                 TradeType = tradeType,

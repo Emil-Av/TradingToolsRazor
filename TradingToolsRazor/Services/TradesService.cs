@@ -38,7 +38,7 @@ namespace TradingToolsRazor.Services
             return _tradesVM;
         }
 
-        public async Task<TradesVM> LoadTimeFrameAsync(TradesLoadRequestModel requestModel)
+        public async Task<TradesVM> LoadTimeFrameAsync(TradesLoadTimeFrameRequestModel requestModel)
         {
             _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == requestModel.Strategy &&
                                                                                      sampleSize.TradeType == requestModel.TradeType &&
@@ -96,18 +96,30 @@ namespace TradingToolsRazor.Services
 
         public async Task UpdateResearchData([FromBody] UpdateResearchDataModel updateResearchData)
         {
-            if (updateResearchData.Strategy == Strategy.SRS)
+            switch (updateResearchData.Strategy)
             {
-                SRS srs = JsonConvert.DeserializeObject<SRS>(updateResearchData.Data!)!;
-                await _unitOfWork.SRS.UpdateAsync(srs);
-                await _unitOfWork.SaveAsync();
+                case Strategy.SRS:
+                    await UpdateSRSResearchData(updateResearchData);
+                    break;
+
+                case Strategy.BrunchBreak:
+                    await UpdateBrunchBreakResearchData(updateResearchData);
+                    break;
             }
-            else if (updateResearchData.Strategy == Strategy.BrunchBreak)
-            {
-                BrunchBreak brunchBreak = JsonConvert.DeserializeObject<BrunchBreak>(updateResearchData.Data!)!;
-                await _unitOfWork.BrunchBreak.UpdateAsync(brunchBreak);
-                await _unitOfWork.SaveAsync();
-            }
+        }
+
+        private async Task UpdateBrunchBreakResearchData(UpdateResearchDataModel updateResearchData)
+        {
+            BrunchBreak brunchBreak = JsonConvert.DeserializeObject<BrunchBreak>(updateResearchData.Data!)!;
+            await _unitOfWork.BrunchBreak.UpdateAsync(brunchBreak);
+            await _unitOfWork.SaveAsync();
+        }
+
+        private async Task UpdateSRSResearchData(UpdateResearchDataModel updateResearchData)
+        {
+            SRS srs = JsonConvert.DeserializeObject<SRS>(updateResearchData.Data!)!;
+            await _unitOfWork.SRS.UpdateAsync(srs);
+            await _unitOfWork.SaveAsync();
         }
 
         public async Task UpdateReviewAsync(Review review)

@@ -15,7 +15,7 @@ namespace TradingToolsRazor.Services.Interfaces
         Task UpdateResearchData(UpdateResearchDataModel updateResearchData);
         Task DeleteTrade(DeleteTradeRequestModel deleteTradeRequest);
         Task<TradesVM> LoadSampleSizeNumberAsync(int sampleSizeId);
-        Task<TradesVM> LoadTimeFrameAsync(TradesLoadRequestModel requestModel);
+        Task<TradesVM> LoadTimeFrameAsync(TradesLoadTimeFrameRequestModel requestModel);
         Task<TradesVM> LoadStrategyAsync(Strategy strategy);
     }
 }
