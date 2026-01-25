@@ -7,8 +7,8 @@ namespace Statistics.Models
 {
     public class StatisticsPageViewModel
     {
-        public List<ETimeFrame> AvailableTimeFrames { get; set; } = [];
-        public List<EStrategy> AvailableStrategies { get; set; } = [];
+        public List<TimeFrame> AvailableTimeFrames { get; set; } = [];
+        public List<Strategy> AvailableStrategies { get; set; } = [];
 
         public SampleSize? CurrentSampleSize { get; set; }
         public int NumberSampleSizes { get; set; }

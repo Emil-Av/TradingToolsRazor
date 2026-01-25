@@ -32,7 +32,7 @@
                                         Time Frame: <span id="spanTimeFrame">@MyEnumConverter.TimeFrameFromEnum(Model.ResearchVM.CurrentSampleSize.TimeFrame)</span>
                                     </button>
                                     <div class="dropdown-menu animated--fade-in" id="dropdownBtnTimeFrame" aria-labelledby="dropdownMenuButton">
-                                        @foreach (ETimeFrame tf in Model.ResearchVM.AvailableTimeframes)
+                                        @foreach (TimeFrame tf in Model.ResearchVM.AvailableTimeframes)
                                         {
                                             <a class="dropdown-item" role="button">@MyEnumConverter.TimeFrameFromEnum(tf)</a>
                                         }
@@ -46,7 +46,7 @@
                                         Strategy: <span id="spanStrategy">@MyEnumConverter.StrategyFromEnum(Model.ResearchVM.CurrentSampleSize.Strategy)</span>
                                     </button>
                                     <div class="dropdown-menu animated--fade-in" id="dropdownBtnStrategy" aria-labelledby="dropdownMenuButton">
-                                        @foreach (EStrategy strategy in Model.ResearchVM.AvailableStrategies)
+                                        @foreach (Strategy strategy in Model.ResearchVM.AvailableStrategies)
                                         {
                                             <a class="dropdown-item" role="button">@MyEnumConverter.StrategyFromEnum(strategy)</a>
                                         }
@@ -124,15 +124,15 @@
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <div id="researchDataContainer">
-                                @if (Model.ResearchVM.CurrentSampleSize.Strategy == EStrategy.Cradle)
+                                @if (Model.ResearchVM.CurrentSampleSize.Strategy == Strategy.Cradle)
                                 {
                                     @await Html.PartialAsync("_ResearchCradleData", Model.ResearchVM)
                                 }
-                                else if (Model.ResearchVM.CurrentSampleSize.Strategy == EStrategy.FirstBarPullback)
+                                else if (Model.ResearchVM.CurrentSampleSize.Strategy == Strategy.FirstBarPullback)
                                 {
                                     @await Html.PartialAsync("_ResearchFirstBarPullbackData", Model.ResearchVM)
                                 }
-                                else if (Model.ResearchVM.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
+                                else if (Model.ResearchVM.CurrentSampleSize.Strategy == Strategy.CandleBracketing)
                                 {
                                     @await Html.PartialAsync("_ResearchCandleBracketingData", Model.ResearchVM)
                                 }

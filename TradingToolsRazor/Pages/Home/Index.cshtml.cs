@@ -67,8 +67,8 @@ namespace TradingTools.Pages.Home
             {
                 _unitOfWork.UserSettings.Add(new UserSettings
                 {
-                    PTTimeFrame = ETimeFrame.M10,
-                    PTStrategy = EStrategy.FirstBarPullback
+                    PTTimeFrame = TimeFrame.M10,
+                    PTStrategy = Strategy.FirstBarPullback
                 });
 
                 await _unitOfWork.SaveAsync();

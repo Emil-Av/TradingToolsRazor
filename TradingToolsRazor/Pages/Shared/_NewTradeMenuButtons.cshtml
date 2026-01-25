@@ -6,7 +6,7 @@
 <div class="col-auto p-2">
     <select class="select-dropdown-styled" id="selectTimeFrame" data-menu-type="timeFrame">
         <option value="" selected disabled>Time Frame: </option>
-        @foreach (ETimeFrame timeFrame in Enum.GetValues(typeof(ETimeFrame)))
+        @foreach (TimeFrame timeFrame in Enum.GetValues(typeof(TimeFrame)))
         {
             <option value="@((int)timeFrame)">Time Frame: @MyEnumConverter.TimeFrameFromEnum(timeFrame)</option>
         }
@@ -17,7 +17,7 @@
 <div class="col-auto p-2">
     <select class="select-dropdown-styled" id="selectStrategy" data-menu-type="strategy">
         <option value="" selected disabled>Strategy: </option>
-        @foreach (EStrategy strategy in Enum.GetValues(typeof(EStrategy)))
+        @foreach (Strategy strategy in Enum.GetValues(typeof(Strategy)))
         {
             <option value="@((int)strategy)">Strategy: @MyEnumConverter.StrategyFromEnum(strategy)</option>
         }
@@ -28,7 +28,7 @@
 <div class="col-auto p-2">
     <select class="select-dropdown-styled" id="selectTradeType" data-menu-type="tradeType">
         <option value="" selected disabled>Type: </option>
-        @foreach (ETradeType tradeType in Enum.GetValues(typeof(ETradeType)))
+        @foreach (TradeType tradeType in Enum.GetValues(typeof(TradeType)))
         {
             <option value="@((int)tradeType)">Type: @MyEnumConverter.TradeTypeFromEnum(tradeType)</option>
         }

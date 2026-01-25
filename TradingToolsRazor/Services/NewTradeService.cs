@@ -28,7 +28,7 @@ namespace TradingToolsRazor.Services
             _viewModel = viewModel;
             _files = files;
 
-            if (_viewModel.SampleSizeViewData.TradeType == ETradeType.Research)
+            if (_viewModel.SampleSizeViewData.TradeType == TradeType.Research)
             {
                 await SaveResearchTradeAsync();
             }
@@ -42,13 +42,13 @@ namespace TradingToolsRazor.Services
         {
             switch (_viewModel.Strategy)
             {
-                case EStrategy.FirstBarPullback:
+                case Strategy.FirstBarPullback:
                     await SaveResearchDataFirstbarPullback(maxTradesProSampleSize: 100);
                     break;
-                case EStrategy.Cradle:
+                case Strategy.Cradle:
                     await SaveResearchCradleData(maxTradesProSampleSize: 100);
                     break;
-                case EStrategy.CandleBracketing:
+                case Strategy.CandleBracketing:
                     await SaveCandleBracketingData(maxTradesProSampleSize: 200);
                     break;
             }
@@ -58,10 +58,10 @@ namespace TradingToolsRazor.Services
         {
             switch (_viewModel.SampleSizeViewData.Strategy)
             {
-                case EStrategy.SRS:
+                case Strategy.SRS:
                     await SaveSRSTrade();
                     break;
-                case EStrategy.BrunchBreak:
+                case Strategy.BrunchBreak:
                     await SaveBrunchBreak();
                     break;
                 default:
@@ -212,25 +212,25 @@ namespace TradingToolsRazor.Services
 
             int numberTradesInSampleSize = _viewModel.SampleSizeViewData.TradeType switch
             {
-                ETradeType.Research when _viewModel.Strategy == EStrategy.FirstBarPullback =>
+                TradeType.Research when _viewModel.Strategy == Strategy.FirstBarPullback =>
                     (await _unitOfWork.ResearchFirstBarPullback.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
-                ETradeType.Research when _viewModel.Strategy == EStrategy.Cradle =>
+                TradeType.Research when _viewModel.Strategy == Strategy.Cradle =>
                     (await _unitOfWork.ResearchCradle.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
-                ETradeType.Research when _viewModel.Strategy == EStrategy.CandleBracketing =>
+                TradeType.Research when _viewModel.Strategy == Strategy.CandleBracketing =>
                     (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(x => x.SampleSizeId == sampleSize.Id))
                         .Select(trade => trade.Date)
                         .Distinct()
                         .Count(),
 
-                ETradeType.Trade =>
+                TradeType.Trade =>
                     (await _unitOfWork.BaseTrade.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
                 _ => 0
             };
 
-            if (sampleSize.Strategy == EStrategy.CandleBracketing && numberTradesInSampleSize == 100 && !isFlippedTheSwitch)
+            if (sampleSize.Strategy == Strategy.CandleBracketing && numberTradesInSampleSize == 100 && !isFlippedTheSwitch)
             {
                 isFull = true;
             }

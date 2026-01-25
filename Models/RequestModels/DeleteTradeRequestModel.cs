@@ -11,6 +11,6 @@ namespace Models.RequestModels
     {
         public int Id { get; set; }
 
-        public EStrategy Strategy { get; set; }
+        public Strategy Strategy { get; set; }
     }
 }

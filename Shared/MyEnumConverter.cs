@@ -72,109 +72,109 @@ namespace Shared
             }
         }
 
-        public static Result<ETradeType> TradeTypeFromString(string tradeType)
+        public static Result<TradeType> TradeTypeFromString(string tradeType)
         {
-            Dictionary<string, ETradeType> tradeTypes = new()
+            Dictionary<string, TradeType> tradeTypes = new()
             {
-                { "Trade", ETradeType.Trade },
-                { "Research", ETradeType.Research },
+                { "Trade", TradeType.Trade },
+                { "Research", TradeType.Research },
             };
 
             try
             {
-                return Result<ETradeType>.SuccessResult(tradeTypes[tradeType]);
+                return Result<TradeType>.SuccessResult(tradeTypes[tradeType]);
             }
             catch
             {
-                return Result<ETradeType>.ErrorResult($"Error converting the trade type from a string. Value given: {tradeType}");
+                return Result<TradeType>.ErrorResult($"Error converting the trade type from a string. Value given: {tradeType}");
             }
         }
 
-        public static string TradeTypeFromEnum(ETradeType tradeType)
+        public static string TradeTypeFromEnum(TradeType tradeType)
         {
-            Dictionary<ETradeType, string> tradeTypes = new()
+            Dictionary<TradeType, string> tradeTypes = new()
             {
-                { ETradeType.Trade , "Trade"},
-                { ETradeType.Research, "Research" },
+                { TradeType.Trade , "Trade"},
+                { TradeType.Research, "Research" },
             };
 
             return tradeTypes[tradeType];
         }
 
-        public static Result<ETimeFrame> TimeFrameFromString(string timeFrame)
+        public static Result<TimeFrame> TimeFrameFromString(string timeFrame)
         {
 
-            Dictionary<string, ETimeFrame> timeFrames = new()
+            Dictionary<string, TimeFrame> timeFrames = new()
             {
-                { "5M", ETimeFrame.M5 },
-                { "10M", ETimeFrame.M10 },
-                { "15M", ETimeFrame.M15 },
-                { "30M", ETimeFrame.M30 },
-                { "1H", ETimeFrame.H1 },
-                { "2H", ETimeFrame.H2 },
-                { "4H", ETimeFrame.H4 },
-                { "D", ETimeFrame.D }
+                { "5M", TimeFrame.M5 },
+                { "10M", TimeFrame.M10 },
+                { "15M", TimeFrame.M15 },
+                { "30M", TimeFrame.M30 },
+                { "1H", TimeFrame.H1 },
+                { "2H", TimeFrame.H2 },
+                { "4H", TimeFrame.H4 },
+                { "D", TimeFrame.D }
 
             };
 
             try
             {
-                return Result<ETimeFrame>.SuccessResult(timeFrames[timeFrame]);
+                return Result<TimeFrame>.SuccessResult(timeFrames[timeFrame]);
             }
             catch
             {
-                return Result<ETimeFrame>.ErrorResult($"Error converting the time frame from as string. Value given: {timeFrame}");
+                return Result<TimeFrame>.ErrorResult($"Error converting the time frame from as string. Value given: {timeFrame}");
             }
         }
 
-        public static string TimeFrameFromEnum(ETimeFrame timeFrame)
+        public static string TimeFrameFromEnum(TimeFrame timeFrame)
         {
-            Dictionary<ETimeFrame, string> timeFrames = new()
+            Dictionary<TimeFrame, string> timeFrames = new()
             {
-                { ETimeFrame.M5, "5M" },
-                { ETimeFrame.M10 , "10M" },
-                { ETimeFrame.M15 , "15M" },
-                { ETimeFrame.M30 , "30M" },
-                { ETimeFrame.H1 , "1H" },
-                { ETimeFrame.H2 , "2H" },
-                { ETimeFrame.H4 , "4H" },
-                { ETimeFrame.D , "D" }
+                { TimeFrame.M5, "5M" },
+                { TimeFrame.M10 , "10M" },
+                { TimeFrame.M15 , "15M" },
+                { TimeFrame.M30 , "30M" },
+                { TimeFrame.H1 , "1H" },
+                { TimeFrame.H2 , "2H" },
+                { TimeFrame.H4 , "4H" },
+                { TimeFrame.D , "D" }
 
             };
 
             return timeFrames[timeFrame];
         }
 
-        public static Result<EStrategy> StrategyFromString(string strategy)
+        public static Result<Strategy> StrategyFromString(string strategy)
         {
-            Dictionary<string, EStrategy> strategies = new()
+            Dictionary<string, Strategy> strategies = new()
             {
-                { "Cradle", EStrategy.Cradle },
-                { "First Bar Pullback", EStrategy.FirstBarPullback },
-                { "Candle Bracketing", EStrategy.CandleBracketing },
-                { "SRS", EStrategy.SRS },
-                { "BrunchBreak", EStrategy.BrunchBreak }
+                { "Cradle", Strategy.Cradle },
+                { "First Bar Pullback", Strategy.FirstBarPullback },
+                { "Candle Bracketing", Strategy.CandleBracketing },
+                { "SRS", Strategy.SRS },
+                { "BrunchBreak", Strategy.BrunchBreak }
             };
 
             try
             {
-                return Result<EStrategy>.SuccessResult(strategies[strategy]);
+                return Result<Strategy>.SuccessResult(strategies[strategy]);
             }
             catch
             {
-                return Result<EStrategy>.ErrorResult($"Error converting the strategy from a string. Value given: {strategy}");
+                return Result<Strategy>.ErrorResult($"Error converting the strategy from a string. Value given: {strategy}");
             }
         }
 
-        public static string StrategyFromEnum(EStrategy strategy)
+        public static string StrategyFromEnum(Strategy strategy)
         {
-            Dictionary<EStrategy, string> strategies = new()
+            Dictionary<Strategy, string> strategies = new()
             {
-                { EStrategy.Cradle, "Cradle" },
-                { EStrategy.FirstBarPullback, "First Bar Pullback" },
-                { EStrategy.CandleBracketing, "Candle Bracketing" },
-                { EStrategy.SRS, "SRS" },
-                { EStrategy.BrunchBreak, "BrunchBreak" }
+                { Strategy.Cradle, "Cradle" },
+                { Strategy.FirstBarPullback, "First Bar Pullback" },
+                { Strategy.CandleBracketing, "Candle Bracketing" },
+                { Strategy.SRS, "SRS" },
+                { Strategy.BrunchBreak, "BrunchBreak" }
             };
 
             return strategies[strategy];

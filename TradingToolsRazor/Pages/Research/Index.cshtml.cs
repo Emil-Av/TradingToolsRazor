@@ -42,7 +42,7 @@ namespace TradingToolsRazor.Pages.Research
         // Handler for GET /Research/Index
         public async Task<IActionResult> OnGetAsync()
         {
-            var sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == ETradeType.Research);
+            var sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == TradeType.Research);
 
             if (!sampleSizes.Any())
                 return Page();
@@ -58,19 +58,19 @@ namespace TradingToolsRazor.Pages.Research
         }
 
         // DELETE handler (can be called via fetch to ?handler=Delete)
-        public async Task<IActionResult> OnDeleteAsync(int id, EStrategy strategy)
+        public async Task<IActionResult> OnDeleteAsync(int id, Strategy strategy)
         {
             try
             {
-                if (strategy == EStrategy.FirstBarPullback)
+                if (strategy == Strategy.FirstBarPullback)
                 {
                     return new JsonResult(new { error = "Delete method not implemented for this strategy." });
                 }
-                else if (strategy == EStrategy.Cradle)
+                else if (strategy == Strategy.Cradle)
                 {
                     return await DeleteCradle(id);
                 }
-                else if (strategy == EStrategy.CandleBracketing)
+                else if (strategy == Strategy.CandleBracketing)
                 {
                     return await DeleteCandleBracketing(id);
                 }
@@ -92,7 +92,7 @@ namespace TradingToolsRazor.Pages.Research
                 return new JsonResult(new { error = errorMsg });
             }
 
-            List<SampleSize> sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == ResearchVM.CurrentStrategy);
+            List<SampleSize> sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == TradeType.Research && x.Strategy == ResearchVM.CurrentStrategy);
 
             if (!sampleSizes.Any())
             {
@@ -226,7 +226,7 @@ namespace TradingToolsRazor.Pages.Research
 
             await _deleteTradeHelper.UpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls!.First(), [.. tradesInSampleSize.Cast<BaseTrade>()], _webHostEnvironment.WebRootPath);
 
-            var samplesizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.CandleBracketing);
+            var samplesizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == TradeType.Research && x.Strategy == Strategy.CandleBracketing);
 
             if (!TrySetLastSampleSizeId(tradesInSampleSize, samplesizes, trade, out int lastSampleSizeId))
                 return new JsonResult(new { redirectUrl = Url.Page("/Research/Index") });
@@ -256,7 +256,7 @@ namespace TradingToolsRazor.Pages.Research
 
             var tradesInSampleSize = await CheckAndDeleteSampleSize(trade);
             var sampleSizes = await _unitOfWork.SampleSize
-                .GetAllAsync(x => x.TradeType == ETradeType.Research && x.Strategy == EStrategy.Cradle);
+                .GetAllAsync(x => x.TradeType == TradeType.Research && x.Strategy == Strategy.Cradle);
 
             await _deleteTradeHelper.UpdateScreenshotPathsAfterDeletion(trade.ScreenshotsUrls.First(), tradesInSampleSize.Cast<BaseTrade>().ToList(), _webHostEnvironment.WebRootPath);
 
@@ -311,7 +311,7 @@ namespace TradingToolsRazor.Pages.Research
                 }
 
                 // Check if there are more sample sizes for the paramaters. If yes get the last
-                sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.Strategy == sampleSize!.Strategy && x.TimeFrame == sampleSize.TimeFrame && x.TradeType == ETradeType.Research);
+                sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.Strategy == sampleSize!.Strategy && x.TimeFrame == sampleSize.TimeFrame && x.TradeType == TradeType.Research);
 
                 int lastSampleSizeId = 0;
                 // No more sample sizes for these parameters. The trade that was deleted was the last for these paramaters
@@ -333,7 +333,7 @@ namespace TradingToolsRazor.Pages.Research
                 // Check if there are any other sample sizes (any TF, any Strategy)
                 else
                 {
-                    sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == ETradeType.Research);
+                    sampleSizes = await _unitOfWork.SampleSize.GetAllAsync(x => x.TradeType == TradeType.Research);
 
                     if (sampleSizes.Any())
                     {
@@ -391,7 +391,7 @@ namespace TradingToolsRazor.Pages.Research
 
             async Task SetTrades()
             {
-                if (sampleSize.Strategy == EStrategy.Cradle)
+                if (sampleSize.Strategy == Strategy.Cradle)
                 {
                     ResearchVM.AllTrades = (await _unitOfWork.ResearchCradle
                                                                             .GetAllAsync(x => x.SampleSizeId == lastSampleSizeId))
@@ -399,7 +399,7 @@ namespace TradingToolsRazor.Pages.Research
                                                                             .ToList();
                     ResearchVM.ResearchCradle = (ResearchVM.AllTrades.FirstOrDefault() as ResearchCradle)!;
                 }
-                else if (sampleSize.Strategy == EStrategy.CandleBracketing)
+                else if (sampleSize.Strategy == Strategy.CandleBracketing)
                 {
                     ResearchVM.AllTrades = (await _unitOfWork.ResearchCandleBracketing
                                                                                     .GetAllAsync(x => x.SampleSizeId == lastSampleSizeId))
@@ -408,7 +408,7 @@ namespace TradingToolsRazor.Pages.Research
                                                                                     .ToList();
                     ResearchVM.CandleBracketing = (ResearchVM.AllTrades.FirstOrDefault() as ResearchCandleBracketing)!;
                 }
-                else if (sampleSize.Strategy == EStrategy.FirstBarPullback)
+                else if (sampleSize.Strategy == Strategy.FirstBarPullback)
                 {
                     ResearchVM.AllTrades = (await _unitOfWork.ResearchFirstBarPullback
                                             .GetAllAsync(x => x.SampleSizeId == lastSampleSizeId))
@@ -439,11 +439,11 @@ namespace TradingToolsRazor.Pages.Research
                 if (ResearchVM.AllTrades.Any())
                 {
 
-                    if (ResearchVM.CurrentSampleSize.Strategy == EStrategy.Cradle)
+                    if (ResearchVM.CurrentSampleSize.Strategy == Strategy.Cradle)
                     {
                         ResearchVM.TradeData.ScreenshotsUrls = (ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!;
                     }
-                    else if (ResearchVM.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
+                    else if (ResearchVM.CurrentSampleSize.Strategy == Strategy.CandleBracketing)
                     {
                         ResearchVM.TradeData.ScreenshotsUrls = (ResearchVM.AllTrades.FirstOrDefault()! as BaseTrade)!.ScreenshotsUrls!;
                     }
@@ -562,7 +562,7 @@ namespace TradingToolsRazor.Pages.Research
 
         private void SetAvailableTimeframes(List<SampleSize> sampleSizes)
         {
-            var currentStrategy = ResearchVM.CurrentSampleSize?.Strategy ?? EStrategy.FirstBarPullback;
+            var currentStrategy = ResearchVM.CurrentSampleSize?.Strategy ?? Strategy.FirstBarPullback;
             var filtered = sampleSizes.Where(x => x.Strategy == currentStrategy).ToList();
 
             foreach (var strategy in filtered)

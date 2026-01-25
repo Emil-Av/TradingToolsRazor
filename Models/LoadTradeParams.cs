@@ -14,9 +14,9 @@ namespace Models
         public void ConvertParamsFromView()
         {
             Result<EStatus> resultStatus = MyEnumConverter.StatusFromString(StatusFromView);
-            Result<ETimeFrame> resultTimeFrame = MyEnumConverter.TimeFrameFromString(TimeFrameFromView);
-            Result<EStrategy> resultStrategy = MyEnumConverter.StrategyFromString(StrategyFromView);
-            Result<ETradeType> resultTradeType = MyEnumConverter.TradeTypeFromString(TradeTypeFromView);
+            Result<TimeFrame> resultTimeFrame = MyEnumConverter.TimeFrameFromString(TimeFrameFromView);
+            Result<Strategy> resultStrategy = MyEnumConverter.StrategyFromString(StrategyFromView);
+            Result<TradeType> resultTradeType = MyEnumConverter.TradeTypeFromString(TradeTypeFromView);
 
             if (resultStatus.Success)
             {
@@ -77,11 +77,11 @@ namespace Models
 
         public EStatus Status { get; set; }
 
-        public ETimeFrame TimeFrame { get; set; }
+        public TimeFrame TimeFrame { get; set; }
 
-        public EStrategy Strategy { get; set; }
+        public Strategy Strategy { get; set; }
 
-        public ETradeType TradeType { get; set; }
+        public TradeType TradeType { get; set; }
 
         #endregion
     }

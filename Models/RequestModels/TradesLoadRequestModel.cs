@@ -9,11 +9,11 @@ namespace Models.RequestModels
 {
     public class TradesLoadRequestModel
     {
-        public EStrategy Strategy { get; set; }
+        public Strategy Strategy { get; set; }
 
-        public ETradeType TradeType { get; set; }
+        public TradeType TradeType { get; set; }
 
-        public ETimeFrame TimeFrame { get; set; }
+        public TimeFrame TimeFrame { get; set; }
 
     }
 }

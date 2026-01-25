@@ -7,11 +7,11 @@ namespace Models
     {
         public int Id { get; set; }
 
-        public EStrategy Strategy { get; set; }
+        public Strategy Strategy { get; set; }
 
-        public ETimeFrame TimeFrame { get; set; }
+        public TimeFrame TimeFrame { get; set; }
 
-        public ETradeType TradeType { get; set; }
+        public TradeType TradeType { get; set; }
 
         /// <summary>
         ///  ReviewId is null for research trades.

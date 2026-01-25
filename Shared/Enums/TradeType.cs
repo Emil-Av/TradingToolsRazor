@@ -1,6 +1,6 @@
 ﻿namespace SharedEnums.Enums
 {
-    public enum ETradeType 
+    public enum TradeType 
     { 
         Trade = 1, 
         Research = 2 

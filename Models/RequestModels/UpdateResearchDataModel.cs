@@ -10,6 +10,6 @@ namespace Models.RequestModels
     public class UpdateResearchDataModel
     {
         public string Data { get; set; } 
-        public EStrategy Strategy { get; set; }
+        public Strategy Strategy { get; set; }
     }
 }

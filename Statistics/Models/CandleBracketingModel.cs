@@ -50,6 +50,6 @@ namespace Statistics.Models
 
         public bool FlippedTheSwitch { get; set; }  
 
-        public ETimeFrame TimeFrame { get; set; }
+        public TimeFrame TimeFrame { get; set; }
     }
 }

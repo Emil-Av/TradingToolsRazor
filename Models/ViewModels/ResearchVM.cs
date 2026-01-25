@@ -21,9 +21,9 @@ namespace Models.ViewModels
 
         #region Public Properties
 
-        public ETimeFrame CurrentTimeFrame { get; set; }
+        public TimeFrame CurrentTimeFrame { get; set; }
 
-        public EStrategy CurrentStrategy { get; set; }
+        public Strategy CurrentStrategy { get; set; }
 
         public EStatus Status { get; set; }
 
@@ -44,9 +44,9 @@ namespace Models.ViewModels
 
         public List<SelectListItem> OrderType { get; set; }
 
-        public List<EStrategy> AvailableStrategies { get; set; }
+        public List<Strategy> AvailableStrategies { get; set; }
 
-        public List<ETimeFrame> AvailableTimeframes { get; set; }
+        public List<TimeFrame> AvailableTimeframes { get; set; }
 
         // The number of sample sizes for a strategy and time frame
         public int NumberSampleSizes { get; set; }
@@ -75,8 +75,8 @@ namespace Models.ViewModels
         {
             List<string> errors = new List<string>();
             string error = string.Empty;
-            Result<ETimeFrame> timeFrameResult = MyEnumConverter.TimeFrameFromString(viewData.TimeFrame);
-            Result<EStrategy> strategyResult = MyEnumConverter.StrategyFromString(viewData.Strategy);
+            Result<TimeFrame> timeFrameResult = MyEnumConverter.TimeFrameFromString(viewData.TimeFrame);
+            Result<Strategy> strategyResult = MyEnumConverter.StrategyFromString(viewData.Strategy);
             if (!timeFrameResult.Success)
             {
                 errors.Add(timeFrameResult.ErrorMessage);

@@ -50,9 +50,9 @@ namespace Models.ViewModels
         public List<object> AllTradesInSampleSize { get; set; }
 
         // The current number of trades for the latest sample size
-        public List<EStrategy> AvailableStrategies { get; set; }
+        public List<Strategy> AvailableStrategies { get; set; }
 
-        public List<ETimeFrame> AvailableTimeframes { get; set; }
+        public List<TimeFrame> AvailableTimeframes { get; set; }
 
         public List<SelectListItem> TradeRatingOptions { get; set; }
 

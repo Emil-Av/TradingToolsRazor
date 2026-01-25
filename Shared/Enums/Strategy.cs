@@ -1,6 +1,6 @@
 ﻿namespace SharedEnums.Enums
 {
-    public enum EStrategy {
+    public enum Strategy {
         FirstBarPullback = 0,
         Cradle = 1,
         CandleBracketing = 2,

@@ -26,7 +26,7 @@ namespace Statistics.Services
 
         private async Task PopulateStatisticsAsync(StatisticsPageViewModel viewModel)
         {
-            if (viewModel.CurrentSampleSize!.Strategy == EStrategy.CandleBracketing)
+            if (viewModel.CurrentSampleSize!.Strategy == Strategy.CandleBracketing)
             {
                 await PopulateCandleBracketingDetailsAsync(viewModel);
             }
@@ -47,10 +47,10 @@ namespace Statistics.Services
 
         private Task<List<SampleSize>> GetAllResearchSampleSizesAsync()
         {
-            return _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == ETradeType.Research);
+            return _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == TradeType.Research);
         }
 
-        private static List<EStrategy> BuildAvailableStrategies(List<SampleSize> allSampleSizes)
+        private static List<Strategy> BuildAvailableStrategies(List<SampleSize> allSampleSizes)
         {
             return [.. allSampleSizes
                 .Where(sampleSize => sampleSize.Strategy == allSampleSizes.Last().Strategy)
@@ -59,7 +59,7 @@ namespace Statistics.Services
                 .OrderBy(strategy => strategy)];
         }
 
-        private static List<ETimeFrame> BuildAvailableTimeFrames(List<SampleSize> allSampleSizes)
+        private static List<TimeFrame> BuildAvailableTimeFrames(List<SampleSize> allSampleSizes)
         {
             return [.. allSampleSizes
                 .Where(sampleSize => sampleSize.Strategy == allSampleSizes.Last().Strategy)
@@ -75,7 +75,7 @@ namespace Statistics.Services
                 return await ResolveSampleSizeForInitialLoadingAsync(allSampleSizes);
             }
 
-            if (query.Strategy == EStrategy.CandleBracketing)
+            if (query.Strategy == Strategy.CandleBracketing)
             {
                 return await ResolveSampleSizeForCandleBracketingAsync(allSampleSizes, query);
             }
@@ -152,7 +152,7 @@ namespace Statistics.Services
         {
             var currentSampleSize = allSampleSizes.Last();
             int numberOfSampleSizes = 0;
-            if (currentSampleSize.Strategy == EStrategy.CandleBracketing)
+            if (currentSampleSize.Strategy == Strategy.CandleBracketing)
             {
                 var time = (await _unitOfWork.ResearchCandleBracketing.GetAsync(trade => trade.SampleSizeId == currentSampleSize.Id)).Time;
                 numberOfSampleSizes = (await _unitOfWork.ResearchCandleBracketing

@@ -34,13 +34,13 @@ namespace TradingToolsRazor.Pages.Trades
             return Page();
         }
 
-        public async Task<IActionResult> OnGetLoadStrategy([FromQuery] EStrategy strategy)
+        public async Task<IActionResult> OnGetLoadStrategy([FromQuery] Strategy strategy)
         {
             TradesVM = await _tradesService.LoadStrategyAsync(strategy);
             return Page();
         }
 
-        public async Task<IActionResult> OnGetLoadTimeFrameAsync([FromQuery] EStrategy strategy, [FromQuery] ETradeType tradeType, [FromQuery] ETimeFrame timeFrame)
+        public async Task<IActionResult> OnGetLoadTimeFrameAsync([FromQuery] Strategy strategy, [FromQuery] TradeType tradeType, [FromQuery] TimeFrame timeFrame)
         {
             var requestModel = new TradesLoadRequestModel
             {

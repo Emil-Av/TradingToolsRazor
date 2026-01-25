@@ -37,17 +37,17 @@ namespace Models.ViewModels
         /// <summary>
         /// Obsolete. Should use SampleSizeViewData instead.
         /// </summary>
-        public ETimeFrame TimeFrame { get; set; }
+        public TimeFrame TimeFrame { get; set; }
 
         /// <summary>
         /// Obsolete. Should use SampleSizeViewData instead.
         /// </summary>
-        public EStrategy Strategy { get; set; }
+        public Strategy Strategy { get; set; }
 
         /// <summary>
         /// Obsolete. Should use SampleSizeViewData instead.
         /// </summary>
-        public ETradeType TradeType { get; set; }
+        public TradeType TradeType { get; set; }
 
         public object ResearchData { get; set; }
 
@@ -82,10 +82,10 @@ namespace Models.ViewModels
                 
                 switch (SampleSizeViewData.Strategy)
                 {
-                    case EStrategy.SRS:
+                    case Strategy.SRS:
                         SRSTrade = JsonConvert.DeserializeObject<SRS>(viewData)!;
                         break;
-                    case EStrategy.BrunchBreak:
+                    case Strategy.BrunchBreak:
                         BrunchBreakTrade = JsonConvert.DeserializeObject<BrunchBreak>(viewData)!;
                         break;
                 }
@@ -125,10 +125,10 @@ namespace Models.ViewModels
         {
             ResearchData = Strategy switch
             {
-                EStrategy.FirstBarPullback => JsonConvert.DeserializeObject<ResearchFirstBarPullbackDisplay>(researchData)!,
-                EStrategy.Cradle => JsonConvert.DeserializeObject<ResearchCradle>(researchData)!,
-                EStrategy.CandleBracketing => JsonConvert.DeserializeObject<ResearchCandleBracketing>(researchData)!,
-                EStrategy.SRS => JsonConvert.DeserializeObject<SRS>(researchData)!,
+                Strategy.FirstBarPullback => JsonConvert.DeserializeObject<ResearchFirstBarPullbackDisplay>(researchData)!,
+                Strategy.Cradle => JsonConvert.DeserializeObject<ResearchCradle>(researchData)!,
+                Strategy.CandleBracketing => JsonConvert.DeserializeObject<ResearchCandleBracketing>(researchData)!,
+                Strategy.SRS => JsonConvert.DeserializeObject<SRS>(researchData)!,
                 _ => throw new ArgumentException($"Unknown strategy: {Strategy}")
             };
         }

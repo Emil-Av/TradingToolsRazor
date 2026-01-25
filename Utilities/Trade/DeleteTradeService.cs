@@ -18,7 +18,7 @@ namespace Utilities.Trade
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-        public async Task DeleteTrade(EStrategy strategy, int id, string webRootPath)
+        public async Task DeleteTrade(Strategy strategy, int id, string webRootPath)
         {
             BaseTrade removedTrade = await DeleteTrade(strategy, id);
 
@@ -48,12 +48,12 @@ namespace Utilities.Trade
             await _unitOfWork.SaveAsync();
         }
 
-        private async Task<BaseTrade> DeleteTrade(EStrategy strategy, int id)
+        private async Task<BaseTrade> DeleteTrade(Strategy strategy, int id)
         {
             return strategy switch
             {
-                EStrategy.SRS => await RemoveSRSTrade(id),
-                EStrategy.BrunchBreak => await RemoveBrunchBreakTrade(id),
+                Strategy.SRS => await RemoveSRSTrade(id),
+                Strategy.BrunchBreak => await RemoveBrunchBreakTrade(id),
                 _ => new()
             };
         }

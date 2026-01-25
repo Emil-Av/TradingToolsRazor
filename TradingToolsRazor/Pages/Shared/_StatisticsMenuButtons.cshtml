@@ -1,9 +1,9 @@
 ﻿@using global::Shared
 
 @{
-    ETimeFrame currentTimeFrame = Model.ViewModel.CurrentSampleSize.TimeFrame;
-    EStrategy currentStrategy = Model.ViewModel.CurrentSampleSize.Strategy;
-    ETradeType currentTradeType = Model.ViewModel.CurrentSampleSize.TradeType;
+    TimeFrame currentTimeFrame = Model.ViewModel.CurrentSampleSize.TimeFrame;
+    Strategy currentStrategy = Model.ViewModel.CurrentSampleSize.Strategy;
+    TradeType currentTradeType = Model.ViewModel.CurrentSampleSize.TradeType;
 }
 
 <!-- Menu Time Frame -->
@@ -14,7 +14,7 @@
             Time Frame: <span id="spanTimeFrame">@MyEnumConverter.TimeFrameFromEnum(currentTimeFrame)</span>
         </button>
         <div class="dropdown-menu animated--fade-in" id="dropdownBtnTimeFrame" aria-labelledby="dropdownMenuButton">
-            @foreach (ETimeFrame timeFrame in Model.ViewModel.AvailableTimeFrames)
+            @foreach (TimeFrame timeFrame in Model.ViewModel.AvailableTimeFrames)
             {
                 var isSelected = timeFrame == currentTimeFrame;
                 <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@MyEnumConverter.TimeFrameFromEnum(timeFrame)</a>
@@ -29,7 +29,7 @@
             Strategy: <span id="spanStrategy">@MyEnumConverter.StrategyFromEnum(currentStrategy)</span>
         </button>
         <div class="dropdown-menu animated--fade-in" id="dropdownBtnStrategy" aria-labelledby="dropdownMenuButton">
-            @foreach (EStrategy strategy in Model.ViewModel.AvailableStrategies)
+            @foreach (Strategy strategy in Model.ViewModel.AvailableStrategies)
             {
                 var isSelected = strategy == currentStrategy;
                 <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@MyEnumConverter.StrategyFromEnum(strategy)</a>
@@ -44,7 +44,7 @@
             Type: <span id="spanTradeType">@MyEnumConverter.TradeTypeFromEnum(currentTradeType)</span>
         </button>
         <div class="dropdown-menu animated--fade-in" id="dropdownBtnTradeType" aria-labelledby="dropdownMenuButton">
-            @foreach (ETradeType tradeType in Enum.GetValues(typeof(ETradeType)))
+            @foreach (TradeType tradeType in Enum.GetValues(typeof(TradeType)))
             {
                 var isSelected = tradeType == currentTradeType;
                 <a class="dropdown-item @(isSelected ? "bg-gray-400" : "")" role="button">@MyEnumConverter.TradeTypeFromEnum(tradeType)</a>
@@ -71,7 +71,7 @@
 </div>
 
 @{
-    if (Model.ViewModel.CurrentSampleSize.Strategy == EStrategy.CandleBracketing)
+    if (Model.ViewModel.CurrentSampleSize.Strategy == Strategy.CandleBracketing)
     {
         var currentTradeTime = Model.ViewModel.CurrentResearchCandleBracketingTrade.Time;
 

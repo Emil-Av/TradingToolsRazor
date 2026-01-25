@@ -26,7 +26,7 @@ namespace TradingToolsRazor.Services
         private List<SampleSize> _allSampleSizes = [];
         private TradesVM _tradesVM = new();
 
-        public async Task<TradesVM> LoadStrategyAsync(EStrategy strategy)
+        public async Task<TradesVM> LoadStrategyAsync(Strategy strategy)
         {
             _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == strategy, includeProperties: "Review");
             if (!_allSampleSizes.Any())
@@ -95,13 +95,13 @@ namespace TradingToolsRazor.Services
 
         public async Task UpdateResearchData([FromBody] UpdateResearchDataModel updateResearchData)
         {
-            if (updateResearchData.Strategy == EStrategy.SRS)
+            if (updateResearchData.Strategy == Strategy.SRS)
             {
                 SRS srs = JsonConvert.DeserializeObject<SRS>(updateResearchData.Data!)!;
                 await _unitOfWork.SRS.UpdateAsync(srs);
                 await _unitOfWork.SaveAsync();
             }
-            else if (updateResearchData.Strategy == EStrategy.BrunchBreak)
+            else if (updateResearchData.Strategy == Strategy.BrunchBreak)
             {
                 BrunchBreak brunchBreak = JsonConvert.DeserializeObject<BrunchBreak>(updateResearchData.Data!)!;
                 await _unitOfWork.BrunchBreak.UpdateAsync(brunchBreak);
@@ -125,7 +125,7 @@ namespace TradingToolsRazor.Services
 
         private async Task<List<SampleSize>> GetAllSampleSizes()
         {
-            return [.. await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == ETradeType.Trade, includeProperties: "Review")];
+            return [.. await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == TradeType.Trade, includeProperties: "Review")];
         }
 
         // Overload that accepts a specific sample size ID
@@ -152,11 +152,11 @@ namespace TradingToolsRazor.Services
         {
             switch (_tradesVM.CurrentSampleSize.Strategy)
             {
-                case EStrategy.SRS:
+                case Strategy.SRS:
                     await SetSRSCurrentTrade();
                     break;
 
-                case EStrategy.BrunchBreak:
+                case Strategy.BrunchBreak:
                     await SetBrunchBreakCurrentTrade();
                     break;
             }

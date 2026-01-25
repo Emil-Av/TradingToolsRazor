@@ -9,11 +9,11 @@ namespace Models.RequestModels
 {
     public class StatisticsQueryModel
     {
-        public ETimeFrame? TimeFrame { get; set; }
+        public TimeFrame? TimeFrame { get; set; }
 
-        public EStrategy? Strategy { get; set; }
+        public Strategy? Strategy { get; set; }
 
-        public ETradeType? TradeType { get; set; }
+        public TradeType? TradeType { get; set; }
 
         /// <summary>
         /// True if all nullable props are null.
