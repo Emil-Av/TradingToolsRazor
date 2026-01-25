@@ -11,6 +11,7 @@ using SharedEnums.Enums;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using TradingToolsRazor.Services.Interfaces;
 using Utilities;
@@ -28,12 +29,12 @@ namespace TradingToolsRazor.Services
 
         public async Task<TradesVM> LoadStrategyAsync(Strategy strategy)
         {
-            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == strategy, includeProperties: "Review");
+            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == TradeType.Trade, includeProperties: "Review");
             if (!_allSampleSizes.Any())
             {
                 await InitializeTradesViewModelAsync();
             }
-            await SetViewModel();
+            await SetViewModel(strategy);
             return _tradesVM;
         }
 
@@ -128,6 +129,15 @@ namespace TradingToolsRazor.Services
             return [.. await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.TradeType == TradeType.Trade, includeProperties: "Review")];
         }
 
+        private async Task SetViewModel(Strategy strategy)
+        {
+            _tradesVM.CurrentSampleSize = _allSampleSizes.Where(sampleSize => sampleSize.Strategy == strategy).Last();
+            _tradesVM.SampleSizes = _allSampleSizes;
+
+            await SetCurrentTrade();
+            await SetAvailableMenus(strategy);
+        }
+
         // Overload that accepts a specific sample size ID
         private async Task SetViewModel(int sampleSizeId)
         {
@@ -180,17 +190,26 @@ namespace TradingToolsRazor.Services
             _tradesVM.SRSTrade = _tradesVM.AllTradesInSampleSize.Last() as SRS;
         }
 
+        private async Task SetAvailableMenus(Strategy strategy)
+        {
+            SetSampleSizeMenu(strategy);
+            await SetTimeFrames();
+            await SetStrategies();
+            SortMenus();
+        }
+
         private async Task SetAvailableMenus()
         {
             SetSampleSizeMenu();
             await SetTimeFrames();
-            SetStrategies();
+            await SetStrategies();
             SortMenus();
         }
 
-        private void SetStrategies()
+        private async Task SetStrategies()
         {
-            foreach (SampleSize sampleSize in _allSampleSizes)
+            var sampleSizes = (await GetAllSampleSizes()).Where(sampleSize => sampleSize.TradeType == _tradesVM.CurrentSampleSize.TradeType);
+            foreach (SampleSize sampleSize in sampleSizes)
             {
                 if (!_tradesVM.AvailableStrategies.Contains(sampleSize.Strategy))
                 {
@@ -201,13 +220,19 @@ namespace TradingToolsRazor.Services
 
         private async Task SetTimeFrames()
         {
-            foreach (SampleSize sampleSize in await GetAllSampleSizes())
+            var sampleSizesForCurrentStrategy = (await GetAllSampleSizes()).Where(sampleSize => sampleSize.Strategy == _tradesVM.CurrentSampleSize.Strategy);
+            foreach (SampleSize sampleSize in sampleSizesForCurrentStrategy)
             {
                 if (!_tradesVM.AvailableTimeframes.Contains(sampleSize.TimeFrame))
                 {
                     _tradesVM.AvailableTimeframes.Add(sampleSize.TimeFrame);
                 }
             }
+        }
+
+        private void SetSampleSizeMenu(Strategy strategy)
+        {
+            _tradesVM.SampleSizes = [.. _allSampleSizes.Where(sampleSize => sampleSize.Strategy == strategy && sampleSize.TimeFrame == _tradesVM.CurrentSampleSize.TimeFrame)];
         }
 
         private void SetSampleSizeMenu()
