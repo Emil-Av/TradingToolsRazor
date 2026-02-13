@@ -150,7 +150,7 @@ namespace TradingToolsRazor.Services
 
         private async Task<List<SampleSize>> GetAllSampleSizes()
         {
-            return [.. await _unitOfWork.SampleSize.GetAllAsync(includeProperties: "Review")];
+            return [.. await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.SampleSizeType != SampleSizeType.Research, includeProperties: "Review")];
         }
 
         private async Task SetViewModel(Strategy strategy)
@@ -193,6 +193,8 @@ namespace TradingToolsRazor.Services
                 case Strategy.BrunchBreak:
                     await SetBrunchBreakCurrentTrade();
                     break;
+                default:
+                    throw new ArgumentException($"Strategy {_tradesVM.CurrentSampleSize.Strategy.ToString()} not implemented in {nameof(TradesService)}.{nameof(SetCurrentTrade)}");
             }
         }
 

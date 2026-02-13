@@ -20,10 +20,10 @@
                     toastr.error('@Html.Raw(Model.TradesVM.ErrorMsg)');
                 </script>
             }
-            @(Model.TradesVM.CurrentTrade is not null ? "Trades" : "No Trades Yet")
+            @(Model.TradesVM.CurrentTrade!.ScreenshotsUrls is not null ? "Trades" : "No Trades Yet")
         </h2>
 
-        @if (Model.TradesVM.CurrentTrade is not null)
+        @if (Model.TradesVM.CurrentTrade!.ScreenshotsUrls is not null)
         {
             @await Html.PartialAsync("_TradesMenuDropdowns")
 
@@ -35,7 +35,7 @@
 </div>
 
 @section Scripts {
-    @if (Model.TradesVM.CurrentTrade is not null)
+    @if (Model.TradesVM.CurrentTrade.ScreenshotsUrls is not null)
     {
         <script>
             window.tradeData = @Html.Raw(JsonSerializer.Serialize(new {
