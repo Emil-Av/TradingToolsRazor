@@ -1,0 +1,114 @@
+@page
+@model TradingToolsRazor.Pages.ErrorModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Error - Trading Tools</title>
+    
+    <!-- Custom fonts -->
+    <link href="~/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    
+    <!-- Custom styles -->
+    <link href="~/css/sb-admin-2.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gradient-primary">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-10">
+                <div class="card o-hidden border-0 shadow-lg">
+                    <div class="card-body p-5 text-center">
+                        @if (Model.StatusCode == 400)
+                        {
+                            <h1 class="display-1 text-danger">400</h1>
+                            <h2 class="mb-4 text-gray-900">Bad Request</h2>
+                            <p class="lead text-muted">
+                                The request could not be understood by the server. Please check your input and try again.
+                            </p>
+                        }
+                        else if (Model.StatusCode == 404)
+                        {
+                            <h1 class="display-1 text-warning">404</h1>
+                            <h2 class="mb-4 text-gray-900">Page Not Found</h2>
+                            <p class="lead text-muted">
+                                The page you are looking for doesn't exist or has been moved.
+                            </p>
+                        }
+                        else if (Model.StatusCode == 500)
+                        {
+                            <h1 class="display-1 text-danger">500</h1>
+                            <h2 class="mb-4 text-gray-900">Server Error</h2>
+                            <p class="lead text-muted">
+                                Something went wrong on our end. Please try again later.
+                            </p>
+                        }
+                        else
+                        {
+                            <h1 class="display-1 text-danger">Error</h1>
+                            <h2 class="mb-4 text-gray-900">An Error Occurred</h2>
+                            <p class="lead text-muted">
+                                An error occurred while processing your request.
+                            </p>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                        {
+                            <div class="alert alert-danger mt-3">
+                                @Model.ErrorMessage
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.ExceptionMessage))
+                        {
+                            <div class="alert alert-danger mt-4 text-left">
+                                <h5 class="alert-heading">
+                                    <i class="fas fa-bug"></i> Exception Details
+                                </h5>
+                                <hr>
+                                <p><strong>Message:</strong></p>
+                                <p class="mb-2">@Model.ExceptionMessage</p>
+                                
+                                @if (!string.IsNullOrEmpty(Model.StackTrace))
+                                {
+                                    <p><strong>Stack Trace:</strong></p>
+                                    <pre class="text-left" style="max-height: 300px; overflow-y: auto; font-size: 0.8rem; background-color: #f8f9fa; padding: 15px; border-radius: 5px;">@Model.StackTrace</pre>
+                                }
+                            </div>
+                        }
+
+                        @if (Model.ShowRequestId)
+                        {
+                            <p class="text-muted small mt-3">
+                                Request ID: <code>@Model.RequestId</code>
+                            </p>
+                        }
+
+                        <div class="mt-4">
+                            <a asp-page="/Account/Login" class="btn btn-primary btn-user">
+                                <i class="fas fa-sign-in-alt me-2"></i>&ensp;Go to Login
+                            </a>
+                            <button onclick="history.back()" class="btn btn-secondary btn-user ms-2">
+                                <i class="fas fa-arrow-left me-2"></i>&ensp;Go Back
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="~/js/sb-admin-2.min.js"></script>
+</body>
+</html>

@@ -17,6 +17,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Utilities.Trade;
+using Models.Trades;
 
 namespace TradingToolsRazor.Pages.Research
 {

@@ -1,7 +1,7 @@
 ﻿using DataAccess.Data;
 using DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
-using Models;
+using Models.Trades;
 using System;
 using System.Collections.Generic;
 using System.Linq;

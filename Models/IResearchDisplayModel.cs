@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Models.Trades;
 using Models.ViewModels;
 using Models.ViewModels.DisplayClasses;
 using System;

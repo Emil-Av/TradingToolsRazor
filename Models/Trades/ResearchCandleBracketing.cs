@@ -2,7 +2,7 @@
 using Shared.Enums;
 using SharedEnums.Enums;
 
-namespace Models
+namespace Models.Trades
 {
     public class ResearchCandleBracketing : BaseTrade
     {

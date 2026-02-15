@@ -1,4 +1,4 @@
-﻿using Models;
+﻿using Models.Trades;
 using SharedEnums.Enums;
 using Statistics.Models;
 using System;

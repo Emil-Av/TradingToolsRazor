@@ -1,5 +1,6 @@
 using Models;
 using Models.RequestModels;
+using Models.Trades;
 using Models.ViewModels;
 using SharedEnums.Enums;
 

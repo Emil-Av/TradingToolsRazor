@@ -1,6 +1,7 @@
 using DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
 using Models;
+using Models.Trades;
 using Models.ViewModels;
 using Models.ViewModels.DisplayClasses;
 using SharedEnums.Enums;

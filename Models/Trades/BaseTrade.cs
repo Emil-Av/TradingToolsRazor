@@ -3,7 +3,7 @@ using Shared.Enums;
 using SharedEnums.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Models
+namespace Models.Trades
 {
     public class BaseTrade
     {

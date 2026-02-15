@@ -1,4 +1,4 @@
-﻿using Models;
+﻿using Models.Trades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
