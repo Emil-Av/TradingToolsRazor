@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Models;
 using Models.RequestModels;
+using Models.Trades;
 using Models.ViewModels;
 using Models.ViewModels.DisplayClasses;
 using Newtonsoft.Json;

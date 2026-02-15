@@ -3,7 +3,7 @@ using DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Microsoft.VisualBasic;
-using Models;
+using Models.Trades;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

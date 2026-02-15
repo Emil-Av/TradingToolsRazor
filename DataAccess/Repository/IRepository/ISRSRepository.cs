@@ -1,4 +1,4 @@
-﻿using Models;
+﻿using Models.Trades;
 
 namespace DataAccess.Repository.IRepository
 {

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharedEnums.Enums;
 
-namespace Models
+namespace Models.Trades
 {
     public class ResearchFirstBarPullback : BaseTrade
     {

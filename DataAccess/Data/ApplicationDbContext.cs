@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.Trades;
 using Models.ViewModels;
 
 namespace DataAccess.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         // When the class gets injected, the connection string is passed to the DbContext as a paramater in the constructor
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)

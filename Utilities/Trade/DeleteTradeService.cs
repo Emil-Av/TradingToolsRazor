@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Models;
+using Models.Trades;
 using SharedEnums.Enums;
 using System;
 using System.Collections.Generic;

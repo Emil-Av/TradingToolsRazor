@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Models;
 using Models.RequestModels;
+using Models.Trades;
 using Models.ViewModels;
 using Newtonsoft.Json;
 using SharedEnums.Enums;

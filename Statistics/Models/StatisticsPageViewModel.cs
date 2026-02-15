@@ -2,6 +2,7 @@ using SharedEnums.Enums;
 using Models;
 using Statistics.Models;
 using System.Collections.Generic;
+using Models.Trades;
 
 namespace Statistics.Models
 {
