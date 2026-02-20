@@ -8,19 +8,27 @@
       "launchUrl": "Home",
       "applicationUrl": "https://localhost:7031;http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionStrings__DefaultConnection": "Server=.;Database=TradingToolsDev;Trusted_Connection=True;TrustServerCertificate=True"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "ProdProfile": {
+    "LocalProdProfile": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "Home",
       "applicationUrl": "https://localhost:7031;http://localhost:5000",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production",
-        "ConnectionStrings__DefaultConnection": "Server=.;Database=TradingTools;Trusted_Connection=True;TrustServerCertificate=True"
+        "ASPNETCORE_ENVIRONMENT": "LocalProd"
+      }
+    },
+    "VPSProdProfile": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "Home",
+      "applicationUrl": "https://localhost:7031;http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "VPSProd"
       }
     }
   }

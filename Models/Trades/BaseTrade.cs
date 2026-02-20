@@ -31,8 +31,6 @@ namespace Models.Trades
 
         public double? PnL { get; set; }
 
-        public double? Fee { get; set; }
-
         public EStatus Status { get; set; }
 
         public EDirection Direction { get; set; }
