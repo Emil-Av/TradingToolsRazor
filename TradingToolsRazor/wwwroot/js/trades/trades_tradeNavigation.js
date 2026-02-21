@@ -153,6 +153,15 @@ function loadImagesLocally(screenshotsUrls) {
         return;
     }
 
+    // Dispose of existing carousel instance to prevent DOM conflicts
+    const carouselElement = document.querySelector('#carouselTrades');
+    if (carouselElement) {
+        const existingCarousel = bootstrap.Carousel.getInstance(carouselElement);
+        if (existingCarousel) {
+            existingCarousel.dispose();
+        }
+    }
+
     let carouselHtml = '<div class="carousel-indicators">';
     for (let i = 0; i < screenshotsUrls.length; i++) {
         if (i === 0) {
@@ -176,6 +185,14 @@ function loadImagesLocally(screenshotsUrls) {
     carouselHtml += '</div>';
 
     $('#imageContainer').html(carouselHtml);
+    
+    // Reinitialize the carousel with the new DOM structure
+    if (carouselElement) {
+        new bootstrap.Carousel(carouselElement, {
+            interval: false,
+            wrap: true
+        });
+    }
 }
 
 // Update the total trades count display

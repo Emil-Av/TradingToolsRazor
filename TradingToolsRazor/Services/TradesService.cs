@@ -284,5 +284,63 @@ namespace TradingToolsRazor.Services
         {
             await _deleteTradeService.DeleteTrade(deleteTradeRequest.Strategy, deleteTradeRequest.Id, webHostEnvironment.WebRootPath);
         }
+
+        public async Task<List<string>> UploadScreenshotsAsync(int tradeId, IFormFile[] files)
+        {
+            // Get the trade to determine its folder path
+            var trade = await _unitOfWork.BaseTrade.GetAsync(t => t.Id == tradeId) ?? throw new ArgumentException($"Trade with ID {tradeId} not found.");
+
+            // Get the existing screenshots folder path from the first screenshot URL
+            string tradeFolderPath;
+            if (trade.ScreenshotsUrls!.Any())
+            {
+                // Extract the folder path from the first screenshot URL
+                string firstScreenshotUrl = trade.ScreenshotsUrls![0];
+                string fullPath = Path.Combine(webHostEnvironment.WebRootPath, firstScreenshotUrl.Replace("/", "\\"));
+                tradeFolderPath = Path.GetDirectoryName(fullPath)!;
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot upload screenshots to a trade that has no existing screenshots folder.");
+            }
+
+            // Save the files to disk
+            var newScreenshotPaths = await SaveFilesToDiskAsync(webHostEnvironment.WebRootPath, tradeFolderPath, files);
+            
+            trade.ScreenshotsUrls.AddRange(newScreenshotPaths);
+            
+            await _unitOfWork.BaseTrade.UpdateAsync(trade);
+            await _unitOfWork.SaveAsync();
+
+            return trade.ScreenshotsUrls;
+        }
+
+        private async Task<List<string>> SaveFilesToDiskAsync(string webRootPath, string destinationPath, IFormFile[] files)
+        {
+            List<string> screenshotsPaths = [];
+
+            try
+            {
+                foreach (IFormFile file in files)
+                {
+                    string filePath = Path.Combine(destinationPath, file.FileName);
+
+                    using (Stream stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    string dbFilePath = Path.GetRelativePath(webRootPath, filePath).Replace("\\", "/");
+                    screenshotsPaths.Add(dbFilePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error in saving uploaded files: {ex.Message}");
+                throw;
+            }
+
+            return screenshotsPaths;
+        }
     }
 }

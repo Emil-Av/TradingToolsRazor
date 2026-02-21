@@ -17,11 +17,14 @@ function initializeEventHandlers() {
     $('button[data-bs-toggle="tab"]').on('shown.bs.tab', handleTabChange);
 
     // Button click events
-    $('#btnUpdate').on('click', handleUpdateClick);
-    $('#btnDelete').on('click', handleDeleteClick);
-    $('#btnEdit').on('click', openEditor);
-    $('#btnSave').on('click', saveEditorText);
-    $('#btnCancel').on('click', handleCancelClick);
+    $('#ButtonUpdate').on('click', handleUpdateClick);
+    $('#ButtonDelete').on('click', handleDeleteClick);
+    $('#ButtonEdit').on('click', openEditor);
+    $('#ButtonSave').on('click', saveEditorText);
+    $('#ButtonCancel').on('click', handleCancelClick);
+
+    // File input change event for screenshot upload
+    $('#InputUploadScreenshot').on('change', handleScreenshotFileChange);
 
     // Card menu events
     $('#headerMenu').on('click', '.dropdown-item', handleCardMenuClick);
