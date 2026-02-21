@@ -4,16 +4,19 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DataAccess.Migrations
+namespace DataAccess.MigrationsSqlServer
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(SqlServerDbContext))]
+    [Migration("20260217214653_RemoveFee4")]
+    partial class RemoveFee4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,79 +226,6 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Models.BaseTrade", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<double?>("Amount")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
-
-                    b.Property<int>("Direction")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("EntryPrice")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("ExitPrice")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("Fee")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("JournalId")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("MaxPrice")
-                        .HasColumnType("float");
-
-                    b.Property<int>("Outcome")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("PnL")
-                        .HasColumnType("float");
-
-                    b.Property<int>("SampleSizeId")
-                        .HasColumnType("int");
-
-                    b.PrimitiveCollection<string>("ScreenshotsUrls")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("StopPrice")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Symbol")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TradeRating")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("TriggerPrice")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("JournalId");
-
-                    b.HasIndex("SampleSizeId");
-
-                    b.ToTable("BaseTrades", (string)null);
-
-                    b.UseTptMappingStrategy();
-                });
-
             modelBuilder.Entity("Models.Journal", b =>
                 {
                     b.Property<int>("Id")
@@ -376,6 +306,76 @@ namespace DataAccess.Migrations
                     b.ToTable("SampleSizes");
                 });
 
+            modelBuilder.Entity("Models.Trades.BaseTrade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double?>("Amount")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Direction")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("EntryPrice")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ExitPrice")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("JournalId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("MaxPrice")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Outcome")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("PnL")
+                        .HasColumnType("float");
+
+                    b.Property<int>("SampleSizeId")
+                        .HasColumnType("int");
+
+                    b.PrimitiveCollection<string>("ScreenshotsUrls")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("StopPrice")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Symbol")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TradeRating")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("TriggerPrice")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JournalId");
+
+                    b.HasIndex("SampleSizeId");
+
+                    b.ToTable("BaseTrades", (string)null);
+
+                    b.UseTptMappingStrategy();
+                });
+
             modelBuilder.Entity("Models.UserSettings", b =>
                 {
                     b.Property<int>("Id")
@@ -413,9 +413,9 @@ namespace DataAccess.Migrations
                     b.ToTable("UserSettings");
                 });
 
-            modelBuilder.Entity("Models.BrunchBreak", b =>
+            modelBuilder.Entity("Models.Trades.BrunchBreak", b =>
                 {
-                    b.HasBaseType("Models.BaseTrade");
+                    b.HasBaseType("Models.Trades.BaseTrade");
 
                     b.Property<int>("CandleType")
                         .HasColumnType("int");
@@ -426,9 +426,9 @@ namespace DataAccess.Migrations
                     b.ToTable("BrunchBreak", (string)null);
                 });
 
-            modelBuilder.Entity("Models.ResearchCandleBracketing", b =>
+            modelBuilder.Entity("Models.Trades.ResearchCandleBracketing", b =>
                 {
-                    b.HasBaseType("Models.BaseTrade");
+                    b.HasBaseType("Models.Trades.BaseTrade");
 
                     b.Property<int>("ATR")
                         .HasColumnType("int");
@@ -469,9 +469,9 @@ namespace DataAccess.Migrations
                     b.ToTable("ResearchCandleBracketing", (string)null);
                 });
 
-            modelBuilder.Entity("Models.ResearchCradle", b =>
+            modelBuilder.Entity("Models.Trades.ResearchCradle", b =>
                 {
-                    b.HasBaseType("Models.BaseTrade");
+                    b.HasBaseType("Models.Trades.BaseTrade");
 
                     b.Property<int>("TestCradleProp")
                         .HasColumnType("int");
@@ -479,9 +479,9 @@ namespace DataAccess.Migrations
                     b.ToTable("ResearchCradles", (string)null);
                 });
 
-            modelBuilder.Entity("Models.ResearchFirstBarPullback", b =>
+            modelBuilder.Entity("Models.Trades.ResearchFirstBarPullback", b =>
                 {
-                    b.HasBaseType("Models.BaseTrade");
+                    b.HasBaseType("Models.Trades.BaseTrade");
 
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
@@ -570,9 +570,9 @@ namespace DataAccess.Migrations
                     b.ToTable("ResearchFirstBarPullbacks", (string)null);
                 });
 
-            modelBuilder.Entity("Models.SRS", b =>
+            modelBuilder.Entity("Models.Trades.SRS", b =>
                 {
-                    b.HasBaseType("Models.BaseTrade");
+                    b.HasBaseType("Models.Trades.BaseTrade");
 
                     b.Property<int>("CandleType")
                         .HasColumnType("int");
@@ -586,9 +586,9 @@ namespace DataAccess.Migrations
                     b.ToTable("SRS", (string)null);
                 });
 
-            modelBuilder.Entity("Models.Trade", b =>
+            modelBuilder.Entity("Models.Trades.Trade", b =>
                 {
-                    b.HasBaseType("Models.BaseTrade");
+                    b.HasBaseType("Models.Trades.BaseTrade");
 
                     b.Property<int?>("ResearchId")
                         .HasColumnType("int");
@@ -649,7 +649,16 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Models.BaseTrade", b =>
+            modelBuilder.Entity("Models.SampleSize", b =>
+                {
+                    b.HasOne("Models.Review", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId");
+
+                    b.Navigation("Review");
+                });
+
+            modelBuilder.Entity("Models.Trades.BaseTrade", b =>
                 {
                     b.HasOne("Models.Journal", "Journal")
                         .WithMany()
@@ -666,69 +675,60 @@ namespace DataAccess.Migrations
                     b.Navigation("SampleSize");
                 });
 
-            modelBuilder.Entity("Models.SampleSize", b =>
+            modelBuilder.Entity("Models.Trades.BrunchBreak", b =>
                 {
-                    b.HasOne("Models.Review", "Review")
-                        .WithMany()
-                        .HasForeignKey("ReviewId");
-
-                    b.Navigation("Review");
-                });
-
-            modelBuilder.Entity("Models.BrunchBreak", b =>
-                {
-                    b.HasOne("Models.BaseTrade", null)
+                    b.HasOne("Models.Trades.BaseTrade", null)
                         .WithOne()
-                        .HasForeignKey("Models.BrunchBreak", "Id")
+                        .HasForeignKey("Models.Trades.BrunchBreak", "Id")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Models.ResearchCandleBracketing", b =>
+            modelBuilder.Entity("Models.Trades.ResearchCandleBracketing", b =>
                 {
-                    b.HasOne("Models.BaseTrade", null)
+                    b.HasOne("Models.Trades.BaseTrade", null)
                         .WithOne()
-                        .HasForeignKey("Models.ResearchCandleBracketing", "Id")
+                        .HasForeignKey("Models.Trades.ResearchCandleBracketing", "Id")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Models.ResearchCradle", b =>
+            modelBuilder.Entity("Models.Trades.ResearchCradle", b =>
                 {
-                    b.HasOne("Models.BaseTrade", null)
+                    b.HasOne("Models.Trades.BaseTrade", null)
                         .WithOne()
-                        .HasForeignKey("Models.ResearchCradle", "Id")
+                        .HasForeignKey("Models.Trades.ResearchCradle", "Id")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Models.ResearchFirstBarPullback", b =>
+            modelBuilder.Entity("Models.Trades.ResearchFirstBarPullback", b =>
                 {
-                    b.HasOne("Models.BaseTrade", null)
+                    b.HasOne("Models.Trades.BaseTrade", null)
                         .WithOne()
-                        .HasForeignKey("Models.ResearchFirstBarPullback", "Id")
+                        .HasForeignKey("Models.Trades.ResearchFirstBarPullback", "Id")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Models.SRS", b =>
+            modelBuilder.Entity("Models.Trades.SRS", b =>
                 {
-                    b.HasOne("Models.BaseTrade", null)
+                    b.HasOne("Models.Trades.BaseTrade", null)
                         .WithOne()
-                        .HasForeignKey("Models.SRS", "Id")
+                        .HasForeignKey("Models.Trades.SRS", "Id")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Models.Trade", b =>
+            modelBuilder.Entity("Models.Trades.Trade", b =>
                 {
-                    b.HasOne("Models.BaseTrade", null)
+                    b.HasOne("Models.Trades.BaseTrade", null)
                         .WithOne()
-                        .HasForeignKey("Models.Trade", "Id")
+                        .HasForeignKey("Models.Trades.Trade", "Id")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Models.ResearchFirstBarPullback", "Research")
+                    b.HasOne("Models.Trades.ResearchFirstBarPullback", "Research")
                         .WithMany()
                         .HasForeignKey("ResearchId");
 

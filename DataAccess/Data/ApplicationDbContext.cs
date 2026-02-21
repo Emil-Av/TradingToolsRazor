@@ -1,15 +1,18 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Models;
 using Models.Trades;
 using Models.ViewModels;
+using System.Linq;
+using System.Text.Json;
 
 namespace DataAccess.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         // When the class gets injected, the connection string is passed to the DbContext as a paramater in the constructor
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions options) : base(options)
         {
 
         }
@@ -36,6 +39,9 @@ namespace DataAccess.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Provider-specific configuration for ScreenshotsUrls
+            ConfigureScreenshots(modelBuilder);
 
             // TPT Configuration: Maps each derived class to its own table
             modelBuilder.Entity<BaseTrade>().ToTable("BaseTrades");
@@ -90,6 +96,36 @@ namespace DataAccess.Data
                 .WithMany()
                 .HasForeignKey(b => b.SampleSizeId)
                 .OnDelete(DeleteBehavior.NoAction);
+        }
+
+        private void ConfigureScreenshots(ModelBuilder modelBuilder)
+        {
+            var providerName = Database.ProviderName;
+
+            if (providerName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                var propertyBuilder = modelBuilder.Entity<BaseTrade>()
+                    .Property(b => b.ScreenshotsUrls)
+                    .HasColumnType("jsonb")
+                    .HasConversion(
+                        v => JsonSerializer.Serialize(v ?? new List<string>(), (JsonSerializerOptions)null),
+                        v => string.IsNullOrWhiteSpace(v)
+                            ? new List<string>()
+                            : JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null) ?? new List<string>());
+
+                propertyBuilder.Metadata.SetValueComparer(
+                    new ValueComparer<List<string>>(
+                        (c1, c2) => (c1 == null && c2 == null) || (c1 != null && c2 != null && c1.SequenceEqual(c2)),
+                        c => c == null
+                            ? 0
+                            : c.Aggregate(0, (acc, value) => HashCode.Combine(acc, value == null ? 0 : value.GetHashCode())),
+                        c => c == null ? null : c.ToList()));
+            }
+            else
+            {
+                modelBuilder.Entity<BaseTrade>()
+                    .PrimitiveCollection(b => b.ScreenshotsUrls);
+            }
         }
     }
 }
