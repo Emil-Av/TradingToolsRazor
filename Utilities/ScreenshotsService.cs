@@ -50,7 +50,7 @@ namespace Utilities
             pathToSaveFiles = Path.Combine(pathToSaveFiles, newTrade.GetType().Name);
             EnsureDirectoryExists(pathToSaveFiles);
 
-            string timeFrame = MyEnumConverter.TimeFrameFromEnum(viewModel.TimeFrame);
+            string timeFrame = MyEnumConverter.TimeFrameFromEnum(viewModel.SampleSizeViewData.TimeFrame);
             pathToSaveFiles = Path.Combine(pathToSaveFiles, timeFrame);
             EnsureDirectoryExists(pathToSaveFiles);
 

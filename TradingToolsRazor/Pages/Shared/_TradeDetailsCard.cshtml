@@ -100,16 +100,20 @@
                     <button class="btn btn-info ms-1" id="btnUpdate" type="button">
                         <i class="fa-regular fa-floppy-disk me-2"></i>Update
                     </button>
-                    <button class="btn btn-danger ms-1" id="btnDelete" type="button">
+                    <button class="btn btn-primary ms-1" id="ButtonUpload" type="button" onclick="document.getElementById('InputUploadScreenshot').click()">
+                        <i class="fa-solid fa-upload me-2"></i>Upload
+                    </button>
+                    <input type="file" id="InputUploadScreenshot" class="d-none" accept="image/*" multiple />
+                    <button class="btn btn-danger ms-1" id="ButtonDelete" type="button">
                         <i class="fa-solid fa-trash-can me-2"></i>Delete
                     </button>
-                    <button class="btn btn-primary d-none" id="btnEdit" type="button">
+                    <button class="btn btn-primary d-none" id="ButtonEdit" type="button">
                         <i class="fa-solid fa-pen-to-square me-2"></i>Edit
                     </button>
-                    <button class="btn btn-primary d-none editorOnBtns" id="btnSave" type="button">
+                    <button class="btn btn-primary d-none editorOnBtns" id="ButtonSave" type="button">
                         <i class="fa-regular fa-floppy-disk me-2"></i>Save
                     </button>
-                    <button class="btn btn-secondary d-none editorOnBtns" id="btnCancel" type="button">
+                    <button class="btn btn-secondary d-none editorOnBtns" id="ButtonCancel" type="button">
                         <i class="fa-solid fa-xmark me-2"></i>Cancel
                     </button>
                 </div>

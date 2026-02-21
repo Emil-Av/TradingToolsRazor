@@ -25,6 +25,49 @@ function handleUpdateClick() {
     }
 }
 
+function handleScreenshotFileChange(event) {
+    const files = event.target.files;
+    
+    if (!files || files.length === 0) {
+        return;
+    }
+
+    // Validate file types (only images)
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'];
+    const invalidFiles = [];
+    
+    for (let i = 0; i < files.length; i++) {
+        if (!validImageTypes.includes(files[i].type)) {
+            invalidFiles.push(files[i].name);
+        }
+    }
+    
+    if (invalidFiles.length > 0) {
+        toastr.error('Only image files are allowed. Invalid files: ' + invalidFiles.join(', '));
+        event.target.value = ''; // Clear the input
+        return;
+    }
+
+    // Create FormData for multipart/form-data
+    const formData = new FormData();
+    
+    // Add all selected files
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+    }
+    
+    // Add trade ID from window.tradeData
+    if (typeof window.tradeData !== 'undefined' && window.tradeData.tradeId) {
+        formData.append('tradeId', window.tradeData.tradeId);
+    } else {
+        toastr.error('Unable to identify current trade.');
+        event.target.value = ''; // Clear the input
+        return;
+    }
+
+    uploadScreenshotsAsync(formData, event);
+}
+
 function handleDeleteClick() {
     Swal.fire({
         title: "Are you sure?",

@@ -148,6 +148,25 @@ namespace TradingToolsRazor.Pages.Trades
             }
         }
 
+        public async Task<IActionResult> OnPostUploadScreenshots([FromForm] IFormFile[] files, [FromForm] int tradeId)
+        {
+            try
+            {
+                if (files == null || files.Length == 0)
+                {
+                    return new JsonResult(new { error = "No files uploaded." });
+                }
+
+                var screenshotsUrls = await _tradesService.UploadScreenshotsAsync(tradeId, files);
+                
+                return new JsonResult(new { success = $"{files.Length} screenshot(s) uploaded.", screenshotsUrls });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = $"An error occurred while uploading screenshots: {ex.Message}" });
+            }
+        }
+
         #endregion
     }
 }

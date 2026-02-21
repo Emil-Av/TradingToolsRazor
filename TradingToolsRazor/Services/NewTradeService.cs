@@ -213,13 +213,13 @@ namespace TradingToolsRazor.Services
 
             int numberTradesInSampleSize = _viewModel.SampleSizeViewData.SampleSizeType switch
             {
-                SampleSizeType.Research when _viewModel.Strategy == Strategy.FirstBarPullback =>
+                SampleSizeType.Research when _viewModel.SampleSizeViewData.Strategy == Strategy.FirstBarPullback =>
                     (await _unitOfWork.ResearchFirstBarPullback.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
-                SampleSizeType.Research when _viewModel.Strategy == Strategy.Cradle =>
+                SampleSizeType.Research when _viewModel.SampleSizeViewData.Strategy == Strategy.Cradle =>
                     (await _unitOfWork.ResearchCradle.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
-                SampleSizeType.Research when _viewModel.Strategy == Strategy.CandleBracketing =>
+                SampleSizeType.Research when _viewModel.SampleSizeViewData.Strategy == Strategy.CandleBracketing =>
                     (await _unitOfWork.ResearchCandleBracketing.GetAllAsync(x => x.SampleSizeId == sampleSize.Id))
                         .Select(trade => trade.Date)
                         .Distinct()

@@ -4,6 +4,53 @@
  * ******************************
  */
 
+function uploadScreenshotsAsync(formData, event) {
+
+    // Get anti-forgery token
+    const token = document.getElementById('__RequestVerificationToken')?.value;
+
+    // Make fetch API call
+    fetch('/Trades?handler=UploadScreenshots', {
+        method: 'POST',
+        headers: token ? { 'RequestVerificationToken': token } : {},
+        body: formData
+    })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(function (data) {
+            if (data.success) {
+                toastr.success(data.success);
+
+                // Update the screenshots URLs in window.tradeData
+                if (data.screenshotsUrls && Array.isArray(data.screenshotsUrls)) {
+                    window.tradeData.screenshotsUrls = data.screenshotsUrls;
+
+                    // Update local trade data in allTrades array
+                    if (allTrades && allTrades.length > 0 && tradeIndex >= 0 && tradeIndex < allTrades.length) {
+                        allTrades[tradeIndex].ScreenshotsUrls = data.screenshotsUrls;
+                    }
+
+                    // Reload the carousel to show new screenshots
+                    loadImagesLocally(data.screenshotsUrls);
+                }
+            } else if (data.error) {
+                toastr.error(data.error);
+            }
+        })
+        .catch(function (error) {
+            console.error('Error uploading screenshots:', error);
+            toastr.error('Error uploading screenshots. See console for details.');
+        })
+        .finally(function () {
+            // Clear the file input so the same files can be selected again if needed
+            event.target.value = '';
+        });
+}
+
 function loadSampleSizeType(type) {
     const strategy = getStrategy();
 

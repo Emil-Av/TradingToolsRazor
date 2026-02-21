@@ -3,6 +3,7 @@ using Models.RequestModels;
 using Models.Trades;
 using Models.ViewModels;
 using SharedEnums.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace TradingToolsRazor.Services.Interfaces
 {
@@ -19,5 +20,6 @@ namespace TradingToolsRazor.Services.Interfaces
         Task<TradesVM> LoadTimeFrameAsync(TradesLoadTimeFrameRequestModel requestModel);
         Task<TradesVM> LoadStrategyAsync(Strategy strategy, SampleSizeType sampleSizeType);
         Task<TradesVM> LoadTypeAsync(SampleSizeType sampleSizeType, Strategy strategy);
+        Task<List<string>> UploadScreenshotsAsync(int tradeId, IFormFile[] files);
     }
 }
