@@ -46,6 +46,9 @@ if (!app.Environment.IsDevelopment())
 // Use exception handler middleware (handles unhandled exceptions)
 app.UseExceptionHandler("/Error");
 
+// Status code pages middleware BEFORE authentication/authorization
+app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
+
 // Redirect the root URL to Login page
 app.MapGet("/", () => Results.Redirect("/Account/Login"));
 
@@ -55,9 +58,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Status code pages middleware AFTER authentication/authorization
-app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
 
 app.MapRazorPages();
 
@@ -78,9 +78,8 @@ static void ApplyMigrations(WebApplication app)
         {
             using var context = dbContextFactory.CreateDbContext();
 
-            logger.LogInformation("Applying {Provider} database migrations...", dbProvider);
+            logger.LogInformation("Applying {Provider} database migration(s)...", dbProvider);
 
-            // Get pending migrations
             var pendingMigrations = context.Database.GetPendingMigrations();
 
             if (pendingMigrations.Any())
