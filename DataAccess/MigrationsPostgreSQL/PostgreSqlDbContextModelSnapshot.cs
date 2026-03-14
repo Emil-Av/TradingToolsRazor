@@ -357,9 +357,6 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.Property<int>("TradeRating")
                         .HasColumnType("integer");
 
-                    b.Property<double?>("TriggerPrice")
-                        .HasColumnType("double precision");
-
                     b.HasKey("Id");
 
                     b.HasIndex("JournalId");

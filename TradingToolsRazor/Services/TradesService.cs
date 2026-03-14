@@ -30,12 +30,17 @@ namespace TradingToolsRazor.Services
 
         public async Task<TradesVM> LoadTypeAsync(SampleSizeType sampleSizeType, Strategy strategy)
         {
-            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.SampleSizeType == sampleSizeType, includeProperties: "Review");
+            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => 
+                                                                        sampleSize.SampleSizeType == sampleSizeType, 
+                                                                        includeProperties: "Review");
             if (!_allSampleSizes.Any())
             {
                 await InitializeTradesViewModelAsync();
             }
-            await SetViewModel(strategy);
+
+            Strategy availableStrategy = _allSampleSizes.Any(s => s.Strategy == strategy) ? strategy : _allSampleSizes.First().Strategy;
+
+            await SetViewModel(availableStrategy);
             return _tradesVM;
         }
 
@@ -150,7 +155,7 @@ namespace TradingToolsRazor.Services
         #region Helper Methods - General
 
         private async Task<List<SampleSize>> GetAllSampleSizes()
-        {
+        { 
             return [.. await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.SampleSizeType != SampleSizeType.Research, includeProperties: "Review")];
         }
 

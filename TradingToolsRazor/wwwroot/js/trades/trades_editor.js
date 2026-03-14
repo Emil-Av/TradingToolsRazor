@@ -48,11 +48,11 @@ function saveEditorText() {
 }
 
 function toggleFooterButtons() {
-    if ($('#btnEdit').hasClass('d-none')) {
-        $('#btnEdit').removeClass('d-none');
+    if ($('#ButtonEdit').hasClass('d-none')) {
+        $('#ButtonEdit').removeClass('d-none');
         $('.editorOnBtns').addClass('d-none');
     } else {
-        $('#btnEdit').addClass('d-none');
+        $('#ButtonEdit').addClass('d-none');
         $('.editorOnBtns').removeClass('d-none');
     }
 }
