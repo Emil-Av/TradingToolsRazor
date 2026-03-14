@@ -4,6 +4,7 @@
     { 
         Trade = 1, 
         Research = 2,
-        PaperTrade = 3
+        PaperTrade = 3,
+        DemoTrading = 4
     }
 }

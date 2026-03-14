@@ -11,9 +11,10 @@ function showTradingDataContent() {
     $('#reviewTabHeaders').addClass('d-none');
     $('#reviewTabContent').addClass('d-none');
     $('#researchTabContent').addClass('d-none');
-    $('#btnEdit').addClass('d-none');
-    $('#btnUpdate').removeClass('d-none');
-    $('#btnDelete').removeClass('d-none');
+    $('#ButtonEdit').addClass('d-none');
+    $('#ButtonUpdate').removeClass('d-none');
+    $('#ButtonUpload').removeClass('d-none');
+    $('#ButtonDelete').removeClass('d-none');
 }
 
 function showJournalContent() {
@@ -29,9 +30,10 @@ function showJournalContent() {
     $('#reviewTabContent').addClass('d-none');
     $('#tradeDataTabContent').addClass('d-none');
     $('#researchTabContent').addClass('d-none');
-    $('#btnEdit').removeClass('d-none');
-    $('#btnUpdate').addClass('d-none');
-    $('#btnDelete').addClass('d-none');
+    $('#ButtonEdit').removeClass('d-none');
+    $('#ButtonUpdate').addClass('d-none');
+    $('#ButtonUpload').addClass('d-none');
+    $('#ButtonDelete').addClass('d-none');
 }
 
 function showResearchContent() {
@@ -41,9 +43,10 @@ function showResearchContent() {
     $('#journalTabContent').addClass('d-none');
     $('#reviewTabHeaders').addClass('d-none');
     $('#reviewTabContent').addClass('d-none');
-    $('#btnEdit').addClass('d-none');
-    $('#btnUpdate').removeClass('d-none');
-    $('#btnDelete').removeClass('d-none');
+    $('#ButtonEdit').addClass('d-none');
+    $('#ButtonUpdate').removeClass('d-none');
+    $('#ButtonUpload').removeClass('d-none');
+    $('#ButtonDelete').removeClass('d-none');
 }
 
 function showReviewContent() {
@@ -54,9 +57,10 @@ function showReviewContent() {
     $('#journalTabContent').addClass('d-none');
     $('#tradeDataTabContent').addClass('d-none');
     $('#researchTabContent').addClass('d-none');
-    $('#btnEdit').removeClass('d-none');
-    $('#btnUpdate').addClass('d-none');
-    $('#btnDelete').addClass('d-none');
+    $('#ButtonEdit').removeClass('d-none');
+    $('#ButtonUpdate').addClass('d-none');
+    $('#ButtonUpload').addClass('d-none');
+    $('#ButtonDelete').addClass('d-none');
 }
 
 function updateCardMenuHeader(clickedElement) {

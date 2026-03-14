@@ -17,8 +17,6 @@ namespace Models.Trades
         public DateOnly Date { get; set; }
         public string? Symbol { get; set; }
 
-        public double? TriggerPrice { get; set; }
-
         public double? EntryPrice { get; set; }
 
         public double? StopPrice { get; set; }

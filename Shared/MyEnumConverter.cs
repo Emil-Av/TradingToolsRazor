@@ -78,7 +78,8 @@ namespace Shared
             {
                 { "Trade", SampleSizeType.Trade },
                 { "Research", SampleSizeType.Research },
-                { "Paper Trade", SampleSizeType.PaperTrade }
+                { "Paper Trade", SampleSizeType.PaperTrade },
+                { "Demo Trading", SampleSizeType.DemoTrading }
             };
 
             try
@@ -97,7 +98,8 @@ namespace Shared
             {
                 { SampleSizeType.Trade , "Trade"},
                 { SampleSizeType.Research, "Research" },
-                { SampleSizeType.PaperTrade, "Paper Trade" }
+                { SampleSizeType.PaperTrade, "Paper Trade" },
+                { SampleSizeType.DemoTrading, "Demo Trading" }
             };
 
             return tradeTypes[tradeType];
