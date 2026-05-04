@@ -301,7 +301,9 @@ namespace TradingToolsRazor.Services
             {
                 // Extract the folder path from the first screenshot URL
                 string firstScreenshotUrl = trade.ScreenshotsUrls![0];
-                string fullPath = Path.Combine(webHostEnvironment.WebRootPath, firstScreenshotUrl.Replace("/", "\\"));
+                // Convert forward slashes to backslashes for Windows path
+                string relativePath = firstScreenshotUrl.Replace("/", "\\");
+                string fullPath = Path.Combine(webHostEnvironment.WebRootPath, relativePath);
                 tradeFolderPath = Path.GetDirectoryName(fullPath)!;
             }
             else

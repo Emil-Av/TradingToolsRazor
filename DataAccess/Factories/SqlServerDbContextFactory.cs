@@ -19,10 +19,8 @@ namespace DataAccess.Factories
                 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false)
                 .Build();
 
-            // First try SqlServerConnection, then DefaultConnection as fallback
             var connectionString = configuration.GetConnectionString("SqlServerConnection")
-                ?? configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("SqlServerConnection or DefaultConnection string is missing.");
+                ?? throw new InvalidOperationException("SqlServerConnection string is missing.");
 
             var builder = new DbContextOptionsBuilder<SqlServerDbContext>();
             builder.UseSqlServer(connectionString, x => x.MigrationsAssembly("DataAccess"));

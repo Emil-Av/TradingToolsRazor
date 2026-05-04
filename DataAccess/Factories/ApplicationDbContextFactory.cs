@@ -20,9 +20,18 @@ namespace DataAccess.Factories
                 .Build();
 
             var provider = configuration["DatabaseProvider"] ?? "SqlServer";
-            var connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? configuration.GetSection("ConnectionStrings")["DefaultConnection"]
-                ?? throw new InvalidOperationException("DefaultConnection string is missing.");
+            
+            string connectionString;
+            if (provider.Equals("PostgreSQL", StringComparison.OrdinalIgnoreCase))
+            {
+                connectionString = configuration.GetConnectionString("PostgreSqlConnection")
+                    ?? throw new InvalidOperationException("PostgreSqlConnection string is missing.");
+            }
+            else
+            {
+                connectionString = configuration.GetConnectionString("SqlServerConnection")
+                    ?? throw new InvalidOperationException("SqlServerConnection string is missing.");
+            }
 
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
 

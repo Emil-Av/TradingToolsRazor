@@ -135,23 +135,25 @@ static void AddServices(WebApplicationBuilder builder)
 
 static void ConfigureDatabase(WebApplicationBuilder builder)
 {
-    // Configure database based on environment
     var dbProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? throw new InvalidOperationException("DefaultConnection string is missing.");
-
-    // Register the base ApplicationDbContext for runtime use
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    
+    string connectionString;
+    if (dbProvider.Equals("PostgreSQL", StringComparison.OrdinalIgnoreCase))
     {
-        if (dbProvider.Equals("PostgreSQL", StringComparison.OrdinalIgnoreCase))
-        {
-            options.UseNpgsql(connectionString, x => x.MigrationsAssembly("DataAccess"));
-        }
-        else
-        {
-            options.UseSqlServer(connectionString, x => x.MigrationsAssembly("DataAccess"));
-        }
-    });
+        connectionString = builder.Configuration.GetConnectionString("PostgreSqlConnection")
+            ?? throw new InvalidOperationException("PostgreSqlConnection string is missing.");
+        
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(connectionString, x => x.MigrationsAssembly("DataAccess")));
+    }
+    else
+    {
+        connectionString = builder.Configuration.GetConnectionString("SqlServerConnection")
+            ?? throw new InvalidOperationException("SqlServerConnection string is missing.");
+        
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(connectionString, x => x.MigrationsAssembly("DataAccess")));
+    }
 }
 
 static void ConfigureIdentity(WebApplicationBuilder builder)

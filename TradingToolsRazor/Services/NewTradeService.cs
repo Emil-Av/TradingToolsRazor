@@ -225,7 +225,7 @@ namespace TradingToolsRazor.Services
                         .Distinct()
                         .Count(),
 
-                SampleSizeType.Trade =>
+                SampleSizeType.Trade or SampleSizeType.DemoTrading =>
                     (await _unitOfWork.BaseTrade.GetAllAsync(x => x.SampleSizeId == sampleSize.Id)).Count,
 
                 _ => 0

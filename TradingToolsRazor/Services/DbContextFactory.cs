@@ -30,8 +30,7 @@ namespace TradingToolsRazor.Services
         private PostgreSqlDbContext CreatePostgreSqlContext()
         {
             var connectionString = _configuration.GetConnectionString("PostgreSqlConnection")
-                ?? _configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("PostgreSQL connection string is missing.");
+                ?? throw new InvalidOperationException("PostgreSqlConnection string is missing.");
 
             var options = new DbContextOptionsBuilder<PostgreSqlDbContext>()
                 .UseNpgsql(connectionString, x => x.MigrationsAssembly("DataAccess"))
@@ -43,8 +42,7 @@ namespace TradingToolsRazor.Services
         private SqlServerDbContext CreateSqlServerContext()
         {
             var connectionString = _configuration.GetConnectionString("SqlServerConnection")
-                ?? _configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("SQL Server connection string is missing.");
+                ?? throw new InvalidOperationException("SqlServerConnection string is missing.");
 
             var options = new DbContextOptionsBuilder<SqlServerDbContext>()
                 .UseSqlServer(connectionString, x => x.MigrationsAssembly("DataAccess"))

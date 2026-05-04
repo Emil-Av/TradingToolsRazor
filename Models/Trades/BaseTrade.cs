@@ -9,7 +9,7 @@ namespace Models.Trades
     {
         public BaseTrade()
         {
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
         }
 
         public int Id { get; set; }
