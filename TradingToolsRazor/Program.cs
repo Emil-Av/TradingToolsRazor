@@ -49,15 +49,22 @@ app.UseExceptionHandler("/Error");
 // Status code pages middleware BEFORE authentication/authorization
 app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
 
-// Redirect the root URL to Login page
-app.MapGet("/", () => Results.Redirect("/Account/Login"));
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Redirect the root URL based on authentication status
+app.MapGet("/", (HttpContext context) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        return Results.Redirect("/Home");
+    }
+    return Results.Redirect("/Account/Login");
+});
 
 app.MapRazorPages();
 
@@ -112,7 +119,8 @@ static void AddServices(WebApplicationBuilder builder)
     builder.Services.ConfigureApplicationCookie(options =>
     {
         options.Cookie.HttpOnly = true;
-        options.ExpireTimeSpan = TimeSpan.FromDays(365); // Cookie expires after 1 year
+        options.Cookie.IsEssential = true;
+        options.ExpireTimeSpan = TimeSpan.FromDays(30); // Cookie expires after 30 days when RememberMe is checked
         options.SlidingExpiration = true; // Renew cookie on activity
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";

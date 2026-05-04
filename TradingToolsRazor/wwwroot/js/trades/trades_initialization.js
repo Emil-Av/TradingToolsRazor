@@ -33,7 +33,6 @@ function initializeEventHandlers() {
     $('#btnNext').on('click', handleNextClick);
     $('#btnPrev').on('click', handlePrevClick);
     $('#tradeNumberInput').on('keypress', handleTradeNumberInput);
-    $(document).on('keydown', handleKeyboardNavigation);
 }
 
 function initializeMenuButtons() {

@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Calculator\" />
     <Folder Include="wwwroot\ScreenshotsDev\" />
     <Folder Include="wwwroot\Screenshots\Research\ResearchCradle\" />
     <Folder Include="wwwroot\vendor\" />

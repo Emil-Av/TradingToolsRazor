@@ -19,10 +19,13 @@ function showTradingDataContent() {
 
 function showJournalContent() {
     currentTabSelector = '#pre';
-    // Ensure the Pre tab is active when showing journal content
-    $('#pre').addClass('show active').siblings('.tab-pane').removeClass('show active');
-    $('#pre-tab').addClass('active').attr('aria-selected', 'true')
-        .siblings('.nav-link').removeClass('active').attr('aria-selected', 'false');
+    // Reset all journal tab panes first
+    $('#journalTabContent .tab-pane').removeClass('show active');
+    // Activate the Pre tab pane
+    $('#pre').addClass('show active');
+    // Reset and activate the Pre tab button
+    $('#journalTabHeaders .nav-link').removeClass('active').attr('aria-selected', 'false');
+    $('#pre-tab').addClass('active').attr('aria-selected', 'true');
 
     $('#journalTabHeaders').removeClass('d-none');
     $('#journalTabContent').removeClass('d-none');
@@ -51,6 +54,14 @@ function showResearchContent() {
 
 function showReviewContent() {
     currentTabSelector = '#first';
+    // Reset all review tab panes first
+    $('#reviewTabContent .tab-pane').removeClass('show active');
+    // Activate the First tab pane
+    $('#first').addClass('show active');
+    // Reset and activate the First tab button
+    $('#reviewTabHeaders .nav-link').removeClass('active').attr('aria-selected', 'false');
+    $('#first-tab').addClass('active').attr('aria-selected', 'true');
+
     $('#reviewTabHeaders').removeClass('d-none');
     $('#reviewTabContent').removeClass('d-none');
     $('#journalTabHeaders').addClass('d-none');

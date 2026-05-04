@@ -134,18 +134,6 @@ function handleTradeNumberInput(event) {
     }
 }
 
-// Event handler when the left or the right arrow is pressed. Displays the trade accordingly.
-function handleKeyboardNavigation(event) {
-    // Left arrow key pressed
-    if (event.which === 37) {
-        showPrevTrade(-1);
-    }
-    // Right arrow key pressed
-    else if (event.which === 39) {
-        showNextTrade(1);
-    }
-}
-
 // Handle changes to menu select dropdowns
 function handleMenuSelectChange(selectId, selectedValue, selectedText) {
     switch (selectId) {

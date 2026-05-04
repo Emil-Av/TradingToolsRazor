@@ -38,8 +38,13 @@ function loadTradeData() {
 }
 
 function loadReview() {
-    // Activate the 'First' tab
-    $('#first-tab').trigger('click');
+    // Reset all review tab panes
+    $('#reviewTabContent .tab-pane').removeClass('show active');
+    // Activate the 'First' tab pane
+    $('#first').addClass('show active');
+    // Reset and activate the 'First' tab button
+    $('#reviewTabHeaders .nav-link').removeClass('active').attr('aria-selected', 'false');
+    $('#first-tab').addClass('active').attr('aria-selected', 'true');
 
     const review = tradesViewModel.tradesVM.currentSampleSize.review;
 

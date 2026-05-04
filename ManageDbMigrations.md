@@ -10,9 +10,9 @@ Update-Database -Context SqlServerDbContext
 ### Postgre Update Database
 Update-Database -Context PostgreSqlDbContext
 
-### Change environment variable and update database
+### Change environment variable and update database: VPSProd, LocalProdProfile, DevProfile
+$env:ASPNETCORE_ENVIRONMENT="VPSProd" 
 
-# Environment variables: VPSProd, LocalProdProfile, DevProfile
-
-$env:ASPNETCORE_ENVIRONMENT="VPSProd"
-Update-Database -Context SqlServerDbContext
+### VPS Postgre DB
+user: emil
+password: Fragile1012!
