@@ -36,6 +36,8 @@ namespace DataAccess.Data
 
         public DbSet<BrunchBreak> BrunchBreak { get; set; }
 
+        public DbSet<Espresso> Espresso { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -51,6 +53,7 @@ namespace DataAccess.Data
             modelBuilder.Entity<ResearchCandleBracketing>().ToTable("ResearchCandleBracketing");
             modelBuilder.Entity<SRS>().ToTable("SRS");
             modelBuilder.Entity<BrunchBreak>().ToTable("BrunchBreak");
+            modelBuilder.Entity<Espresso>().ToTable("Espresso");
 
             // Configure the primary key inheritance (TPT) - derived -> BaseTrade (shared PK)
             modelBuilder.Entity<Trade>()
@@ -87,6 +90,12 @@ namespace DataAccess.Data
                 .HasOne<BaseTrade>()
                 .WithOne()
                 .HasForeignKey<BrunchBreak>(t => t.Id)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Espresso>()
+                .HasOne<BaseTrade>()
+                .WithOne()
+                .HasForeignKey<Espresso>(t => t.Id)
                 .OnDelete(DeleteBehavior.NoAction);
 
 

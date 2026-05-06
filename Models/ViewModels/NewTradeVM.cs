@@ -56,6 +56,8 @@ namespace Models.ViewModels
         public SRS SRSTrade { get; set; }
 
         public BrunchBreak BrunchBreakTrade { get; set; }
+
+        public Espresso EspressoTrade { get; set; }
         public SampleSizeViewData SampleSizeViewData { get; set; }
 
         public TradesVM TradesVM { get; set; }
@@ -69,7 +71,7 @@ namespace Models.ViewModels
             try
             {
                 SampleSizeViewData = JsonConvert.DeserializeObject<SampleSizeViewData>(sampleSizeViewData)!;
-                
+
                 switch (SampleSizeViewData.Strategy)
                 {
                     case Strategy.SRS:
@@ -78,6 +80,11 @@ namespace Models.ViewModels
                     case Strategy.BrunchBreak:
                         BrunchBreakTrade = JsonConvert.DeserializeObject<BrunchBreak>(viewData)!;
                         break;
+                    case Strategy.Espresso:
+                        EspressoTrade = JsonConvert.DeserializeObject<Espresso>(viewData)!;
+                        break;
+                    default:
+                        throw new ArgumentException($"Unknown strategy: {SampleSizeViewData.Strategy}");
                 }
             }
             catch (Exception ex)
@@ -119,6 +126,7 @@ namespace Models.ViewModels
                 Strategy.Cradle => JsonConvert.DeserializeObject<ResearchCradle>(researchData)!,
                 Strategy.CandleBracketing => JsonConvert.DeserializeObject<ResearchCandleBracketing>(researchData)!,
                 Strategy.SRS => JsonConvert.DeserializeObject<SRS>(researchData)!,
+                Strategy.Espresso => JsonConvert.DeserializeObject<Espresso>(researchData)!,
                 _ => throw new ArgumentException($"Unknown strategy: {SampleSizeViewData.Strategy}")
             };
         }

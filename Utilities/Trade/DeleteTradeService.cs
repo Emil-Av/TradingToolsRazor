@@ -55,8 +55,18 @@ namespace Utilities.Trade
             {
                 Strategy.SRS => await RemoveSRSTrade(id),
                 Strategy.BrunchBreak => await RemoveBrunchBreakTrade(id),
+                Strategy.Espresso => await RemoveEspressoTrade(id),
                 _ => new()
             };
+        }
+
+        private async Task<Espresso> RemoveEspressoTrade(int id)
+        {
+            Espresso? trade = await _unitOfWork.Espresso.GetAsync(trade => trade.Id == id) ?? throw new ArgumentException($"Failed to find trade with id {id}");
+            _unitOfWork.Espresso.Remove(trade);
+            await _unitOfWork.SaveAsync();
+
+            return trade;
         }
 
         private async Task<BrunchBreak> RemoveBrunchBreakTrade(int id)

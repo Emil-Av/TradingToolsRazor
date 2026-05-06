@@ -65,8 +65,29 @@ namespace TradingToolsRazor.Services
                 case Strategy.BrunchBreak:
                     await SaveBrunchBreak();
                     break;
+                case Strategy.Espresso:
+                    await SaveEspresso();
+                    break;
                 default:
                     throw new ArgumentException("Unknown strategy");
+            }
+        }
+
+        private async Task SaveEspresso()
+        {
+            try
+            {
+                var (sampleSizeId, isFull) = await ProcessSampleSize(maxTradesProSampleSize: 20, _viewModel.EspressoTrade.IsFlippedTheSwitch);
+                _viewModel.EspressoTrade.SampleSizeId = sampleSizeId;
+                _viewModel.EspressoTrade.JournalId = await CreateJournal();
+                _viewModel.EspressoTrade.ScreenshotsUrls = await ScreenshotsService.SaveFilesAsync(_webHostEnvironment.WebRootPath, _viewModel, _viewModel.EspressoTrade, _files, isFull);
+
+                _unitOfWork.Espresso.Add(_viewModel.EspressoTrade);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in NewTradeService.SaveEspresso(): {ex.Message}");
             }
         }
 

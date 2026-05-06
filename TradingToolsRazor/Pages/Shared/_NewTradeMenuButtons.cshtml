@@ -19,7 +19,7 @@
         <option value="" selected disabled>Strategy: </option>
         @foreach (Strategy strategy in Enum.GetValues(typeof(Strategy)))
         {
-            if (strategy == Strategy.FirstBarPullback || strategy == Strategy.CandleBracketing)
+            if (strategy != Strategy.SRS && strategy != Strategy.Espresso)
             {
                 continue;
             }
@@ -39,14 +39,3 @@
         }
     </select>
 </div>
-
-@* <!-- Menu Order Type -->
-<div class="col-auto p-2">
-    <select class="select-dropdown-styled" id="selectOrderType" data-menu-type="orderType">
-        <option value="" selected disabled>Order Type: </option>
-        @foreach (EOrderType orderType in Enum.GetValues(typeof(EOrderType)))
-        {
-            <option value="@((int)orderType)">Order Type: @MyEnumConverter.OrderTypeFromEnum(orderType)</option>
-        }
-    </select>
-</div> *@

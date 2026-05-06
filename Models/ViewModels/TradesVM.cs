@@ -40,6 +40,7 @@ namespace Models.ViewModels
         public SRS SRSTrade { get; set; }
 
         public BrunchBreak BrunchBreakTrade { get; set; }
+        public Espresso? EspressoTrade { get; set; }
 
         public TradeDisplay TradeData { get; set; }
 
@@ -58,6 +59,5 @@ namespace Models.ViewModels
         public List<SelectListItem> TradeRatingOptions { get; set; }
 
         public EStatus DefaultTradeStatus { get; set; } = EStatus.All;
-
     }
 }

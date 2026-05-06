@@ -123,7 +123,18 @@ namespace TradingToolsRazor.Services
                 case Strategy.BrunchBreak:
                     await UpdateBrunchBreakResearchData(updateResearchData);
                     break;
+
+                case Strategy.Espresso:
+                    await UpdateEspressoResearchData(updateResearchData);
+                    break;
             }
+        }
+
+        private async Task UpdateEspressoResearchData(UpdateResearchDataModel updateResearchData)
+        {
+            Espresso espresso = JsonConvert.DeserializeObject<Espresso>(updateResearchData.Data!)!;
+            await _unitOfWork.Espresso.UpdateAsync(espresso);
+            await _unitOfWork.SaveAsync();
         }
 
         private async Task UpdateBrunchBreakResearchData(UpdateResearchDataModel updateResearchData)
@@ -199,9 +210,22 @@ namespace TradingToolsRazor.Services
                 case Strategy.BrunchBreak:
                     await SetBrunchBreakCurrentTrade();
                     break;
+
+                case Strategy.Espresso:
+                    await SetEspressoCurrentTrade();
+                    break;
                 default:
                     throw new ArgumentException($"Strategy {_tradesVM.CurrentSampleSize.Strategy.ToString()} not implemented in {nameof(TradesService)}.{nameof(SetCurrentTrade)}");
             }
+        }
+
+        private async Task SetEspressoCurrentTrade()
+        {
+            _tradesVM.AllTradesInSampleSize = [.. (await _unitOfWork.Espresso.GetAllAsync(trade => trade.SampleSizeId == _tradesVM.CurrentSampleSize.Id,
+                                                                                            includeProperties: "Journal")).OrderBy(t => t.Id).Cast<object>()];
+
+            _tradesVM.CurrentTrade = _tradesVM.AllTradesInSampleSize.Last() as BaseTrade;
+            _tradesVM.EspressoTrade = _tradesVM.AllTradesInSampleSize.Last() as Espresso;
         }
 
         private async Task SetBrunchBreakCurrentTrade()

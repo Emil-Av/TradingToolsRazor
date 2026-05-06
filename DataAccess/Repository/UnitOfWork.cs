@@ -32,6 +32,8 @@ namespace DataAccess.Repository
 
         public IBrunchBreakRepository BrunchBreak { get; private set; }
 
+        public IEspressoRepository Espresso { get; private set; }
+
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -45,6 +47,7 @@ namespace DataAccess.Repository
             ResearchCandleBracketing = new ResearchCandleBracketingRepository(_db);
             SRS = new SRSRepository(_db);
             BrunchBreak = new BrunchBreakRepository(_db);
+            Espresso = new EspressoRepository(_db);
         }
 
         public async Task SaveAsync()

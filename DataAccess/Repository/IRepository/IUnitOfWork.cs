@@ -28,6 +28,8 @@ namespace DataAccess.Repository.IRepository
 
         IBrunchBreakRepository BrunchBreak { get; }
 
+        IEspressoRepository Espresso { get; }
+
         Task SaveAsync();
     }
 }

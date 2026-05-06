@@ -81,7 +81,7 @@ function loadTradeByIndex(tradeNumber) {
         // Load the trade data into the UI
         loadTradeDataLocally(trade);
         
-        if (getStrategy() === STRATEGY.SRS) {
+        if (getStrategy() === STRATEGY.SRS || getStrategy() === STRATEGY.ESPRESSO) {
             loadResearchDataLocally(trade);
         }
         
@@ -123,7 +123,7 @@ function loadTradeDataLocally(trade) {
 
 // Load research data for SRS trades
 function loadResearchDataLocally(trade) {
-    // Load SRS research data fields (all properties PascalCase)
+    // Load SRS and Espresso research data fields (all properties PascalCase)
     if (trade.CandleType !== null && trade.CandleType !== undefined) {
         $('#InputCandleType').val(trade.CandleType);
     }

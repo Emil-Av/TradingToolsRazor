@@ -157,7 +157,8 @@ namespace Shared
                 { "First Bar Pullback", Strategy.FirstBarPullback },
                 { "Candle Bracketing", Strategy.CandleBracketing },
                 { "SRS", Strategy.SRS },
-                { "BrunchBreak", Strategy.BrunchBreak }
+                { "BrunchBreak", Strategy.BrunchBreak },
+                { "Espresso", Strategy.Espresso }
             };
 
             try
@@ -178,7 +179,8 @@ namespace Shared
                 { Strategy.FirstBarPullback, "First Bar Pullback" },
                 { Strategy.CandleBracketing, "Candle Bracketing" },
                 { Strategy.SRS, "SRS" },
-                { Strategy.BrunchBreak, "BrunchBreak" }
+                { Strategy.BrunchBreak, "BrunchBreak" },
+                { Strategy.Espresso, "Espresso" }
             };
 
             return strategies[strategy];

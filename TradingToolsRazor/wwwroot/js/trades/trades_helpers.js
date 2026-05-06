@@ -148,7 +148,7 @@ function getReviewData() {
 function getResearchData() {
     let researchData = {};
 
-    if (getStrategy() === STRATEGY.SRS || getStrategy() === STRATEGY.BRUNCH_BREAK) {
+    if (getStrategy() === STRATEGY.SRS || getStrategy() === STRATEGY.BRUNCH_BREAK || getStrategy() === STRATEGY.ESPRESSO) {
         // Collect all research data fields to ensure all properties are included in the update
         $('#cardBody [data-research-data]').each(function () {
             var bindProperty = $(this).data('research-data');

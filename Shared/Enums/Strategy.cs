@@ -5,6 +5,7 @@
         Cradle = 1,
         CandleBracketing = 2,
         SRS = 3,
-        BrunchBreak = 4
+        BrunchBreak = 4,
+        Espresso = 5
     }
 }

@@ -79,6 +79,12 @@
                         @await Html.PartialAsync("_ResearchSRSData", Model.TradesVM.SRSTrade)
                     </div>
                 }
+                else if (Model.TradesVM.CurrentSampleSize.Strategy == Strategy.Espresso)
+                {
+                    <div id="researchTabContent" class="d-none">
+                        @await Html.PartialAsync("_ResearchEspressoData", Model.TradesVM.EspressoTrade)
+                    </div>
+                }
                 else if (Model.TradesVM.CurrentSampleSize.Strategy == Strategy.BrunchBreak)
                 {
                     <div id="researchTabContent" class="d-none">

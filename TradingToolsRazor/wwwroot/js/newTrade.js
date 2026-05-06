@@ -24,7 +24,8 @@
         FirstBarPullback: "First Bar Pullback",
         CandleBracketing: "Candle Bracketing",
         SRS: "SRS",
-        BrunchBreak: "BrunchBreak"
+        BrunchBreak: "BrunchBreak",
+        Espresso: "Espresso"
     };
 
     // Helper function to extract value after colon and trim
@@ -61,7 +62,20 @@
             else if (selectedText == strategies.BrunchBreak) {
                 ShowBrunchBreakPartialView();
             }
+            else if (selectedText == strategies.Espresso) {
+                ShowEspressoPartialView();
+            }
         }
+    }
+
+    function ShowEspressoPartialView() {
+        $('#researchEspressoData').removeClass('d-none');
+
+        $('#researchBrunchBreakData').addClass('d-none');
+        $('#researchSRSData').addClass('d-none');
+        $('#researchCandleBracketingData').addClass('d-none');
+        $('#researchCradleData').addClass('d-none');
+        $('#researchFirstBarPullbackData').addClass('d-none');
     }
 
     function ShowBrunchBreakPartialView() {
@@ -131,6 +145,7 @@
             $('#researchCandleBracketingData').addClass('d-none');
             $('#researchSRSData').addClass('d-none');
             $('#researchBrunchBreakData').addClass('d-none');
+            $('#researchEspressoData').addClass('d-none');
 
         }
         // Display Research Partial View
@@ -153,6 +168,10 @@
             }
             else if (selectedStrategy == strategies.BrunchBreak) {
                 ShowBrunchBreakPartialView();
+                $('#tradeData').addClass('d-none');
+            }
+            else if (selectedStrategy == strategies.Espresso) {
+                ShowEspressoPartialView();
                 $('#tradeData').addClass('d-none');
             }
         }
@@ -179,7 +198,7 @@
     $('#btnSave').on('click', function () {
         if (validateNumberInputs()) {
             var selectedStrategy = getSelectValue('#selectStrategy');
-            if (selectedStrategy == strategies.SRS || selectedStrategy == strategies.BrunchBreak) {
+            if (selectedStrategy == strategies.SRS || selectedStrategy == strategies.BrunchBreak || selectedStrategy == strategies.Espresso) {
                 if (ValidateMenuButtonsAndScreenshots()) {
                     saveTrade();
                 }
@@ -384,6 +403,12 @@
         else if (selectedStrategy == strategies.BrunchBreak) {
             $('#cardBody [data-research-brunchbreak]').each(function () {
                 var bindProperty = $(this).data('research-brunchbreak');
+                researchData[bindProperty] = $(this).val();
+            });
+        }
+        else if (selectedStrategy == strategies.Espresso) {
+            $('#cardBody [data-research-espresso]').each(function () {
+                var bindProperty = $(this).data('research-espresso');
                 researchData[bindProperty] = $(this).val();
             });
         }
