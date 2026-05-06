@@ -85,6 +85,7 @@
         $('#researchCandleBracketingData').addClass('d-none');
         $('#researchCradleData').addClass('d-none');
         $('#researchFirstBarPullbackData').addClass('d-none');
+        $('#researchEspressoData').addClass('d-none');
     }
 
     function ShowSRSPartialView() {
@@ -94,6 +95,7 @@
         $('#researchCradleData').addClass('d-none');
         $('#researchFirstBarPullbackData').addClass('d-none');
         $('#researchBrunchBreakData').addClass('d-none');
+        $('#researchEspressoData').addClass('d-none');
     }
 
     function ShowCandleBracketingPartialView() {
@@ -102,6 +104,7 @@
         $('#researchFirstBarPullbackData').addClass('d-none');
         $('#researchSRSData').addClass('d-none');
         $('#researchBrunchBreakData').addClass('d-none');
+        $('#researchEspressoData').addClass('d-none');
     }
 
     function ShowResearchCradlePartialView() {
@@ -111,6 +114,7 @@
         $('#researchCandleBracketingData').addClass('d-none');
         $('#researchSRSData').addClass('d-none');
         $('#researchBrunchBreakData').addClass('d-none');
+        $('#researchEspressoData').addClass('d-none');
     }
 
     function ShowFirstBarPullbackPartialView() {
@@ -119,6 +123,7 @@
         $('#researchCradleData').addClass('d-none');
         $('#researchCandleBracketingData').addClass('d-none');
         $('#researchSRSData').addClass('d-none');
+        $('#researchEspressoData').addClass('d-none');
         $('#researchBrunchBreakData').addClass('d-none');
     }
 
@@ -286,12 +291,30 @@
     }
 
     function saveTrade() {
-        // Collect all data-trade-data values into a viewData object
+        // Collect all data-research-data values into viewData object (visible partial only)
         var dataViewData = {};
+        $('#cardBody [data-research-data]:visible').each(function () {
+            var bindProperty = $(this).data('research-data');
+            var value = $(this).val();
+
+            if (bindProperty === 'CandleType') {
+                dataViewData[bindProperty] = value !== null && value !== undefined && value !== '' ? parseInt(value) : null;
+            } else if (value === "true") {
+                dataViewData[bindProperty] = true;
+            } else if (value === "false") {
+                dataViewData[bindProperty] = false;
+            } else if (value === "") {
+                dataViewData[bindProperty] = null;
+            } else {
+                dataViewData[bindProperty] = value;
+            }
+        });
+
+        // Collect all data-trade-data values and merge into viewData object
         $('#cardBody [data-trade-data]').each(function () {
             var bindProperty = $(this).data('trade-data');
             var value = $(this).val();
-            
+
             // Handle empty values
             if (value === "") {
                 dataViewData[bindProperty] = null;
