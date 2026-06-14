@@ -46,7 +46,10 @@ namespace TradingToolsRazor.Services
 
         public async Task<TradesVM> LoadStrategyAsync(Strategy strategy, SampleSizeType sampleSizeType)
         {
-            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.SampleSizeType == sampleSizeType, includeProperties: "Review");
+            _allSampleSizes = [.. (await _unitOfWork.SampleSize
+                .GetAllAsync(sampleSize => sampleSize.SampleSizeType == sampleSizeType, includeProperties: "Review"))
+                .OrderBy(sampleSize => sampleSize.Id)];
+
             if (!_allSampleSizes.Any())
             {
                 await InitializeTradesViewModelAsync();
