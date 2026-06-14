@@ -60,10 +60,10 @@ namespace TradingToolsRazor.Services
 
         public async Task<TradesVM> LoadTimeFrameAsync(TradesLoadTimeFrameRequestModel requestModel)
         {
-            _allSampleSizes = await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == requestModel.Strategy &&
+            _allSampleSizes = [.. (await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.Strategy == requestModel.Strategy &&
                                                                                      sampleSize.SampleSizeType == requestModel.SampleSizeType &&
-                                                                                     sampleSize.TimeFrame == requestModel.TimeFrame, 
-                                                                                     includeProperties: "Review");
+                                                                                     sampleSize.TimeFrame == requestModel.TimeFrame,
+                                                                                     includeProperties: "Review")).OrderBy(sampleSize => sampleSize.Id)];
 
             if (!_allSampleSizes.Any())
             {
@@ -170,7 +170,9 @@ namespace TradingToolsRazor.Services
 
         private async Task<List<SampleSize>> GetAllSampleSizes()
         { 
-            return [.. await _unitOfWork.SampleSize.GetAllAsync(sampleSize => sampleSize.SampleSizeType != SampleSizeType.Research, includeProperties: "Review")];
+            return [.. (await _unitOfWork.SampleSize
+                .GetAllAsync(sampleSize => sampleSize.SampleSizeType != SampleSizeType.Research, includeProperties: "Review")
+                ).OrderBy(sampleSize => sampleSize.Id)];
         }
 
         private async Task SetViewModel(Strategy strategy)

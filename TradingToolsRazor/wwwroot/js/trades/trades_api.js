@@ -65,7 +65,7 @@ function loadStrategy(strategy) {
 
 function loadTimeFrame() {
     const request = getTradesLoadTimeFrameRequest();
-    window.location.href = `/trades?handler=LoadTimeFrame&strategy=${request.Strategy}&sampleSizeType=${request.SampleSizeType}&timeFrame=${request.TimeFrame}`;
+    window.location.href = `/trades?handler=LoadTimeFrameAsync&strategy=${request.Strategy}&sampleSizeType=${request.SampleSizeType}&timeFrame=${request.TimeFrame}`;
 }
 
 function loadSampleSize(sampleSizeId) {
@@ -78,7 +78,7 @@ function deleteTrade() {
     sendPostRequest('/trades?handler=DeleteTrade', deleteTradeRequest)
         .then(data => {
             handleApiResponse(data);
-            window.location.href = '/Trades';
+            window.location.href = '/trades';
         })
         .catch(error => handleApiError('Error updating review', error));
 }
