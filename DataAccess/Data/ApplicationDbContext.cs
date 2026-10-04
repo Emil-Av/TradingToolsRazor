@@ -38,6 +38,16 @@ namespace DataAccess.Data
 
         public DbSet<Espresso> Espresso { get; set; }
 
+        public DbSet<TradeAddOn> TradeAddOns { get; set; }
+
+        public DbSet<InstrumentSpread> InstrumentSpreads { get; set; }
+
+        public DbSet<AccountSetting> AccountSettings { get; set; }
+
+        public DbSet<EquityReset> EquityResets { get; set; }
+
+        public DbSet<AppPreference> AppPreferences { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -105,6 +115,19 @@ namespace DataAccess.Data
                 .WithMany()
                 .HasForeignKey(b => b.SampleSizeId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // Add-ons belong to their trade: deleting the trade deletes them.
+            modelBuilder.Entity<TradeAddOn>().ToTable("TradeAddOns");
+            modelBuilder.Entity<BaseTrade>()
+                .HasMany(b => b.AddOns)
+                .WithOne()
+                .HasForeignKey(a => a.BaseTradeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Settings: one spread per instrument, one account amount per account.
+            modelBuilder.Entity<InstrumentSpread>().HasIndex(s => s.Symbol).IsUnique();
+            modelBuilder.Entity<AccountSetting>().HasIndex(a => a.AccountType).IsUnique();
+            modelBuilder.Entity<EquityReset>().HasIndex(r => new { r.AccountType, r.ResetAt });
         }
 
         private void ConfigureScreenshots(ModelBuilder modelBuilder)

@@ -154,6 +154,44 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Models.AccountSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("AccountAmount")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("AccountType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountType")
+                        .IsUnique();
+
+                    b.ToTable("AccountSettings");
+                });
+
+            modelBuilder.Entity("Models.AppPreference", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DefaultAccount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppPreferences");
+                });
+
             modelBuilder.Entity("Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -219,6 +257,56 @@ namespace DataAccess.MigrationsPostgreSQL
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Models.EquityReset", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountType")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("PreviousStartingBalance")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("ResetAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("StartingBalance")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountType", "ResetAt");
+
+                    b.ToTable("EquityResets");
+                });
+
+            modelBuilder.Entity("Models.InstrumentSpread", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Spread")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Symbol")
+                        .IsUnique();
+
+                    b.ToTable("InstrumentSpreads");
                 });
 
             modelBuilder.Entity("Models.Journal", b =>
@@ -366,6 +454,39 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.ToTable("BaseTrades", (string)null);
 
                     b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("Models.Trades.TradeAddOn", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BaseTradeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("EntryPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("ExitPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("PnL")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("Volume")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BaseTradeId");
+
+                    b.ToTable("TradeAddOns", (string)null);
                 });
 
             modelBuilder.Entity("Models.UserSettings", b =>
@@ -683,6 +804,15 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.Navigation("SampleSize");
                 });
 
+            modelBuilder.Entity("Models.Trades.TradeAddOn", b =>
+                {
+                    b.HasOne("Models.Trades.BaseTrade", null)
+                        .WithMany("AddOns")
+                        .HasForeignKey("BaseTradeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Models.Trades.BrunchBreak", b =>
                 {
                     b.HasOne("Models.Trades.BaseTrade", null)
@@ -750,6 +880,11 @@ namespace DataAccess.MigrationsPostgreSQL
                         .HasForeignKey("ResearchId");
 
                     b.Navigation("Research");
+                });
+
+            modelBuilder.Entity("Models.Trades.BaseTrade", b =>
+                {
+                    b.Navigation("AddOns");
                 });
 #pragma warning restore 612, 618
         }

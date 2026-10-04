@@ -50,5 +50,8 @@ namespace Models.Trades
 
         [ForeignKey(nameof(JournalId))]
         public Journal? Journal { get; set; }
+
+        /// <summary>Positions added while the trade was open, in the order they were added (by Id).</summary>
+        public List<TradeAddOn> AddOns { get; set; } = new();
     }
 }
