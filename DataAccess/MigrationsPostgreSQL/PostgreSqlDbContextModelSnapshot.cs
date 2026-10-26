@@ -389,6 +389,66 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.ToTable("SampleSizes");
                 });
 
+            modelBuilder.Entity("Models.Tom.TomStream", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Date");
+
+                    b.ToTable("TomStreams");
+                });
+
+            modelBuilder.Entity("Models.Tom.TomTrade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScreenshotsUrls")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("TomStreamId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("VideoSeconds")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TomStreamId");
+
+                    b.ToTable("TomTrades");
+                });
+
             modelBuilder.Entity("Models.Trades.BaseTrade", b =>
                 {
                     b.Property<int>("Id")
@@ -787,6 +847,15 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.Navigation("Review");
                 });
 
+            modelBuilder.Entity("Models.Tom.TomTrade", b =>
+                {
+                    b.HasOne("Models.Tom.TomStream", null)
+                        .WithMany("Trades")
+                        .HasForeignKey("TomStreamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Models.Trades.BaseTrade", b =>
                 {
                     b.HasOne("Models.Journal", "Journal")
@@ -880,6 +949,11 @@ namespace DataAccess.MigrationsPostgreSQL
                         .HasForeignKey("ResearchId");
 
                     b.Navigation("Research");
+                });
+
+            modelBuilder.Entity("Models.Tom.TomStream", b =>
+                {
+                    b.Navigation("Trades");
                 });
 
             modelBuilder.Entity("Models.Trades.BaseTrade", b =>

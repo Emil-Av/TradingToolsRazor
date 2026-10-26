@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Models;
+using Models.Tom;
 using Models.Trades;
 using Models.ViewModels;
 using System.Linq;
@@ -47,6 +48,10 @@ namespace DataAccess.Data
         public DbSet<EquityReset> EquityResets { get; set; }
 
         public DbSet<AppPreference> AppPreferences { get; set; }
+
+        public DbSet<TomStream> TomStreams { get; set; }
+
+        public DbSet<TomTrade> TomTrades { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -128,16 +133,31 @@ namespace DataAccess.Data
             modelBuilder.Entity<InstrumentSpread>().HasIndex(s => s.Symbol).IsUnique();
             modelBuilder.Entity<AccountSetting>().HasIndex(a => a.AccountType).IsUnique();
             modelBuilder.Entity<EquityReset>().HasIndex(r => new { r.AccountType, r.ResetAt });
+
+            // Tom: the streams of Tom and Andi and the trades they took in them; a stream's trades go with it.
+            modelBuilder.Entity<TomStream>()
+                .HasMany(s => s.Trades)
+                .WithOne()
+                .HasForeignKey(t => t.TomStreamId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<TomStream>().HasIndex(s => s.Date);
         }
 
         private void ConfigureScreenshots(ModelBuilder modelBuilder)
+        {
+            ConfigureScreenshotList<BaseTrade>(modelBuilder, b => b.ScreenshotsUrls);
+            ConfigureScreenshotList<TomTrade>(modelBuilder, t => t.ScreenshotsUrls);
+        }
+
+        private void ConfigureScreenshotList<TEntity>(ModelBuilder modelBuilder, System.Linq.Expressions.Expression<Func<TEntity, List<string>?>> property)
+            where TEntity : class
         {
             var providerName = Database.ProviderName;
 
             if (providerName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true)
             {
-                var propertyBuilder = modelBuilder.Entity<BaseTrade>()
-                    .Property(b => b.ScreenshotsUrls)
+                var propertyBuilder = modelBuilder.Entity<TEntity>()
+                    .Property(property)
                     .HasColumnType("jsonb")
                     .HasConversion(
                         v => JsonSerializer.Serialize(v ?? new List<string>(), (JsonSerializerOptions)null),
@@ -155,8 +175,8 @@ namespace DataAccess.Data
             }
             else
             {
-                modelBuilder.Entity<BaseTrade>()
-                    .PrimitiveCollection(b => b.ScreenshotsUrls);
+                modelBuilder.Entity<TEntity>()
+                    .PrimitiveCollection(property);
             }
         }
     }
