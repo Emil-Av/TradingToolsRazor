@@ -406,8 +406,14 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
+                    b.Property<int?>("Session")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .HasColumnType("text");
+
+                    b.Property<int?>("Trader")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Url")
                         .HasColumnType("text");

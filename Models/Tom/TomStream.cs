@@ -18,7 +18,13 @@ namespace Models.Tom
         /// <summary>The link to the video.</summary>
         public string? Url { get; set; }
 
-        /// <summary>An optional short title, e.g. "DAX open".</summary>
+        /// <summary>The session of the stream; null for a stream added before sessions were recorded.</summary>
+        public TomSession? Session { get; set; }
+
+        /// <summary>Who trades in it; null for a stream added before traders were recorded.</summary>
+        public TomTrader? Trader { get; set; }
+
+        /// <summary>Replaced by <see cref="Session"/> and <see cref="Trader"/>: no longer edited, kept so nothing typed before is lost.</summary>
         public string? Title { get; set; }
 
         /// <summary>General notes for the whole stream (HTML from the rich text editor), shown with every trade.</summary>
