@@ -32,7 +32,10 @@ namespace Utilities.Trade
                 await DeleteReview(reviewId);
             }
 
-            await UpdateScreenshotPathsAfterDeletion(removedTrade.ScreenshotsUrls!.First(), tradesInSampleSize, webRootPath);
+            // Only trades from before the screenshots moved into the database have files in the Screenshots folder.
+            // Their screenshots in the database went with the trade (cascade).
+            if (removedTrade.ScreenshotsUrls is { Count: > 0 } oldPaths)
+                await UpdateScreenshotPathsAfterDeletion(oldPaths[0], tradesInSampleSize, webRootPath);
         }
 
         private async Task DeleteJournal(int? journalId)

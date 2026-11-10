@@ -37,7 +37,14 @@ namespace Models.Trades
 
         public EOutcome Outcome { get; set; }   
 
+        /// <summary>
+        /// The old screenshot paths under wwwroot, from before the screenshots moved into the database. Kept as they
+        /// were; no longer written.
+        /// </summary>
         public List<string>? ScreenshotsUrls { get; set; }
+
+        /// <summary>The screenshots (without their images); in carousel order once sorted by Position.</summary>
+        public List<Models.Screenshots.Screenshot> Screenshots { get; set; } = new();
 
         public DateTime CreatedAt { get; set; }
 

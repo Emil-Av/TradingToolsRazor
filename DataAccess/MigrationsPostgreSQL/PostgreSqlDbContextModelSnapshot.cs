@@ -389,6 +389,83 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.ToTable("SampleSizes");
                 });
 
+            modelBuilder.Entity("Models.Screenshots.Screenshot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BaseTradeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LegacyPath")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TomTradeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BaseTradeId", "Position")
+                        .IsUnique();
+
+                    b.HasIndex("TomTradeId", "Position")
+                        .IsUnique();
+
+                    b.ToTable("Screenshots", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Screenshots_OneOwner", "(\"BaseTradeId\" IS NULL) <> (\"TomTradeId\" IS NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("Models.Screenshots.ScreenshotContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScreenshotContents", (string)null);
+                });
+
+            modelBuilder.Entity("Models.Screenshots.ScreenshotImport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Imported")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ImportedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Missing")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScreenshotImports", (string)null);
+                });
+
             modelBuilder.Entity("Models.Tom.TomStream", b =>
                 {
                     b.Property<int>("Id")
@@ -853,6 +930,28 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.Navigation("Review");
                 });
 
+            modelBuilder.Entity("Models.Screenshots.Screenshot", b =>
+                {
+                    b.HasOne("Models.Trades.BaseTrade", null)
+                        .WithMany("Screenshots")
+                        .HasForeignKey("BaseTradeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Models.Tom.TomTrade", null)
+                        .WithMany("Screenshots")
+                        .HasForeignKey("TomTradeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Models.Screenshots.ScreenshotContent", b =>
+                {
+                    b.HasOne("Models.Screenshots.Screenshot", null)
+                        .WithOne("Content")
+                        .HasForeignKey("Models.Screenshots.ScreenshotContent", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Models.Tom.TomTrade", b =>
                 {
                     b.HasOne("Models.Tom.TomStream", null)
@@ -957,14 +1056,26 @@ namespace DataAccess.MigrationsPostgreSQL
                     b.Navigation("Research");
                 });
 
+            modelBuilder.Entity("Models.Screenshots.Screenshot", b =>
+                {
+                    b.Navigation("Content");
+                });
+
             modelBuilder.Entity("Models.Tom.TomStream", b =>
                 {
                     b.Navigation("Trades");
                 });
 
+            modelBuilder.Entity("Models.Tom.TomTrade", b =>
+                {
+                    b.Navigation("Screenshots");
+                });
+
             modelBuilder.Entity("Models.Trades.BaseTrade", b =>
                 {
                     b.Navigation("AddOns");
+
+                    b.Navigation("Screenshots");
                 });
 #pragma warning restore 612, 618
         }

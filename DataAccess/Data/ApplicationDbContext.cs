@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Models;
+using Models.Screenshots;
 using Models.Tom;
 using Models.Trades;
 using Models.ViewModels;
@@ -52,6 +53,12 @@ namespace DataAccess.Data
         public DbSet<TomStream> TomStreams { get; set; }
 
         public DbSet<TomTrade> TomTrades { get; set; }
+
+        public DbSet<Screenshot> Screenshots { get; set; }
+
+        public DbSet<ScreenshotContent> ScreenshotContents { get; set; }
+
+        public DbSet<ScreenshotImport> ScreenshotImports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -141,6 +148,50 @@ namespace DataAccess.Data
                 .HasForeignKey(t => t.TomStreamId)
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<TomStream>().HasIndex(s => s.Date);
+
+            ConfigureScreenshotTables(modelBuilder);
+        }
+
+        /// <summary>
+        /// Screenshots in the database: the metadata (owner, position, file name) in Screenshots, the image in
+        /// ScreenshotContents with the same Id. Each screenshot belongs to exactly one trade - of the journal or a
+        /// Tom trade - and is deleted with it, its content with it.
+        /// </summary>
+        private static void ConfigureScreenshotTables(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Screenshot>(screenshot =>
+            {
+                screenshot.ToTable("Screenshots", t => t.HasCheckConstraint(
+                    "CK_Screenshots_OneOwner", "(\"BaseTradeId\" IS NULL) <> (\"TomTradeId\" IS NULL)"));
+                screenshot.Property(s => s.FileName).IsRequired();
+                screenshot.HasIndex(s => new { s.BaseTradeId, s.Position }).IsUnique();
+                screenshot.HasIndex(s => new { s.TomTradeId, s.Position }).IsUnique();
+                screenshot.HasOne(s => s.Content)
+                    .WithOne()
+                    .HasForeignKey<ScreenshotContent>(c => c.Id)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ScreenshotContent>(content =>
+            {
+                content.ToTable("ScreenshotContents");
+                content.Property(c => c.Id).ValueGeneratedNever();
+                content.Property(c => c.Data).IsRequired();
+            });
+
+            modelBuilder.Entity<BaseTrade>()
+                .HasMany(b => b.Screenshots)
+                .WithOne()
+                .HasForeignKey(s => s.BaseTradeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TomTrade>()
+                .HasMany(t => t.Screenshots)
+                .WithOne()
+                .HasForeignKey(s => s.TomTradeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ScreenshotImport>().ToTable("ScreenshotImports");
         }
 
         private void ConfigureScreenshots(ModelBuilder modelBuilder)

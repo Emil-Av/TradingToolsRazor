@@ -21,8 +21,14 @@ namespace Models.Tom
         /// <summary>Where in the video the trade is, in seconds from the start; null when not set.</summary>
         public int? VideoSeconds { get; set; }
 
-        /// <summary>The screenshots, as paths under wwwroot ("Screenshots/Tom/..."), in the order they're shown.</summary>
+        /// <summary>
+        /// The old screenshot paths under wwwroot ("Screenshots/Tom/..."), from before the screenshots moved into the
+        /// database. Kept as they were; no longer written.
+        /// </summary>
         public List<string>? ScreenshotsUrls { get; set; } = [];
+
+        /// <summary>The screenshots (without their images); in carousel order once sorted by Position.</summary>
+        public List<Models.Screenshots.Screenshot> Screenshots { get; set; } = [];
 
         public DateTime CreatedAt { get; set; }
     }
